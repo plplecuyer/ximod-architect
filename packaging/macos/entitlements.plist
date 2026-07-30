@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!--
+      Entitlements minimales pour une app "Developer ID" avec Hardened Runtime.
+      XIMOD Architect n'a besoin d'aucune capacité particulière (pas de sandbox
+      App Store, pas de JIT, pas d'accès réseau privilégié).
+
+      Si, après notarisation, l'app refuse de se lancer avec une erreur de
+      "library validation", décommentez la clé ci-dessous :
+
+      <key>com.apple.security.cs.disable-library-validation</key>
+      <true/>
+    -->
+</dict>
+</plist>

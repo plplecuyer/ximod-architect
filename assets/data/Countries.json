@@ -1,0 +1,3503 @@
+{
+  "countries": [
+    {
+      "a3": "ZAF",
+      "flag": "ZAF.svg",
+      "languages": [
+        {
+          "countryEndonym": "iRiphabhuliki yaseNingizimu Afrika",
+          "iso639_3": "zul"
+        },
+        {
+          "countryEndonym": "iRiphabliki yoMzantsi Afrika",
+          "iso639_3": "xho"
+        },
+        {
+          "countryEndonym": "Republiek van Suid-Afrika",
+          "iso639_3": "afr"
+        },
+        {
+          "countryEndonym": "Repabliki ya Afrika Borwa",
+          "iso639_3": "nso"
+        },
+        {
+          "countryEndonym": "Republic of South Africa",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "Rephaboliki ya Aforika Borwa",
+          "iso639_3": "tsn"
+        },
+        {
+          "countryEndonym": "Rephaboliki ya Afrika Borwa",
+          "iso639_3": "sot"
+        },
+        {
+          "countryEndonym": "Riphabliki ra Afrika Dzonga",
+          "iso639_3": "tso"
+        },
+        {
+          "countryEndonym": "iRiphabhulikhi yeNingizimu Afrika",
+          "iso639_3": "ssw"
+        },
+        {
+          "countryEndonym": "Riphabuḽiki ya Afurika Tshipembe",
+          "iso639_3": "ven"
+        },
+        {
+          "countryEndonym": "iRiphabliki yeSewula Afrika",
+          "iso639_3": "nbl"
+        }
+      ],
+      "nameEn": "Republic of South Africa",
+      "nameFr": "Afrique du Sud"
+    },
+    {
+      "a3": "AIA",
+      "flag": "AIA.svg",
+      "languages": [
+        {
+          "countryEndonym": "Anguilla",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Anguilla",
+      "nameFr": "Anguilla"
+    },
+    {
+      "a3": "ATG",
+      "flag": "ATG.svg",
+      "languages": [
+        {
+          "countryEndonym": "Antigua and Barbuda",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Antigua and Barbuda",
+      "nameFr": "Antigua-et-Barbuda"
+    },
+    {
+      "a3": "ABW",
+      "flag": "ABW.svg",
+      "languages": [
+        {
+          "countryEndonym": "Aruba",
+          "iso639_3": "pap"
+        },
+        {
+          "countryEndonym": "Aruba",
+          "iso639_3": "nld"
+        }
+      ],
+      "nameEn": "Country of Aruba",
+      "nameFr": "Aruba"
+    },
+    {
+      "a3": "AUT",
+      "flag": "AUT.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republik Österreich",
+          "iso639_3": "deu"
+        }
+      ],
+      "nameEn": "Republic of Austria",
+      "nameFr": "Autriche"
+    },
+    {
+      "a3": "JEY",
+      "flag": "JEY.svg",
+      "languages": [
+        {
+          "countryEndonym": "Bailiwick of Jersey",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Bailiwick of Jersey",
+      "nameFr": "Bailliage de Jersey"
+    },
+    {
+      "a3": "BRB",
+      "flag": "BRB.svg",
+      "languages": [
+        {
+          "countryEndonym": "Barbados",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Barbados",
+      "nameFr": "Barbade"
+    },
+    {
+      "a3": "BLZ",
+      "flag": "BLZ.svg",
+      "languages": [
+        {
+          "countryEndonym": "Belize",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Belize",
+      "nameFr": "Belize"
+    },
+    {
+      "a3": "BMU",
+      "flag": "BMU.svg",
+      "languages": [
+        {
+          "countryEndonym": "Bermuda",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Bermuda",
+      "nameFr": "Bermudes"
+    },
+    {
+      "a3": "BIH",
+      "flag": "BIH.svg",
+      "languages": [
+        {
+          "countryEndonym": "Bosna i Hercegovina",
+          "iso639_3": "bos"
+        }
+      ],
+      "nameEn": "Bosnia and Herzegovina",
+      "nameFr": "Bosnie-Herzégovine"
+    },
+    {
+      "a3": "BWA",
+      "flag": "BWA.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republic of Botswana",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Republic of Botswana",
+      "nameFr": "Botswana"
+    },
+    {
+      "a3": "BRN",
+      "flag": "BRN.svg",
+      "languages": [
+        {
+          "countryEndonym": "بروني دارالسلام",
+          "iso639_3": "msa"
+        }
+      ],
+      "nameEn": "Brunei Darussalam",
+      "nameFr": "Brunei Darussalam"
+    },
+    {
+      "a3": "BFA",
+      "flag": "BFA.svg",
+      "languages": [
+        {
+          "countryEndonym": "Burkĩna Faso",
+          "iso639_3": "mos"
+        },
+        {
+          "countryEndonym": "ߓߙߎߞߌߣߊ߫ ߝߊ߬ߛߏ߫",
+          "iso639_3": "dyu"
+        },
+        {
+          "countryEndonym": "𞤄𞤵𞤪𞤳𞤭𞤲𞤢 𞤊𞤢𞤧𞤮𞥅",
+          "iso639_3": "ful"
+        }
+      ],
+      "nameEn": "Burkina Faso",
+      "nameFr": "Burkina Faso"
+    },
+    {
+      "a3": "CAN",
+      "flag": "CAN.svg",
+      "languages": [
+        {
+          "countryEndonym": "Canada",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "Canada",
+          "iso639_3": "fra"
+        }
+      ],
+      "nameEn": "Canada",
+      "nameFr": "Canada"
+    },
+    {
+      "a3": "AUS",
+      "flag": "AUS.svg",
+      "languages": [
+        {
+          "countryEndonym": "Commonwealth of Australia",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Commonwealth of Australia",
+      "nameFr": "Commonwealth d'Australie"
+    },
+    {
+      "a3": "DMA",
+      "flag": "DMA.svg",
+      "languages": [
+        {
+          "countryEndonym": "Commonwealth of Dominica",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Commonwealth of Dominica",
+      "nameFr": "Commonwealth de la Dominique"
+    },
+    {
+      "a3": "BHS",
+      "flag": "BHS.svg",
+      "languages": [
+        {
+          "countryEndonym": "Commonwealth of the Bahamas",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Commonwealth of The Bahamas",
+      "nameFr": "Commonwealth des Bahamas"
+    },
+    {
+      "a3": "MNP",
+      "flag": "MNP.svg",
+      "languages": [
+        {
+          "countryEndonym": "Commonwealth of the Northern Mariana Islands",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Commonwealth of the Northern Mariana Islands",
+      "nameFr": "Commonwealth des Îles Mariannes du Nord"
+    },
+    {
+      "a3": "CHE",
+      "flag": "CHE.svg",
+      "languages": [
+        {
+          "countryEndonym": "Schweizerische Eidgenossenschaft",
+          "iso639_3": "deu"
+        },
+        {
+          "countryEndonym": "Confédération suisse",
+          "iso639_3": "fra"
+        },
+        {
+          "countryEndonym": "Confederazione Svizzera",
+          "iso639_3": "ita"
+        },
+        {
+          "countryEndonym": "Confederaziun svizra",
+          "iso639_3": "roh"
+        }
+      ],
+      "nameEn": "Swiss Confederation",
+      "nameFr": "Confédération suisse"
+    },
+    {
+      "a3": "CUW",
+      "flag": "CUW.svg",
+      "languages": [
+        {
+          "countryEndonym": "Curaçao",
+          "iso639_3": "nld"
+        },
+        {
+          "countryEndonym": "Kòrsou",
+          "iso639_3": "pap"
+        },
+        {
+          "countryEndonym": "Country of Curaçao",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Country of Curaçao",
+      "nameFr": "Curaçao"
+    },
+    {
+      "a3": "RUS",
+      "flag": "RUS.svg",
+      "languages": [
+        {
+          "countryEndonym": "Российская Федерация",
+          "iso639_3": "rus"
+        }
+      ],
+      "nameEn": "Russian Federation",
+      "nameFr": "Fédération de Russie"
+    },
+    {
+      "a3": "KNA",
+      "flag": "KNA.svg",
+      "languages": [
+        {
+          "countryEndonym": "Federation of Saint Kitts and Nevis",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Federation of Saint Kitts and Nevis",
+      "nameFr": "Fédération de Saint-Christophe-et-Niévès"
+    },
+    {
+      "a3": "GIB",
+      "flag": "GIB.svg",
+      "languages": [
+        {
+          "countryEndonym": "Gibraltar",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Gibraltar",
+      "nameFr": "Gibraltar"
+    },
+    {
+      "a3": "LUX",
+      "flag": "LUX.svg",
+      "languages": [
+        {
+          "countryEndonym": "Groussherzogtum Lëtzebuerg",
+          "iso639_3": "ltz"
+        }
+      ],
+      "nameEn": "Grand Duchy of Luxembourg",
+      "nameFr": "Grand-Duché de Luxembourg"
+    },
+    {
+      "a3": "GRD",
+      "flag": "GRD.svg",
+      "languages": [
+        {
+          "countryEndonym": "Grenada",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Grenada",
+      "nameFr": "Grenade"
+    },
+    {
+      "a3": "GRL",
+      "flag": "GRL.svg",
+      "languages": [
+        {
+          "countryEndonym": "Kalaallit Nunaat",
+          "iso639_3": "kal"
+        },
+        {
+          "countryEndonym": "Grønland",
+          "iso639_3": "dan"
+        }
+      ],
+      "nameEn": "Greenland",
+      "nameFr": "Groenland"
+    },
+    {
+      "a3": "GRC",
+      "flag": "GRC.svg",
+      "languages": [
+        {
+          "countryEndonym": "Ελληνική Δημοκρατία",
+          "iso639_3": "ell"
+        }
+      ],
+      "nameEn": "Hellenic Republic",
+      "nameFr": "Grèce"
+    },
+    {
+      "a3": "GLP",
+      "flag": "GLP.svg",
+      "languages": [
+        {
+          "countryEndonym": "Guadeloupe",
+          "iso639_3": "fra"
+        },
+        {
+          "countryEndonym": "Gwadloup",
+          "iso639_3": "gcf"
+        }
+      ],
+      "nameEn": "Guadeloupe",
+      "nameFr": "Guadeloupe"
+    },
+    {
+      "a3": "GUM",
+      "flag": "GUM.svg",
+      "languages": [
+        {
+          "countryEndonym": "Guam",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "Guåhån",
+          "iso639_3": "cha"
+        }
+      ],
+      "nameEn": "Guam",
+      "nameFr": "Guam"
+    },
+    {
+      "a3": "GGY",
+      "flag": "GGY.svg",
+      "languages": [
+        {
+          "countryEndonym": "Guernsey",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Guernsey",
+      "nameFr": "Guernesey"
+    },
+    {
+      "a3": "GNQ",
+      "flag": "GNQ.svg",
+      "languages": [
+        {
+          "countryEndonym": "República de Guiena ecuatorial",
+          "iso639_3": "spa"
+        },
+        {
+          "countryEndonym": "République de Guinée équatoriale",
+          "iso639_3": "fra"
+        },
+        {
+          "countryEndonym": "República da Guiné Equatorial",
+          "iso639_3": "por"
+        }
+      ],
+      "nameEn": "Republic of Equatorial Guinea",
+      "nameFr": "Guinée équatoriale"
+    },
+    {
+      "a3": "GUF",
+      "flag": "GUF.svg",
+      "languages": [
+        {
+          "countryEndonym": "Guyane",
+          "iso639_3": "fra"
+        },
+        {
+          "countryEndonym": "Lagwiyann",
+          "iso639_3": "gcr"
+        }
+      ],
+      "nameEn": "French Guiana",
+      "nameFr": "Guyane"
+    },
+    {
+      "a3": "GEO",
+      "flag": "GEO.svg",
+      "languages": [
+        {
+          "countryEndonym": "საქართველო",
+          "iso639_3": "kat"
+        }
+      ],
+      "nameEn": "Georgia",
+      "nameFr": "Géorgie"
+    },
+    {
+      "a3": "SGS",
+      "flag": "SGS.svg",
+      "languages": [
+        {
+          "countryEndonym": "South Georgia and the South Sandwich Islands",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "South Georgia and the South Sandwich Islands",
+      "nameFr": "Géorgie du Sud et les Îles Sandwich du Sud"
+    },
+    {
+      "a3": "HKG",
+      "flag": "HKG.svg",
+      "languages": [
+        {
+          "countryEndonym": "Hong Kong",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "香港",
+          "iso639_3": "zho"
+        }
+      ],
+      "nameEn": "Hong Kong",
+      "nameFr": "Hong Kong"
+    },
+    {
+      "a3": "HUN",
+      "flag": "HUN.svg",
+      "languages": [
+        {
+          "countryEndonym": "Magyarország",
+          "iso639_3": "hun"
+        }
+      ],
+      "nameEn": "Hungary",
+      "nameFr": "Hongrie"
+    },
+    {
+      "a3": "IRL",
+      "flag": "IRL.svg",
+      "languages": [
+        {
+          "countryEndonym": "Éire",
+          "iso639_3": "gle"
+        },
+        {
+          "countryEndonym": "Republic of Ireland",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Irlande",
+      "nameFr": "Irlande"
+    },
+    {
+      "a3": "ISL",
+      "flag": "ISL.svg",
+      "languages": [
+        {
+          "countryEndonym": "Ísland",
+          "iso639_3": "isl"
+        }
+      ],
+      "nameEn": "Iceland",
+      "nameFr": "Islande"
+    },
+    {
+      "a3": "JAM",
+      "flag": "JAM.svg",
+      "languages": [
+        {
+          "countryEndonym": "Jamaica",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "Jumieka",
+          "iso639_3": "jam"
+        }
+      ],
+      "nameEn": "Jamaica",
+      "nameFr": "Jamaïque"
+    },
+    {
+      "a3": "JPN",
+      "flag": "JPN.svg",
+      "languages": [
+        {
+          "countryEndonym": "日本",
+          "iso639_3": "jpn"
+        }
+      ],
+      "nameEn": "Japan",
+      "nameFr": "Japon"
+    },
+    {
+      "a3": "REU",
+      "flag": "REU.svg",
+      "languages": [
+        {
+          "countryEndonym": "La Réunion",
+          "iso639_3": "fra"
+        },
+        {
+          "countryEndonym": "Rényon",
+          "iso639_3": "rcf"
+        }
+      ],
+      "nameEn": "Réunion",
+      "nameFr": "La Réunion"
+    },
+    {
+      "a3": "MAC",
+      "flag": "MAC.svg",
+      "languages": [
+        {
+          "countryEndonym": "中華人民共和國澳門特別行政區",
+          "iso639_3": "zho"
+        },
+        {
+          "countryEndonym": "Macau",
+          "iso639_3": "por"
+        }
+      ],
+      "nameEn": "Macau",
+      "nameFr": "Macao"
+    },
+    {
+      "a3": "MYS",
+      "flag": "MYS.svg",
+      "languages": [
+        {
+          "countryEndonym": "برسکوتو برتمبه موتو",
+          "iso639_3": "zsm"
+        }
+      ],
+      "nameEn": "Malaysia",
+      "nameFr": "Malaisie"
+    },
+    {
+      "a3": "MTQ",
+      "flag": "MTQ.svg",
+      "languages": [
+        {
+          "countryEndonym": "Martinique",
+          "iso639_3": "fra"
+        },
+        {
+          "countryEndonym": "Matinik",
+          "iso639_3": "gcf"
+        }
+      ],
+      "nameEn": "Martinique",
+      "nameFr": "Martinique"
+    },
+    {
+      "a3": "MYT",
+      "flag": "MYT.svg",
+      "languages": [
+        {
+          "countryEndonym": "Mayotte",
+          "iso639_3": "fra"
+        }
+      ],
+      "nameEn": "Mayotte",
+      "nameFr": "Mayotte"
+    },
+    {
+      "a3": "MNG",
+      "flag": "MNG.svg",
+      "languages": [
+        {
+          "countryEndonym": "Монгол Улс",
+          "iso639_3": "mon"
+        }
+      ],
+      "nameEn": "Mongolia",
+      "nameFr": "Mongolie"
+    },
+    {
+      "a3": "MSR",
+      "flag": "MSR.svg",
+      "languages": [
+        {
+          "countryEndonym": "Montserrat",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Montserrat",
+      "nameFr": "Montserrat (Antilles)"
+    },
+    {
+      "a3": "MNE",
+      "flag": "MNE.svg",
+      "languages": [
+        {
+          "countryEndonym": "Црна Гора",
+          "iso639_3": "cnr"
+        }
+      ],
+      "nameEn": "Montenegro",
+      "nameFr": "Monténégro"
+    },
+    {
+      "a3": "NIU",
+      "flag": "NIU.svg",
+      "languages": [
+        {
+          "countryEndonym": "Niue",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "Niuē",
+          "iso639_3": "niu"
+        }
+      ],
+      "nameEn": "Niue",
+      "nameFr": "Niue"
+    },
+    {
+      "a3": "NCL",
+      "flag": "NCL.svg",
+      "languages": [
+        {
+          "countryEndonym": "Nouvelle-Calédonie",
+          "iso639_3": "fra"
+        }
+      ],
+      "nameEn": "New Caledonia",
+      "nameFr": "Nouvelle-Calédonie"
+    },
+    {
+      "a3": "NZL",
+      "flag": "NZL.svg",
+      "languages": [
+        {
+          "countryEndonym": "New Zealand",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "Aotearoa",
+          "iso639_3": "mri"
+        }
+      ],
+      "nameEn": "New Zealand",
+      "nameFr": "Nouvelle-Zélande"
+    },
+    {
+      "a3": "BES",
+      "flag": "BES.svg",
+      "languages": [
+        {
+          "countryEndonym": "Bomar, Saint Eustache And Saba",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "Bomar, San Eustache Y Saba",
+          "iso639_3": "pap"
+        },
+        {
+          "countryEndonym": "Bomar, Saint Eustache En Saba",
+          "iso639_3": "nld"
+        }
+      ],
+      "nameEn": "Caribbean Netherlands",
+      "nameFr": "Pays-Bas caribéens"
+    },
+    {
+      "a3": "PYF",
+      "flag": "PYF.svg",
+      "languages": [
+        {
+          "countryEndonym": "Polynésie française",
+          "iso639_3": "fra"
+        },
+        {
+          "countryEndonym": "Pōrīnetia Farāni",
+          "iso639_3": "tah"
+        }
+      ],
+      "nameEn": "French Polynesia",
+      "nameFr": "Polynésie française"
+    },
+    {
+      "a3": "AND",
+      "flag": "AND.svg",
+      "languages": [
+        {
+          "countryEndonym": "Principat d’Andorra",
+          "iso639_3": "cat"
+        }
+      ],
+      "nameEn": "Principality of Andorra",
+      "nameFr": "Principauté d'Andorre"
+    },
+    {
+      "a3": "MCO",
+      "flag": "MCO.svg",
+      "languages": [
+        {
+          "countryEndonym": "Principauté de Monaco",
+          "iso639_3": "fra"
+        },
+        {
+          "countryEndonym": "Principatu de Mu̍negu",
+          "iso639_3": "lij"
+        }
+      ],
+      "nameEn": "Principality of Monaco",
+      "nameFr": "Principauté de Monaco"
+    },
+    {
+      "a3": "LIE",
+      "flag": "LIE.svg",
+      "languages": [
+        {
+          "countryEndonym": "Fürstentum Liechtenstein",
+          "iso639_3": "deu"
+        }
+      ],
+      "nameEn": "Principality of Liechtenstein",
+      "nameFr": "Principauté du Liechtenstein"
+    },
+    {
+      "a3": "ROU",
+      "flag": "ROU.svg",
+      "languages": [
+        {
+          "countryEndonym": "România",
+          "iso639_3": "ron"
+        }
+      ],
+      "nameEn": "Romania",
+      "nameFr": "Roumanie"
+    },
+    {
+      "a3": "SAU",
+      "flag": "SAU.svg",
+      "languages": [
+        {
+          "countryEndonym": "المملكة العربية السعودية",
+          "iso639_3": "ara"
+        }
+      ],
+      "nameEn": "Kingdom of Saudi Arabia",
+      "nameFr": "Royaume d'Arabie saoudite"
+    },
+    {
+      "a3": "ESP",
+      "flag": "ESP.svg",
+      "languages": [
+        {
+          "countryEndonym": "Reino de España",
+          "iso639_3": "spa"
+        }
+      ],
+      "nameEn": "Kingdom of Spain",
+      "nameFr": "Royaume d'Espagne"
+    },
+    {
+      "a3": "BHR",
+      "flag": "BHR.svg",
+      "languages": [
+        {
+          "countryEndonym": "مَمْلَكَةُ ٱلْبَحْرَيْن",
+          "iso639_3": "ara"
+        }
+      ],
+      "nameEn": "Kingdom of Bahrain",
+      "nameFr": "Royaume de Bahreïn"
+    },
+    {
+      "a3": "BEL",
+      "flag": "BEL.svg",
+      "languages": [
+        {
+          "countryEndonym": "Königreich Belgien",
+          "iso639_3": "deu"
+        },
+        {
+          "countryEndonym": "Royaume de Belgique",
+          "iso639_3": "fra"
+        },
+        {
+          "countryEndonym": "Koninkrijk België",
+          "iso639_3": "nld"
+        }
+      ],
+      "nameEn": "Kingdom of Belgium",
+      "nameFr": "Royaume de Belgique"
+    },
+    {
+      "a3": "DNK",
+      "flag": "DNK.svg",
+      "languages": [
+        {
+          "countryEndonym": "Kongeriget Danmark",
+          "iso639_3": "dan"
+        },
+        {
+          "countryEndonym": "Kongsríki Danmarkar",
+          "iso639_3": "fao"
+        },
+        {
+          "countryEndonym": "Kunngeqarfik Danmarki",
+          "iso639_3": "kal"
+        }
+      ],
+      "nameEn": "Kingdom of Denmark",
+      "nameFr": "Royaume de Danemark"
+    },
+    {
+      "a3": "NOR",
+      "flag": "NOR.svg",
+      "languages": [
+        {
+          "countryEndonym": "Norge",
+          "iso639_3": "nor"
+        },
+        {
+          "countryEndonym": "Kongeriket Norge",
+          "iso639_3": "nob"
+        },
+        {
+          "countryEndonym": "Kongeriket Noreg",
+          "iso639_3": "nno"
+        },
+        {
+          "countryEndonym": "Kongeriket Noreg",
+          "iso639_3": "sme"
+        }
+      ],
+      "nameEn": "Kingdom of Norway",
+      "nameFr": "Royaume de Norvège"
+    },
+    {
+      "a3": "SWE",
+      "flag": "SWE.svg",
+      "languages": [
+        {
+          "countryEndonym": "Konungariket Sverige",
+          "iso639_3": "swe"
+        }
+      ],
+      "nameEn": "Kingdom of Sweden",
+      "nameFr": "Royaume de Suède"
+    },
+    {
+      "a3": "THA",
+      "flag": "THA.svg",
+      "languages": [
+        {
+          "countryEndonym": "ราชอาณาจักรไทย",
+          "iso639_3": "tha"
+        }
+      ],
+      "nameEn": "Kingdom of Thailand",
+      "nameFr": "Royaume de Thaïlande"
+    },
+    {
+      "a3": "NLD",
+      "flag": "NLD.svg",
+      "languages": [
+        {
+          "countryEndonym": "Koninkrijk der Nederlanden",
+          "iso639_3": "nld"
+        }
+      ],
+      "nameEn": "Kingdom of the Netherlands",
+      "nameFr": "Royaume des Pays-Bas"
+    },
+    {
+      "a3": "TON",
+      "flag": "TON.svg",
+      "languages": [
+        {
+          "countryEndonym": "Pule'anga Fakatu'i 'o Tonga",
+          "iso639_3": "ton"
+        },
+        {
+          "countryEndonym": "Kingdom of Tonga",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Kingdom of Tonga",
+      "nameFr": "Royaume des Tonga"
+    },
+    {
+      "a3": "BTN",
+      "flag": "BTN.svg",
+      "languages": [
+        {
+          "countryEndonym": "འབྲུག་ཡུལ",
+          "iso639_3": "dzo"
+        }
+      ],
+      "nameEn": "Kingdom of Bhutan",
+      "nameFr": "Royaume du Bhoutan"
+    },
+    {
+      "a3": "KHM",
+      "flag": "KHM.svg",
+      "languages": [
+        {
+          "countryEndonym": "ព្រះរាជាណាចក្រកម្ពុជា",
+          "iso639_3": "khm"
+        }
+      ],
+      "nameEn": "Kingdom of Cambodia",
+      "nameFr": "Royaume du Cambodge"
+    },
+    {
+      "a3": "LSO",
+      "flag": "LSO.svg",
+      "languages": [
+        {
+          "countryEndonym": "Muso oa Lesotho",
+          "iso639_3": "sot"
+        },
+        {
+          "countryEndonym": "Kingdom of Lesotho",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Kingdom of Lesotho",
+      "nameFr": "Royaume du Lesotho"
+    },
+    {
+      "a3": "MAR",
+      "flag": "MAR.svg",
+      "languages": [
+        {
+          "countryEndonym": "المملكة المغربية",
+          "iso639_3": "ara"
+        },
+        {
+          "countryEndonym": "ⵜⴰⴳⵍⴷⵉⵜ ⵏ ⵍⵎⴰⵖⵔⵉⴱ",
+          "iso639_3": "zgh"
+        }
+      ],
+      "nameEn": "Kingdom of Morocco",
+      "nameFr": "Royaume du Maroc"
+    },
+    {
+      "a3": "SWZ",
+      "flag": "SWZ.svg",
+      "languages": [
+        {
+          "countryEndonym": "Umbuso we Swatini",
+          "iso639_3": "ssw"
+        },
+        {
+          "countryEndonym": "Kingdom of Eswatini",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Kingdom of Eswatini",
+      "nameFr": "Royaume d’Eswatini"
+    },
+    {
+      "a3": "JOR",
+      "flag": "JOR.svg",
+      "languages": [
+        {
+          "countryEndonym": "المملكة الأردنّيّة الهاشميّة",
+          "iso639_3": "ara"
+        }
+      ],
+      "nameEn": "Hashemite Kingdom of Jordan",
+      "nameFr": "Royaume hachémite de Jordanie"
+    },
+    {
+      "a3": "GBR",
+      "flag": "GBR.svg",
+      "languages": [
+        {
+          "countryEndonym": "United Kingdom of Great Britain and Northern Ireland",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "United Kingdom of Great Britain and Northern Ireland",
+      "nameFr": "Royaume-Uni de Grande-Bretagne et d'Irlande du Nord"
+    },
+    {
+      "a3": "ALA",
+      "flag": "ALA.svg",
+      "languages": [
+        {
+          "countryEndonym": "Landskapet Åland",
+          "iso639_3": "swe"
+        }
+      ],
+      "nameEn": "Region of Åland",
+      "nameFr": "Région d'Åland"
+    },
+    {
+      "a3": "DZA",
+      "flag": "DZA.svg",
+      "languages": [
+        {
+          "countryEndonym": "ⵜⴰⴳⴷⵓⴷⴰ ⵜⴰⵣⵣⴰⵢⵔⵉⵜ ⵜⴰⵎⴰⴳⴷⴰⵢⵜ ⵜⴰⵖⴻⵔⴼⴰⵏⵜ",
+          "iso639_3": "ara"
+        },
+        {
+          "countryEndonym": "الجمهورية الجزائرية الديمقراطية الشعبية",
+          "iso639_3": "tzm"
+        }
+      ],
+      "nameEn": "People's Democratic Republic of Algeria",
+      "nameFr": "République algérienne démocratique et populaire"
+    },
+    {
+      "a3": "EGY",
+      "flag": "EGY.svg",
+      "languages": [
+        {
+          "countryEndonym": "جمهوريّة مصر العربيّة",
+          "iso639_3": "ara"
+        }
+      ],
+      "nameEn": "Arab Republic of Egypt",
+      "nameFr": "République arabe d'Égypte"
+    },
+    {
+      "a3": "ESH",
+      "flag": "ESH.svg",
+      "languages": [
+        {
+          "countryEndonym": "República Árabe Saharaui Democrática",
+          "iso639_3": "ara"
+        },
+        {
+          "countryEndonym": "الجمهورية العربية الصحراوية الديمقراطية",
+          "iso639_3": "spa"
+        }
+      ],
+      "nameEn": "Sahrawi Arab Democratic Republic",
+      "nameFr": "République arabe sahraouie démocratique"
+    },
+    {
+      "a3": "SYR",
+      "flag": "SYR.svg",
+      "languages": [
+        {
+          "countryEndonym": "الجمهورية العربية السورية",
+          "iso639_3": "ara"
+        }
+      ],
+      "nameEn": "Syrian Arab Republic",
+      "nameFr": "République arabe syrienne"
+    },
+    {
+      "a3": "ARG",
+      "flag": "ARG.svg",
+      "languages": [
+        {
+          "countryEndonym": "República Argentina",
+          "iso639_3": "spa"
+        }
+      ],
+      "nameEn": "Argentine Republic",
+      "nameFr": "République argentine"
+    },
+    {
+      "a3": "VEN",
+      "flag": "VEN.svg",
+      "languages": [
+        {
+          "countryEndonym": "República Bolivariana de Venezuela",
+          "iso639_3": "spa"
+        }
+      ],
+      "nameEn": "Bolivarian Republic of Venezuela",
+      "nameFr": "République bolivarienne du Venezuela"
+    },
+    {
+      "a3": "CAF",
+      "flag": "CAF.svg",
+      "languages": [
+        {
+          "countryEndonym": "République Centrafricaine",
+          "iso639_3": "fra"
+        },
+        {
+          "countryEndonym": "Ködörösêse tî Bêafrîka",
+          "iso639_3": "sag"
+        }
+      ],
+      "nameEn": "Central African Republic",
+      "nameFr": "République Centrafricaine"
+    },
+    {
+      "a3": "GUY",
+      "flag": "GUY.svg",
+      "languages": [
+        {
+          "countryEndonym": "Co-Operative Republic of Guyana",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Co-operative Republic of Guyana",
+      "nameFr": "République coopérative du Guyana"
+    },
+    {
+      "a3": "AGO",
+      "flag": "AGO.svg",
+      "languages": [
+        {
+          "countryEndonym": "República de Angola",
+          "iso639_3": "por"
+        }
+      ],
+      "nameEn": "Republic of Angola",
+      "nameFr": "République d'Angola"
+    },
+    {
+      "a3": "ARM",
+      "flag": "ARM.svg",
+      "languages": [
+        {
+          "countryEndonym": "Հայաստանի Հանրապետություն",
+          "iso639_3": "hye"
+        }
+      ],
+      "nameEn": "Republic of Armenia",
+      "nameFr": "République d'Arménie"
+    },
+    {
+      "a3": "AZE",
+      "flag": "AZE.svg",
+      "languages": [
+        {
+          "countryEndonym": "Azərbaycan Respublikası",
+          "iso639_3": "aze"
+        }
+      ],
+      "nameEn": "Republic of Azerbaijan",
+      "nameFr": "République d'Azerbaïdjan"
+    },
+    {
+      "a3": "EST",
+      "flag": "EST.svg",
+      "languages": [
+        {
+          "countryEndonym": "Eesti Vabariik",
+          "iso639_3": "est"
+        }
+      ],
+      "nameEn": "Republic of Estonia",
+      "nameFr": "République d'Estonie"
+    },
+    {
+      "a3": "HTI",
+      "flag": "HTI.svg",
+      "languages": [
+        {
+          "countryEndonym": "République d’Haïti",
+          "iso639_3": "fra"
+        },
+        {
+          "countryEndonym": "Repiblik Dayiti",
+          "iso639_3": "hat"
+        }
+      ],
+      "nameEn": "Republic of Haiti",
+      "nameFr": "République d'Haïti"
+    },
+    {
+      "a3": "IDN",
+      "flag": "IDN.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republik Indonesia",
+          "iso639_3": "ind"
+        }
+      ],
+      "nameEn": "Republic of Indonesia",
+      "nameFr": "République d'Indonésie"
+    },
+    {
+      "a3": "IRQ",
+      "flag": "IRQ.svg",
+      "languages": [
+        {
+          "countryEndonym": "جمهورية العراق",
+          "iso639_3": "ara"
+        },
+        {
+          "countryEndonym": "كۆماری عێراق",
+          "iso639_3": "kur"
+        }
+      ],
+      "nameEn": "Republic of Iraq",
+      "nameFr": "République d'Irak"
+    },
+    {
+      "a3": "UZB",
+      "flag": "UZB.svg",
+      "languages": [
+        {
+          "countryEndonym": "O’zbekiston Respublikasi",
+          "iso639_3": "uzb"
+        }
+      ],
+      "nameEn": "Republic of Uzbekistan",
+      "nameFr": "République d'Ouzbékistan"
+    },
+    {
+      "a3": "BLR",
+      "flag": "BLR.svg",
+      "languages": [
+        {
+          "countryEndonym": "Рэспубліка Беларусь",
+          "iso639_3": "bel"
+        },
+        {
+          "countryEndonym": "Республика Беларусь",
+          "iso639_3": "rus"
+        }
+      ],
+      "nameEn": "Republic of Belarus",
+      "nameFr": "République de Biélorussie"
+    },
+    {
+      "a3": "BGR",
+      "flag": "BGR.svg",
+      "languages": [
+        {
+          "countryEndonym": "Република България",
+          "iso639_3": "bul"
+        }
+      ],
+      "nameEn": "Republic of Bulgaria",
+      "nameFr": "République de Bulgarie"
+    },
+    {
+      "a3": "TWN",
+      "flag": "TWN.svg",
+      "languages": [
+        {
+          "countryEndonym": "中華民國",
+          "iso639_3": "cmn"
+        }
+      ],
+      "nameEn": "Republic of China",
+      "nameFr": "République de Chine"
+    },
+    {
+      "a3": "CYP",
+      "flag": "CYP.svg",
+      "languages": [
+        {
+          "countryEndonym": "Κυπριακή Δημοκρατία",
+          "iso639_3": "ell"
+        },
+        {
+          "countryEndonym": "Kibris Cumhuriyeti",
+          "iso639_3": "tur"
+        }
+      ],
+      "nameEn": "Republic of Cyprus",
+      "nameFr": "République de Chypre"
+    },
+    {
+      "a3": "COL",
+      "flag": "COL.svg",
+      "languages": [
+        {
+          "countryEndonym": "República de Colombia",
+          "iso639_3": "spa"
+        }
+      ],
+      "nameEn": "Republic of Colombia",
+      "nameFr": "République de Colombie"
+    },
+    {
+      "a3": "KOR",
+      "flag": "KOR.svg",
+      "languages": [
+        {
+          "countryEndonym": "대한민국",
+          "iso639_3": "kor"
+        }
+      ],
+      "nameEn": "Republic of Korea",
+      "nameFr": "République de Corée"
+    },
+    {
+      "a3": "HRV",
+      "flag": "HRV.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republika Hrvatska",
+          "iso639_3": "hrv"
+        }
+      ],
+      "nameEn": "Republic of Croatia",
+      "nameFr": "République de Croatie"
+    },
+    {
+      "a3": "CUB",
+      "flag": "CUB.svg",
+      "languages": [
+        {
+          "countryEndonym": "República de Cuba",
+          "iso639_3": "spa"
+        }
+      ],
+      "nameEn": "Republic of Cuba",
+      "nameFr": "République de Cuba"
+    },
+    {
+      "a3": "CIV",
+      "flag": "CIV.svg",
+      "languages": [
+        {
+          "countryEndonym": "République de Côte d’Ivoire",
+          "iso639_3": "fra"
+        }
+      ],
+      "nameEn": "Republic of Côte d'Ivoire",
+      "nameFr": "République de Côte d’Ivoire"
+    },
+    {
+      "a3": "DJI",
+      "flag": "DJI.svg",
+      "languages": [
+        {
+          "countryEndonym": "République de Djibouti",
+          "iso639_3": "fra"
+        },
+        {
+          "countryEndonym": "جمهورية جيبوتي",
+          "iso639_3": "ara"
+        }
+      ],
+      "nameEn": "Republic of Djibouti",
+      "nameFr": "République de Djibouti"
+    },
+    {
+      "a3": "FIN",
+      "flag": "FIN.svg",
+      "languages": [
+        {
+          "countryEndonym": "Suomen Tasavalta",
+          "iso639_3": "fin"
+        },
+        {
+          "countryEndonym": "Republiken Finland",
+          "iso639_3": "swe"
+        }
+      ],
+      "nameEn": "Republic of Finland",
+      "nameFr": "République de Finlande"
+    },
+    {
+      "a3": "GMB",
+      "flag": "GMB.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republic of Gambia",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Republic of The Gambia",
+      "nameFr": "République de Gambie"
+    },
+    {
+      "a3": "GIN",
+      "flag": "GIN.svg",
+      "languages": [
+        {
+          "countryEndonym": "République de Guinée",
+          "iso639_3": "fra"
+        }
+      ],
+      "nameEn": "Republic of Guinea",
+      "nameFr": "République de Guinée"
+    },
+    {
+      "a3": "GNB",
+      "flag": "GNB.svg",
+      "languages": [
+        {
+          "countryEndonym": "República da Guiné-Bissau",
+          "iso639_3": "por"
+        }
+      ],
+      "nameEn": "Republic of Guinea-Bissau",
+      "nameFr": "République de Guinée-Bissau"
+    },
+    {
+      "a3": "KIR",
+      "flag": "KIR.svg",
+      "languages": [
+        {
+          "countryEndonym": "Kiribati",
+          "iso639_3": "gil"
+        },
+        {
+          "countryEndonym": "Republic of Kiribati",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Republic of Kiribati",
+      "nameFr": "République de Kiribati"
+    },
+    {
+      "a3": "IND",
+      "flag": "IND.svg",
+      "languages": [
+        {
+          "countryEndonym": "भारत गणराज्य",
+          "iso639_3": "hin"
+        },
+        {
+          "countryEndonym": "Republic of India",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Republic of India",
+      "nameFr": "République de l'Inde"
+    },
+    {
+      "a3": "MMR",
+      "flag": "MMR.svg",
+      "languages": [
+        {
+          "countryEndonym": "ပြည်ထောင်စု သမ္မတ မြန်မာနိုင်ငံတော်",
+          "iso639_3": "mya"
+        }
+      ],
+      "nameEn": "Republic of the Union of Myanmar",
+      "nameFr": "République de l'union de Birmanie"
+    },
+    {
+      "a3": "ECU",
+      "flag": "ECU.svg",
+      "languages": [
+        {
+          "countryEndonym": "República del Ecuador",
+          "iso639_3": "spa"
+        },
+        {
+          "countryEndonym": "Ecuadorpi Ripuwlika",
+          "iso639_3": "inb"
+        },
+        {
+          "countryEndonym": "Ekuatur Nunka",
+          "iso639_3": "jiv"
+        }
+      ],
+      "nameEn": "Republic of Ecuador",
+      "nameFr": "République de l'Équateur"
+    },
+    {
+      "a3": "LVA",
+      "flag": "LVA.svg",
+      "languages": [
+        {
+          "countryEndonym": "Latvijas Republika",
+          "iso639_3": "lav"
+        }
+      ],
+      "nameEn": "Republic of Latvia",
+      "nameFr": "République de Lettonie"
+    },
+    {
+      "a3": "LTU",
+      "flag": "LTU.svg",
+      "languages": [
+        {
+          "countryEndonym": "Lietuvos Respublika",
+          "iso639_3": "lit"
+        }
+      ],
+      "nameEn": "Republic of Lithuania",
+      "nameFr": "République de Lituanie"
+    },
+    {
+      "a3": "UGA",
+      "flag": "UGA.svg",
+      "languages": [
+        {
+          "countryEndonym": "Jamhuri ya Uganda",
+          "iso639_3": "swa"
+        },
+        {
+          "countryEndonym": "Republic of Uganda",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Republic of Uganda",
+      "nameFr": "République de l’Ouganda"
+    },
+    {
+      "a3": "MKD",
+      "flag": "MKD.svg",
+      "languages": [
+        {
+          "countryEndonym": "Република Северна Македонија",
+          "iso639_3": "mkd"
+        },
+        {
+          "countryEndonym": "Republika e Maqedonisë së Veriut",
+          "iso639_3": "sqi"
+        }
+      ],
+      "nameEn": "Republic of North Macedonia",
+      "nameFr": "République de Macédoine du Nord"
+    },
+    {
+      "a3": "MDG",
+      "flag": "MDG.svg",
+      "languages": [
+        {
+          "countryEndonym": "Repoblikan'i Madagasikara",
+          "iso639_3": "mlg"
+        },
+        {
+          "countryEndonym": "République de Madagascar",
+          "iso639_3": "fra"
+        }
+      ],
+      "nameEn": "Republic of Madagascar",
+      "nameFr": "République de Madagascar"
+    },
+    {
+      "a3": "MLT",
+      "flag": "MLT.svg",
+      "languages": [
+        {
+          "countryEndonym": "Repubblika ta' Malta",
+          "iso639_3": "mlt"
+        },
+        {
+          "countryEndonym": "Republic of Malta",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Republic of Malta",
+      "nameFr": "République de Malte"
+    },
+    {
+      "a3": "MUS",
+      "flag": "MUS.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republic of Mauritius",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "République de Maurice",
+          "iso639_3": "fra"
+        },
+        {
+          "countryEndonym": "Repiblik Moris",
+          "iso639_3": "mfe"
+        },
+        {
+          "countryEndonym": "मॉरिशस गणराज्य",
+          "iso639_3": "bho"
+        }
+      ],
+      "nameEn": "Republic of Mauritius",
+      "nameFr": "République de Maurice"
+    },
+    {
+      "a3": "MDA",
+      "flag": "MDA.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republica Moldova",
+          "iso639_3": "ron"
+        }
+      ],
+      "nameEn": "Republic of Moldova",
+      "nameFr": "République de Moldavie"
+    },
+    {
+      "a3": "NAM",
+      "flag": "NAM.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republic of Namibia",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Republic of Namibia",
+      "nameFr": "République de Namibie"
+    },
+    {
+      "a3": "NRU",
+      "flag": "NRU.svg",
+      "languages": [
+        {
+          "countryEndonym": "Ripubrikin Naoero",
+          "iso639_3": "nau"
+        },
+        {
+          "countryEndonym": "Republic of Naoero",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Republic of Naoero",
+      "nameFr": "République de Nauru"
+    },
+    {
+      "a3": "POL",
+      "flag": "POL.svg",
+      "languages": [
+        {
+          "countryEndonym": "Rzeczpospolita Polska",
+          "iso639_3": "pol"
+        }
+      ],
+      "nameEn": "Republic of Poland",
+      "nameFr": "République de Pologne"
+    },
+    {
+      "a3": "SMR",
+      "flag": "SMR.svg",
+      "languages": [
+        {
+          "countryEndonym": "Repubblica di San Marino",
+          "iso639_3": "ita"
+        }
+      ],
+      "nameEn": "Republic of San Marino",
+      "nameFr": "République de Saint-Marin"
+    },
+    {
+      "a3": "SRB",
+      "flag": "SRB.svg",
+      "languages": [
+        {
+          "countryEndonym": "Република Сpбија",
+          "iso639_3": "srp"
+        }
+      ],
+      "nameEn": "Republic of Serbia",
+      "nameFr": "République de Serbie"
+    },
+    {
+      "a3": "SLE",
+      "flag": "SLE.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republic of Sierra Leone",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "Salone",
+          "iso639_3": "kri"
+        }
+      ],
+      "nameEn": "Republic of Sierra Leone",
+      "nameFr": "République de Sierra Leone"
+    },
+    {
+      "a3": "SVN",
+      "flag": "SVN.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republika Slovenija",
+          "iso639_3": "slv"
+        },
+        {
+          "countryEndonym": "Repubblica di Slovenia",
+          "iso639_3": "ita"
+        },
+        {
+          "countryEndonym": "Szlovén Köztársaság",
+          "iso639_3": "hun"
+        }
+      ],
+      "nameEn": "Republic of Slovenia",
+      "nameFr": "République de Slovénie"
+    },
+    {
+      "a3": "TTO",
+      "flag": "TTO.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republic of Trinidad and Tobago",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Republic of Trinidad and Tobago",
+      "nameFr": "République de Trinité-et-Tobago"
+    },
+    {
+      "a3": "TUR",
+      "flag": "TUR.svg",
+      "languages": [
+        {
+          "countryEndonym": "Türkiye Cumhuriyeti",
+          "iso639_3": "tur"
+        }
+      ],
+      "nameEn": "Republic of Türkiye",
+      "nameFr": "République de Turquie"
+    },
+    {
+      "a3": "ZMB",
+      "flag": "ZMB.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republic of Zambia",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Republic of Zambia",
+      "nameFr": "République de Zambie"
+    },
+    {
+      "a3": "FJI",
+      "flag": "FJI.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republic of Fiji",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "Matanitu ko Viti",
+          "iso639_3": "fij"
+        },
+        {
+          "countryEndonym": "फ़िजी द्वीप समूह गणराज्य",
+          "iso639_3": "hif"
+        }
+      ],
+      "nameEn": "Republic of Fiji",
+      "nameFr": "République des Fidji"
+    },
+    {
+      "a3": "MDV",
+      "flag": "MDV.svg",
+      "languages": [
+        {
+          "countryEndonym": "ދިވެހިރާއްޖޭގެ ޖުމްހޫރިއްޔާ",
+          "iso639_3": "div"
+        }
+      ],
+      "nameEn": "Republic of Maldives",
+      "nameFr": "République des Maldives"
+    },
+    {
+      "a3": "PLW",
+      "flag": "PLW.svg",
+      "languages": [
+        {
+          "countryEndonym": "Beluu er a Belau",
+          "iso639_3": "pau"
+        },
+        {
+          "countryEndonym": "Republic of Palau",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Republic of Palau",
+      "nameFr": "République des Palaos"
+    },
+    {
+      "a3": "PHL",
+      "flag": "PHL.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republika ng Pilipinas",
+          "iso639_3": "fil"
+        },
+        {
+          "countryEndonym": "Republic of the Philippines",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Republic of the Philippines",
+      "nameFr": "République des Philippines"
+    },
+    {
+      "a3": "SYC",
+      "flag": "SYC.svg",
+      "languages": [
+        {
+          "countryEndonym": "Repiblik Sesel",
+          "iso639_3": "crs"
+        },
+        {
+          "countryEndonym": "Republic of Seychelles",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "République des Seychelles",
+          "iso639_3": "fra"
+        }
+      ],
+      "nameEn": "Republic of Seychelles",
+      "nameFr": "République des Seychelles"
+    },
+    {
+      "a3": "MHL",
+      "flag": "MHL.svg",
+      "languages": [
+        {
+          "countryEndonym": "Aolepān Aorōkin M̧ajeļ",
+          "iso639_3": "mah"
+        },
+        {
+          "countryEndonym": "Republic of the Marshall Islands",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Republic of the Marshall Islands",
+      "nameFr": "République des Îles Marshall"
+    },
+    {
+      "a3": "DOM",
+      "flag": "DOM.svg",
+      "languages": [
+        {
+          "countryEndonym": "República Dominicana",
+          "iso639_3": "spa"
+        }
+      ],
+      "nameEn": "Dominican Republic",
+      "nameFr": "République dominicaine"
+    },
+    {
+      "a3": "BDI",
+      "flag": "BDI.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republique du Burundi",
+          "iso639_3": "fra"
+        },
+        {
+          "countryEndonym": "Republika y’Uburundi",
+          "iso639_3": "run"
+        },
+        {
+          "countryEndonym": "Republic of Burundi",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Republic of Burundi",
+      "nameFr": "République du Burundi"
+    },
+    {
+      "a3": "BEN",
+      "flag": "BEN.svg",
+      "languages": [
+        {
+          "countryEndonym": "République du Bénin",
+          "iso639_3": "fra"
+        }
+      ],
+      "nameEn": "Republic of Benin",
+      "nameFr": "République du Bénin"
+    },
+    {
+      "a3": "CMR",
+      "flag": "CMR.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republique du Cameroun",
+          "iso639_3": "fra"
+        },
+        {
+          "countryEndonym": "Republic of Cameroon",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "Republik Kameruun",
+          "iso639_3": "fuf"
+        },
+        {
+          "countryEndonym": "Repulik Kamerun",
+          "iso639_3": "pbi"
+        },
+        {
+          "countryEndonym": "Jamhuriya Kamerun",
+          "iso639_3": "tbf"
+        }
+      ],
+      "nameEn": "Republic of Cameroon",
+      "nameFr": "République du Cameroun"
+    },
+    {
+      "a3": "CPV",
+      "flag": "CPV.svg",
+      "languages": [
+        {
+          "countryEndonym": "República de Cabo Verde",
+          "iso639_3": "por"
+        },
+        {
+          "countryEndonym": "República de Cabo Verde",
+          "iso639_3": "kea"
+        }
+      ],
+      "nameEn": "Republic of Cabo Verde",
+      "nameFr": "République du Cap-Vert"
+    },
+    {
+      "a3": "CHL",
+      "flag": "CHL.svg",
+      "languages": [
+        {
+          "countryEndonym": "República de Chile",
+          "iso639_3": "spa"
+        }
+      ],
+      "nameEn": "Republic of Chile",
+      "nameFr": "République du Chili"
+    },
+    {
+      "a3": "COG",
+      "flag": "COG.svg",
+      "languages": [
+        {
+          "countryEndonym": "République du Congo",
+          "iso639_3": "fra"
+        },
+        {
+          "countryEndonym": "Repubilika ya Kongo",
+          "iso639_3": "mkw"
+        },
+        {
+          "countryEndonym": "Republiki ya Kongó",
+          "iso639_3": "lin"
+        }
+      ],
+      "nameEn": "Republic of the Congo",
+      "nameFr": "République du Congo"
+    },
+    {
+      "a3": "CRI",
+      "flag": "CRI.svg",
+      "languages": [
+        {
+          "countryEndonym": "República de Costa Rica",
+          "iso639_3": "spa"
+        }
+      ],
+      "nameEn": "Republic of Costa Rica",
+      "nameFr": "République du Costa Rica"
+    },
+    {
+      "a3": "GHA",
+      "flag": "GHA.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republic of Ghana",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Republic of Ghana",
+      "nameFr": "République du Ghana"
+    },
+    {
+      "a3": "GTM",
+      "flag": "GTM.svg",
+      "languages": [
+        {
+          "countryEndonym": "República de Guatemala",
+          "iso639_3": "spa"
+        }
+      ],
+      "nameEn": "Republic of Guatemala",
+      "nameFr": "République du Guatemala"
+    },
+    {
+      "a3": "HND",
+      "flag": "HND.svg",
+      "languages": [
+        {
+          "countryEndonym": "República de Honduras",
+          "iso639_3": "spa"
+        }
+      ],
+      "nameEn": "Republic of Honduras",
+      "nameFr": "République du Honduras"
+    },
+    {
+      "a3": "KAZ",
+      "flag": "KAZ.svg",
+      "languages": [
+        {
+          "countryEndonym": "Қазақстан Республикасы",
+          "iso639_3": "kaz"
+        },
+        {
+          "countryEndonym": "Республика Казахстан",
+          "iso639_3": "rus"
+        }
+      ],
+      "nameEn": "Republic of Kazakhstan",
+      "nameFr": "République du Kazakhstan"
+    },
+    {
+      "a3": "KEN",
+      "flag": "KEN.svg",
+      "languages": [
+        {
+          "countryEndonym": "Jamhuri ya Kenya",
+          "iso639_3": "swa"
+        },
+        {
+          "countryEndonym": "Republic of Kenya",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Republic of Kenya",
+      "nameFr": "République du Kenya"
+    },
+    {
+      "a3": "LBR",
+      "flag": "LBR.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republic of Liberia",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Republic of Liberia",
+      "nameFr": "République du Libéria"
+    },
+    {
+      "a3": "MWI",
+      "flag": "MWI.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republic of Malawi",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "Dziko la Malaŵi",
+          "iso639_3": "nya"
+        }
+      ],
+      "nameEn": "Republic of Malawi",
+      "nameFr": "République du Malawi"
+    },
+    {
+      "a3": "MLI",
+      "flag": "MLI.svg",
+      "languages": [
+        {
+          "countryEndonym": "République du Mali",
+          "iso639_3": "fra"
+        },
+        {
+          "countryEndonym": "Repibiliki Mali",
+          "iso639_3": "bam"
+        }
+      ],
+      "nameEn": "Republic of Mali",
+      "nameFr": "République du Mali"
+    },
+    {
+      "a3": "MOZ",
+      "flag": "MOZ.svg",
+      "languages": [
+        {
+          "countryEndonym": "República de Moçambique",
+          "iso639_3": "por"
+        }
+      ],
+      "nameEn": "Republic of Mozambique",
+      "nameFr": "République du Mozambique"
+    },
+    {
+      "a3": "NIC",
+      "flag": "NIC.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republica de Nicaragua",
+          "iso639_3": "spa"
+        }
+      ],
+      "nameEn": "Republic of Nicaragua",
+      "nameFr": "République du Nicaragua"
+    },
+    {
+      "a3": "NER",
+      "flag": "NER.svg",
+      "languages": [
+        {
+          "countryEndonym": "Jamhuriyar Nijar",
+          "iso639_3": "hau"
+        }
+      ],
+      "nameEn": "Republic of the Niger",
+      "nameFr": "République du Niger"
+    },
+    {
+      "a3": "PAN",
+      "flag": "PAN.svg",
+      "languages": [
+        {
+          "countryEndonym": "República de Panamá",
+          "iso639_3": "spa"
+        }
+      ],
+      "nameEn": "Republic of Panama",
+      "nameFr": "République du Panama"
+    },
+    {
+      "a3": "PRY",
+      "flag": "PRY.svg",
+      "languages": [
+        {
+          "countryEndonym": "República del Paraguay",
+          "iso639_3": "spa"
+        },
+        {
+          "countryEndonym": "Tetä Paraguáy",
+          "iso639_3": "grn"
+        }
+      ],
+      "nameEn": "Republic of Paraguay",
+      "nameFr": "République du Paraguay"
+    },
+    {
+      "a3": "PER",
+      "flag": "PER.svg",
+      "languages": [
+        {
+          "countryEndonym": "República del Perú",
+          "iso639_3": "spa"
+        },
+        {
+          "countryEndonym": "Piruw Ripuwlika",
+          "iso639_3": "que"
+        },
+        {
+          "countryEndonym": "Piruwxa Ripuwlika",
+          "iso639_3": "aym"
+        }
+      ],
+      "nameEn": "Republic of Peru",
+      "nameFr": "République du Pérou"
+    },
+    {
+      "a3": "RWA",
+      "flag": "RWA.svg",
+      "languages": [
+        {
+          "countryEndonym": "Repubulika y'u Rwanda",
+          "iso639_3": "kin"
+        },
+        {
+          "countryEndonym": "Republic of Rwanda",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "République rwandaise",
+          "iso639_3": "fra"
+        },
+        {
+          "countryEndonym": "Jamhuri ya Rwanda",
+          "iso639_3": "swa"
+        }
+      ],
+      "nameEn": "Republic of Rwanda",
+      "nameFr": "République du Rwanda"
+    },
+    {
+      "a3": "SLV",
+      "flag": "SLV.svg",
+      "languages": [
+        {
+          "countryEndonym": "República de El Salvador",
+          "iso639_3": "spa"
+        }
+      ],
+      "nameEn": "Republic of El Salvador",
+      "nameFr": "République du Salvador"
+    },
+    {
+      "a3": "SDN",
+      "flag": "SDN.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republic of the Sudan",
+          "iso639_3": "ara"
+        },
+        {
+          "countryEndonym": "جمهورية السودان",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Republic of the Sudan",
+      "nameFr": "République du Soudan"
+    },
+    {
+      "a3": "SSD",
+      "flag": "SSD.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republic of South Sudan",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Republic of South Sudan",
+      "nameFr": "République du Soudan du Sud"
+    },
+    {
+      "a3": "SUR",
+      "flag": "SUR.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republiek Suriname",
+          "iso639_3": "nld"
+        }
+      ],
+      "nameEn": "Republic of Suriname",
+      "nameFr": "République du Suriname"
+    },
+    {
+      "a3": "SEN",
+      "flag": "SEN.svg",
+      "languages": [
+        {
+          "countryEndonym": "République du Sénégal",
+          "iso639_3": "fra"
+        }
+      ],
+      "nameEn": "Republic of Senegal",
+      "nameFr": "République du Sénégal"
+    },
+    {
+      "a3": "TJK",
+      "flag": "TJK.svg",
+      "languages": [
+        {
+          "countryEndonym": "Ҷумҳурии Тоҷикистон",
+          "iso639_3": "tgk"
+        },
+        {
+          "countryEndonym": "Респу́блика Таджикиста́н",
+          "iso639_3": "rus"
+        }
+      ],
+      "nameEn": "Republic of Tajikistan",
+      "nameFr": "République du Tadjikistan"
+    },
+    {
+      "a3": "TCD",
+      "flag": "TCD.svg",
+      "languages": [
+        {
+          "countryEndonym": "République du Tchad",
+          "iso639_3": "fra"
+        },
+        {
+          "countryEndonym": "جمهورية تشاد",
+          "iso639_3": "ara"
+        }
+      ],
+      "nameEn": "Republic of Chad",
+      "nameFr": "République du Tchad"
+    },
+    {
+      "a3": "YEM",
+      "flag": "YEM.svg",
+      "languages": [
+        {
+          "countryEndonym": "ﺍﻟﺠﻤﻬﻮﺭﯾّﺔ اليمنية",
+          "iso639_3": "ara"
+        }
+      ],
+      "nameEn": "Republic of Yemen",
+      "nameFr": "République du Yémen"
+    },
+    {
+      "a3": "ZWE",
+      "flag": "ZWE.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republic of Zimbabwe",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "Ilizwe leZimbabwe",
+          "iso639_3": "nde"
+        },
+        {
+          "countryEndonym": "Nyika yeZimbabwe",
+          "iso639_3": "sna"
+        }
+      ],
+      "nameEn": "Republic of Zimbabwe",
+      "nameFr": "République du Zimbabwe"
+    },
+    {
+      "a3": "COD",
+      "flag": "COD.svg",
+      "languages": [
+        {
+          "countryEndonym": "République Démocratique du Congo",
+          "iso639_3": "fra"
+        },
+        {
+          "countryEndonym": "Ekólo ya Kongó Demokratiki",
+          "iso639_3": "lin"
+        },
+        {
+          "countryEndonym": "Repubilika ya Kôngo ya Dimokalasi",
+          "iso639_3": "ktu"
+        },
+        {
+          "countryEndonym": "Jamhuri ya Kidemokrasia ya Kongo",
+          "iso639_3": "swa"
+        },
+        {
+          "countryEndonym": "Ditunga dia Kongu wa Mungalaata",
+          "iso639_3": "lua"
+        }
+      ],
+      "nameEn": "Democratic Republic of the Congo",
+      "nameFr": "République Démocratique du Congo"
+    },
+    {
+      "a3": "TLS",
+      "flag": "TLS.svg",
+      "languages": [
+        {
+          "countryEndonym": "República Democrática de Timor-Leste",
+          "iso639_3": "por"
+        },
+        {
+          "countryEndonym": "Repúblika Demokrátika Timór-Leste",
+          "iso639_3": "tet"
+        }
+      ],
+      "nameEn": "Democratic Republic of Timor-Leste",
+      "nameFr": "République démocratique du Timor-Leste"
+    },
+    {
+      "a3": "NPL",
+      "flag": "NPL.svg",
+      "languages": [
+        {
+          "countryEndonym": "सङ्घीय लोकतान्त्रिक गणतन्त्र नेपाल",
+          "iso639_3": "nep"
+        }
+      ],
+      "nameEn": "Federal Democratic Republic of Nepal",
+      "nameFr": "République démocratique fédérale du Népal"
+    },
+    {
+      "a3": "LAO",
+      "flag": "LAO.svg",
+      "languages": [
+        {
+          "countryEndonym": "ສາທາລະນະລັດ ປະຊາທິປະໄຕ ປະຊາຊົນລາວ",
+          "iso639_3": "lao"
+        }
+      ],
+      "nameEn": "Lao People's Democratic Republic",
+      "nameFr": "République démocratique populaire lao"
+    },
+    {
+      "a3": "ALB",
+      "flag": "ALB.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republika e Shqipërisë",
+          "iso639_3": "sqi"
+        }
+      ],
+      "nameEn": "Republic of Albania",
+      "nameFr": "République d’Albanie"
+    },
+    {
+      "a3": "FRA",
+      "flag": "FRA.svg",
+      "languages": [
+        {
+          "countryEndonym": "République française",
+          "iso639_3": "fra"
+        }
+      ],
+      "nameEn": "French Republic",
+      "nameFr": "République française"
+    },
+    {
+      "a3": "DEU",
+      "flag": "DEU.svg",
+      "languages": [
+        {
+          "countryEndonym": "Bundesrepublik Deutschland",
+          "iso639_3": "deu"
+        }
+      ],
+      "nameEn": "Federal Republic of Germany",
+      "nameFr": "République fédérale d'Allemagne"
+    },
+    {
+      "a3": "SOM",
+      "flag": "SOM.svg",
+      "languages": [
+        {
+          "countryEndonym": "Jamhuuriyadda Federaalka Soomaaliya",
+          "iso639_3": "som"
+        },
+        {
+          "countryEndonym": "جمهورية الصومال الفدرالية",
+          "iso639_3": "ara"
+        }
+      ],
+      "nameEn": "Federal Republic of Somalia",
+      "nameFr": "République fédérale de Somalie"
+    },
+    {
+      "a3": "NGA",
+      "flag": "NGA.svg",
+      "languages": [
+        {
+          "countryEndonym": "Federal Republic of Nigeria",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "République fédérale du Nigeria",
+          "iso639_3": "fra"
+        }
+      ],
+      "nameEn": "Federal Republic of Nigeria",
+      "nameFr": "République fédérale du Nigeria"
+    },
+    {
+      "a3": "ETH",
+      "flag": "ETH.svg",
+      "languages": [
+        {
+          "countryEndonym": "የኢትዮጵያ ፌዴራላዊ ዲሞክራሲያዊ ሪፐብሊክ",
+          "iso639_3": "amh"
+        }
+      ],
+      "nameEn": "Federal Democratic Republic of Ethiopia",
+      "nameFr": "République fédérale démocratique d'Éthiopie"
+    },
+    {
+      "a3": "BRA",
+      "flag": "BRA.svg",
+      "languages": [
+        {
+          "countryEndonym": "República Federativa do Brasil",
+          "iso639_3": "por"
+        }
+      ],
+      "nameEn": "Federative Republic of Brazil",
+      "nameFr": "République fédérative du Brésil"
+    },
+    {
+      "a3": "GAB",
+      "flag": "GAB.svg",
+      "languages": [
+        {
+          "countryEndonym": "République gabonaise",
+          "iso639_3": "fra"
+        }
+      ],
+      "nameEn": "Gabonese Republic",
+      "nameFr": "République gabonaise"
+    },
+    {
+      "a3": "IRN",
+      "flag": "IRN.svg",
+      "languages": [
+        {
+          "countryEndonym": "جمهوری اسلامی ايران",
+          "iso639_3": "fas"
+        }
+      ],
+      "nameEn": "Islamic Republic of Iran",
+      "nameFr": "République islamique d'Iran"
+    },
+    {
+      "a3": "MRT",
+      "flag": "MRT.svg",
+      "languages": [
+        {
+          "countryEndonym": "الجمهورية الإسلامية الموريتانية",
+          "iso639_3": "ara"
+        }
+      ],
+      "nameEn": "Islamic Republic of Mauritania",
+      "nameFr": "République islamique de Mauritanie"
+    },
+    {
+      "a3": "PAK",
+      "flag": "PAK.svg",
+      "languages": [
+        {
+          "countryEndonym": "Islamic Republic of Pakistan",
+          "iso639_3": "urd"
+        },
+        {
+          "countryEndonym": "اسلامی جمہوریت پاکستان",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Islamic Republic of Pakistan",
+      "nameFr": "République islamique du Pakistan"
+    },
+    {
+      "a3": "ITA",
+      "flag": "ITA.svg",
+      "languages": [
+        {
+          "countryEndonym": "Repubblica Italiana",
+          "iso639_3": "ita"
+        }
+      ],
+      "nameEn": "Italian Republic",
+      "nameFr": "République italienne"
+    },
+    {
+      "a3": "KGZ",
+      "flag": "KGZ.svg",
+      "languages": [
+        {
+          "countryEndonym": "Кыргыз Республикасы",
+          "iso639_3": "kir"
+        },
+        {
+          "countryEndonym": "Кыргызская республика",
+          "iso639_3": "rus"
+        }
+      ],
+      "nameEn": "Kyrgyz Republic",
+      "nameFr": "République kirghize"
+    },
+    {
+      "a3": "LBN",
+      "flag": "LBN.svg",
+      "languages": [
+        {
+          "countryEndonym": "الجمهوريّةاللبنانيّة",
+          "iso639_3": "ara"
+        }
+      ],
+      "nameEn": "Lebanese Republic",
+      "nameFr": "République libanaise"
+    },
+    {
+      "a3": "URY",
+      "flag": "URY.svg",
+      "languages": [
+        {
+          "countryEndonym": "República Oriental del Uruguay",
+          "iso639_3": "spa"
+        }
+      ],
+      "nameEn": "Oriental Republic of Uruguay",
+      "nameFr": "République orientale de l'Uruguay"
+    },
+    {
+      "a3": "CHN",
+      "flag": "CHN.svg",
+      "languages": [
+        {
+          "countryEndonym": "中华人民共和国",
+          "iso639_3": "zho"
+        },
+        {
+          "countryEndonym": "中華人民共和國",
+          "iso639_3": "cmn"
+        }
+      ],
+      "nameEn": "People's Republic of China",
+      "nameFr": "République populaire de Chine"
+    },
+    {
+      "a3": "BGD",
+      "flag": "BGD.svg",
+      "languages": [
+        {
+          "countryEndonym": "গণপ্রজাতন্ত্রী বাংলাদেশ",
+          "iso639_3": "ben"
+        }
+      ],
+      "nameEn": "People's Republic of Bangladesh",
+      "nameFr": "République populaire du Bangladesh"
+    },
+    {
+      "a3": "PRK",
+      "flag": "PRK.svg",
+      "languages": [
+        {
+          "countryEndonym": "조선민주주의인민공화국",
+          "iso639_3": "kor"
+        }
+      ],
+      "nameEn": "Democratic People's Republic of Korea",
+      "nameFr": "République populaire démocratique de Corée"
+    },
+    {
+      "a3": "PRT",
+      "flag": "PRT.svg",
+      "languages": [
+        {
+          "countryEndonym": "República Portuguesa",
+          "iso639_3": "por"
+        }
+      ],
+      "nameEn": "Portuguese Republic",
+      "nameFr": "République portugaise"
+    },
+    {
+      "a3": "SVK",
+      "flag": "SVK.svg",
+      "languages": [
+        {
+          "countryEndonym": "Slovenská republika",
+          "iso639_3": "slk"
+        }
+      ],
+      "nameEn": "Slovak Republic",
+      "nameFr": "République slovaque"
+    },
+    {
+      "a3": "VNM",
+      "flag": "VNM.svg",
+      "languages": [
+        {
+          "countryEndonym": "Cộng Hoà Xã Hội Chủ Nghĩa Việt Nam",
+          "iso639_3": "vie"
+        }
+      ],
+      "nameEn": "Socialist Republic of Viet Nam",
+      "nameFr": "République socialiste du Viêt Nam"
+    },
+    {
+      "a3": "LKA",
+      "flag": "LKA.svg",
+      "languages": [
+        {
+          "countryEndonym": "ශ්‍රී ලංකා ප්‍රජාතාන්ත්‍රික සමාජවාදී ජනරජය",
+          "iso639_3": "sin"
+        },
+        {
+          "countryEndonym": "இலங்கை சனநாயக சோசலிசக் குடியரசு",
+          "iso639_3": "tam"
+        }
+      ],
+      "nameEn": "Democratic Socialist Republic of Sri Lanka",
+      "nameFr": "République socialiste démocratique du Sri Lanka"
+    },
+    {
+      "a3": "CZE",
+      "flag": "CZE.svg",
+      "languages": [
+        {
+          "countryEndonym": "Česká republika",
+          "iso639_3": "ces"
+        }
+      ],
+      "nameEn": "Czech Republic",
+      "nameFr": "République tchèque"
+    },
+    {
+      "a3": "TGO",
+      "flag": "TGO.svg",
+      "languages": [
+        {
+          "countryEndonym": "République togolaise",
+          "iso639_3": "fra"
+        }
+      ],
+      "nameEn": "Togolese Republic",
+      "nameFr": "République togolaise"
+    },
+    {
+      "a3": "TUN",
+      "flag": "TUN.svg",
+      "languages": [
+        {
+          "countryEndonym": "الجمهورية التونسية",
+          "iso639_3": "ara"
+        }
+      ],
+      "nameEn": "Republic of Tunisia",
+      "nameFr": "République tunisienne"
+    },
+    {
+      "a3": "TZA",
+      "flag": "TZA.svg",
+      "languages": [
+        {
+          "countryEndonym": "Jamhuri ya Muungano wa Tanzania",
+          "iso639_3": "swa"
+        },
+        {
+          "countryEndonym": "United Republic of Tanzania",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "United Republic of Tanzania",
+      "nameFr": "République unie de Tanzanie"
+    },
+    {
+      "a3": "BLM",
+      "flag": "BLM.svg",
+      "languages": [
+        {
+          "countryEndonym": "Saint-Barthélemy",
+          "iso639_3": "fra"
+        }
+      ],
+      "nameEn": "Saint Barthélemy",
+      "nameFr": "Saint-Barthélemy"
+    },
+    {
+      "a3": "MAF",
+      "flag": "MAF.svg",
+      "languages": [
+        {
+          "countryEndonym": "Saint-Martin (Antilles françaises)",
+          "iso639_3": "fra"
+        }
+      ],
+      "nameEn": "Saint Martin",
+      "nameFr": "Saint-Martin (Antilles françaises)"
+    },
+    {
+      "a3": "SXM",
+      "flag": "SXM.svg",
+      "languages": [
+        {
+          "countryEndonym": "Land Sint Maarten",
+          "iso639_3": "nld"
+        },
+        {
+          "countryEndonym": "Sint Maarten",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Sint Maarten",
+      "nameFr": "Saint-Martin (Royaume des Pays-Bas)"
+    },
+    {
+      "a3": "SPM",
+      "flag": "SPM.svg",
+      "languages": [
+        {
+          "countryEndonym": "Saint-Pierre-et-Miquelon",
+          "iso639_3": "fra"
+        }
+      ],
+      "nameEn": "Saint Pierre and Miquelon",
+      "nameFr": "Saint-Pierre-et-Miquelon"
+    },
+    {
+      "a3": "VCT",
+      "flag": "VCT.svg",
+      "languages": [
+        {
+          "countryEndonym": "Saint Vincent and the Grenadines",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Saint Vincent and the Grenadines",
+      "nameFr": "Saint-Vincent et les Grenadines"
+    },
+    {
+      "a3": "SHN",
+      "flag": "SHN.svg",
+      "languages": [
+        {
+          "countryEndonym": "Saint Helena, Ascension and Tristan da Cunha",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Saint Helena, Ascension and Tristan da Cunha",
+      "nameFr": "Sainte-Hélène, Ascension et Tristan da Cunha"
+    },
+    {
+      "a3": "LCA",
+      "flag": "LCA.svg",
+      "languages": [
+        {
+          "countryEndonym": "Commonwealth of Saint Lucia",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "Sent-Lisi",
+          "iso639_3": "acf"
+        }
+      ],
+      "nameEn": "Saint Lucia",
+      "nameFr": "Sainte-Lucie"
+    },
+    {
+      "a3": "ASM",
+      "flag": "ASM.svg",
+      "languages": [
+        {
+          "countryEndonym": "Amerika Sāmoa",
+          "iso639_3": "smo"
+        },
+        {
+          "countryEndonym": "American Samoa",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "American Samoa",
+      "nameFr": "Samoa américaines"
+    },
+    {
+      "a3": "STP",
+      "flag": "STP.svg",
+      "languages": [
+        {
+          "countryEndonym": "República Democrática de São Tomé e Príncipe",
+          "iso639_3": "por"
+        }
+      ],
+      "nameEn": "Democratic Republic of Sao Tome and Principe",
+      "nameFr": "SAO TOMÉ-ET-PRINCIPE"
+    },
+    {
+      "a3": "SGP",
+      "flag": "SGP.svg",
+      "languages": [
+        {
+          "countryEndonym": "Republic of Singapore",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "Republik Singapura",
+          "iso639_3": "msa"
+        },
+        {
+          "countryEndonym": "新加坡共和国",
+          "iso639_3": "cmn"
+        },
+        {
+          "countryEndonym": "சிங்கப்பூர் குடியரசு",
+          "iso639_3": "tam"
+        }
+      ],
+      "nameEn": "Republic of Singapore",
+      "nameFr": "Singapour"
+    },
+    {
+      "a3": "OMN",
+      "flag": "OMN.svg",
+      "languages": [
+        {
+          "countryEndonym": "سلطنة عُمان",
+          "iso639_3": "ara"
+        }
+      ],
+      "nameEn": "Sultanate of Oman",
+      "nameFr": "Sultanat d'Oman"
+    },
+    {
+      "a3": "SJM",
+      "flag": "SJM.svg",
+      "languages": [
+        {
+          "countryEndonym": "Svalbard og Jan Mayen",
+          "iso639_3": "nob"
+        }
+      ],
+      "nameEn": "Svalbard and Jan Mayen",
+      "nameFr": "Svalbard et île Jan Mayen"
+    },
+    {
+      "a3": "IOT",
+      "flag": "IOT.svg",
+      "languages": [
+        {
+          "countryEndonym": "British Indian Ocean Territory",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "British Indian Ocean territory",
+      "nameFr": "Territoire britannique de l'océan Indien"
+    },
+    {
+      "a3": "TKL",
+      "flag": "TKL.svg",
+      "languages": [
+        {
+          "countryEndonym": "Tokelau",
+          "iso639_3": "tkl"
+        },
+        {
+          "countryEndonym": "Tokelau",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Tokelau",
+      "nameFr": "Tokelau"
+    },
+    {
+      "a3": "TKM",
+      "flag": "TKM.svg",
+      "languages": [
+        {
+          "countryEndonym": "Türkmenistan",
+          "iso639_3": "tuk"
+        }
+      ],
+      "nameEn": "Turkmenistan",
+      "nameFr": "Turkménistan"
+    },
+    {
+      "a3": "UKR",
+      "flag": "UKR.svg",
+      "languages": [
+        {
+          "countryEndonym": "Украïна",
+          "iso639_3": "ukr"
+        }
+      ],
+      "nameEn": "Ukraine",
+      "nameFr": "Ukraine"
+    },
+    {
+      "a3": "COM",
+      "flag": "COM.svg",
+      "languages": [
+        {
+          "countryEndonym": "Udzima wa Komori",
+          "iso639_3": "swb"
+        },
+        {
+          "countryEndonym": "Union des Comores",
+          "iso639_3": "fra"
+        },
+        {
+          "countryEndonym": "الْاتِّحَادُ ٱلْقَمَرِيّ",
+          "iso639_3": "ara"
+        }
+      ],
+      "nameEn": "Union of the Comoros",
+      "nameFr": "Union des Comores"
+    },
+    {
+      "a3": "VUT",
+      "flag": "VUT.svg",
+      "languages": [
+        {
+          "countryEndonym": "Ripablik blong Vanuatu",
+          "iso639_3": "bis"
+        },
+        {
+          "countryEndonym": "Republic of Vanuatu",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "République de Vanuatu",
+          "iso639_3": "fra"
+        }
+      ],
+      "nameEn": "Republic of Vanuatu",
+      "nameFr": "Vanuatu"
+    },
+    {
+      "a3": "WLF",
+      "flag": "WLF.svg",
+      "languages": [
+        {
+          "countryEndonym": "Wallis-et-Futuna",
+          "iso639_3": "fra"
+        }
+      ],
+      "nameEn": "Wallis et Futuna",
+      "nameFr": "Wallis et Futuna"
+    },
+    {
+      "a3": "AFG",
+      "flag": "AFG.svg",
+      "languages": [
+        {
+          "countryEndonym": "د افغانستان اسلامي امارات",
+          "iso639_3": "prs"
+        },
+        {
+          "countryEndonym": "امارت اسلامی افغانستان",
+          "iso639_3": "pus"
+        }
+      ],
+      "nameEn": "Islamic Emirate of Afghanistan",
+      "nameFr": "Émirat islamique d'Afghanistan"
+    },
+    {
+      "a3": "ARE",
+      "flag": "ARE.svg",
+      "languages": [
+        {
+          "countryEndonym": "الْإِمَارَاتُ ٱلْعَرَبِيَّةُ ٱلْمُتَّحِدَةُ",
+          "iso639_3": "ara"
+        }
+      ],
+      "nameEn": "United Arab Emirates",
+      "nameFr": "Émirats arabes unis"
+    },
+    {
+      "a3": "ERI",
+      "flag": "ERI.svg",
+      "languages": [
+        {
+          "countryEndonym": "ሃገረ ኤርትራ",
+          "iso639_3": "tir"
+        },
+        {
+          "countryEndonym": "دولة إرتريا",
+          "iso639_3": "ara"
+        },
+        {
+          "countryEndonym": "State of Eritrea",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "State of Eritrea",
+      "nameFr": "Érythrée"
+    },
+    {
+      "a3": "ISR",
+      "flag": "ISR.svg",
+      "languages": [
+        {
+          "countryEndonym": "מְדִינַת יִשְׂרָאֵל",
+          "iso639_3": "heb"
+        }
+      ],
+      "nameEn": "State of Israel",
+      "nameFr": "État d'Israël"
+    },
+    {
+      "a3": "LBY",
+      "flag": "LBY.svg",
+      "languages": [
+        {
+          "countryEndonym": "دولة ليبيا",
+          "iso639_3": "ara"
+        }
+      ],
+      "nameEn": "State of Libya",
+      "nameFr": "État de Libye"
+    },
+    {
+      "a3": "PSE",
+      "flag": "PSE.svg",
+      "languages": [
+        {
+          "countryEndonym": "دولة فلسطين",
+          "iso639_3": "ara"
+        }
+      ],
+      "nameEn": "State of Palestine",
+      "nameFr": "État de Palestine"
+    },
+    {
+      "a3": "TUV",
+      "flag": "TUV.svg",
+      "languages": [
+        {
+          "countryEndonym": "Tuvalu",
+          "iso639_3": "tvl"
+        },
+        {
+          "countryEndonym": "State of Tuvalu",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "State of Tuvalu",
+      "nameFr": "État des Tuvalu"
+    },
+    {
+      "a3": "KWT",
+      "flag": "KWT.svg",
+      "languages": [
+        {
+          "countryEndonym": "دولة الكويت",
+          "iso639_3": "ara"
+        }
+      ],
+      "nameEn": "State of Kuwait",
+      "nameFr": "État du Koweït"
+    },
+    {
+      "a3": "QAT",
+      "flag": "QAT.svg",
+      "languages": [
+        {
+          "countryEndonym": "دولة قطر",
+          "iso639_3": "ara"
+        }
+      ],
+      "nameEn": "State of Qatar",
+      "nameFr": "État du Qatar"
+    },
+    {
+      "a3": "PNG",
+      "flag": "PNG.svg",
+      "languages": [
+        {
+          "countryEndonym": "Independent State of Papua New Guinea",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "Independen Stet bilong Papua Niugini",
+          "iso639_3": "tpi"
+        },
+        {
+          "countryEndonym": "Independen Stet bilong Papua Niu Gini",
+          "iso639_3": "hmo"
+        }
+      ],
+      "nameEn": "Independent State of Papua New Guinea",
+      "nameFr": "État indépendant de Papouasie-Nouvelle-Guinée"
+    },
+    {
+      "a3": "WSM",
+      "flag": "WSM.svg",
+      "languages": [
+        {
+          "countryEndonym": "Malo Sa'oloto Tuto'atasi o Samoa",
+          "iso639_3": "smo"
+        },
+        {
+          "countryEndonym": "Independent State of Samoa",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Independent State of Samoa",
+      "nameFr": "État indépendant des Samoa"
+    },
+    {
+      "a3": "PRI",
+      "flag": "PRI.svg",
+      "languages": [
+        {
+          "countryEndonym": "Estado Libre Asociado de Puerto Rico",
+          "iso639_3": "spa"
+        },
+        {
+          "countryEndonym": "Commonwealth of Puerto Rico",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Commonwealth of Puerto Rico",
+      "nameFr": "État libre associé de Porto Rico"
+    },
+    {
+      "a3": "BOL",
+      "flag": "BOL.svg",
+      "languages": [
+        {
+          "countryEndonym": "Bulibiya Mama llaqta",
+          "iso639_3": "que"
+        },
+        {
+          "countryEndonym": "Tetã Volívia",
+          "iso639_3": "grn"
+        },
+        {
+          "countryEndonym": "Wuliwya Suyu",
+          "iso639_3": "aym"
+        },
+        {
+          "countryEndonym": "Estado Plurinacional de Bolivia",
+          "iso639_3": "spa"
+        }
+      ],
+      "nameEn": "Plurinational State of Bolivia",
+      "nameFr": "État plurinational de Bolivie"
+    },
+    {
+      "a3": "FSM",
+      "flag": "FSM.svg",
+      "languages": [
+        {
+          "countryEndonym": "Federated States of Micronesia",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Federated States of Micronesia",
+      "nameFr": "États fédérés de Micronésie"
+    },
+    {
+      "a3": "USA",
+      "flag": "USA.svg",
+      "languages": [
+        {
+          "countryEndonym": "United States of America",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "United States of America",
+      "nameFr": "États-Unis"
+    },
+    {
+      "a3": "MEX",
+      "flag": "MEX.svg",
+      "languages": [
+        {
+          "countryEndonym": "Estados Unidos Mexicanos",
+          "iso639_3": "spa"
+        }
+      ],
+      "nameEn": "United Mexican States",
+      "nameFr": "États-Unis mexicains"
+    },
+    {
+      "a3": "CXR",
+      "flag": "CXR.svg",
+      "languages": [
+        {
+          "countryEndonym": "Christmas Island",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Christmas Island",
+      "nameFr": "Île Christmas"
+    },
+    {
+      "a3": "IMN",
+      "flag": "IMN.svg",
+      "languages": [
+        {
+          "countryEndonym": "Isle of Man",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "Ellan Vannin",
+          "iso639_3": "glv"
+        }
+      ],
+      "nameEn": "Isle of Man",
+      "nameFr": "île de Man"
+    },
+    {
+      "a3": "NFK",
+      "flag": "NFK.svg",
+      "languages": [
+        {
+          "countryEndonym": "Norfolk Island",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "Teratri a' Norf'k Ailen",
+          "iso639_3": "pih"
+        }
+      ],
+      "nameEn": "Norfolk Island",
+      "nameFr": "île Norfolk"
+    },
+    {
+      "a3": "CYM",
+      "flag": "CYM.svg",
+      "languages": [
+        {
+          "countryEndonym": "Cayman Islands",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Cayman Islands",
+      "nameFr": "Îles Caïmans"
+    },
+    {
+      "a3": "CCK",
+      "flag": "CCK.svg",
+      "languages": [
+        {
+          "countryEndonym": "Territory of Cocos (Keeling) Islands",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Territory of Cocos Islands",
+      "nameFr": "îles Cocos"
+    },
+    {
+      "a3": "COK",
+      "flag": "COK.svg",
+      "languages": [
+        {
+          "countryEndonym": "Cook Islands",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "Kūki 'Āirani",
+          "iso639_3": "rar"
+        }
+      ],
+      "nameEn": "Cook Islands",
+      "nameFr": "Îles Cook"
+    },
+    {
+      "a3": "FRO",
+      "flag": "FRO.svg",
+      "languages": [
+        {
+          "countryEndonym": "Føroyar",
+          "iso639_3": "fao"
+        },
+        {
+          "countryEndonym": "Færøerne",
+          "iso639_3": "dan"
+        }
+      ],
+      "nameEn": "Faroe Islands",
+      "nameFr": "Îles Féroé"
+    },
+    {
+      "a3": "FLK",
+      "flag": "FLK.svg",
+      "languages": [
+        {
+          "countryEndonym": "Falkland Islands",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Falkland Islands",
+      "nameFr": "Îles Malouines"
+    },
+    {
+      "a3": "UMI",
+      "flag": "UMI.svg",
+      "languages": [
+        {
+          "countryEndonym": "United States Minor Outlying Islands",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "United States Minor Outlying Islands",
+      "nameFr": "Îles mineures éloignées des États-Unis"
+    },
+    {
+      "a3": "PCN",
+      "flag": "PCN.svg",
+      "languages": [
+        {
+          "countryEndonym": "Pitcairn Islands",
+          "iso639_3": "eng"
+        },
+        {
+          "countryEndonym": "Pitkern Ailen",
+          "iso639_3": "pih"
+        }
+      ],
+      "nameEn": "Pitcairn Islands",
+      "nameFr": "Îles Pitcairn"
+    },
+    {
+      "a3": "SLB",
+      "flag": "SLB.svg",
+      "languages": [
+        {
+          "countryEndonym": "Solomon Islands",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Solomon Islands",
+      "nameFr": "Îles Salomon"
+    },
+    {
+      "a3": "TCA",
+      "flag": "TCA.svg",
+      "languages": [
+        {
+          "countryEndonym": "Turks and Caicos Islands",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Turks and Caicos Islands",
+      "nameFr": "îles Turques et Caïques"
+    },
+    {
+      "a3": "VGB",
+      "flag": "VGB.svg",
+      "languages": [
+        {
+          "countryEndonym": "British Virgin Islands",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "British Virgin Islands",
+      "nameFr": "Îles Vierges britanniques"
+    },
+    {
+      "a3": "VIR",
+      "flag": "VIR.svg",
+      "languages": [
+        {
+          "countryEndonym": "Virgin Islands of the United States",
+          "iso639_3": "eng"
+        }
+      ],
+      "nameEn": "Virgin Islands of the United States",
+      "nameFr": "Îles Vierges des États-Unis"
+    }
+  ],
+  "generatedAt": "2026-07-20",
+  "note": "Pays et leurs langues officielles. Les endonymes et polices des langues se trouvent dans Languages.json.",
+  "version": "1.0"
+}

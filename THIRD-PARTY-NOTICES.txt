@@ -1,0 +1,138 @@
+XIMOD Architect — Mentions des composants tiers (THIRD-PARTY NOTICES)
+=====================================================================
+
+Le code source de XIMOD Architect est distribué sous licence MIT (voir le
+fichier LICENSE). Le présent document recense les composants tiers utilisés ou
+distribués avec l'application. Ces composants restent régis par leurs propres
+licences, distinctes de la licence MIT de XIMOD Architect, et leurs mentions
+d'attribution doivent être conservées lors de toute redistribution.
+
+
+1. Polices — Google Noto Fonts
+------------------------------------------------------------------
+Licence : SIL Open Font License, version 1.1 (OFL-1.1).
+Source  : projet Noto / Google Fonts (https://fonts.google.com/noto).
+
+Les polices Noto sont fournies dans le dossier assets/fonts/. Chaque famille
+conserve, dans son propre dossier, son fichier de licence OFL (OFL.txt) et son
+fichier README d'origine. Elles restent sous OFL-1.1 et ne sont pas couvertes
+par la licence MIT de XIMOD Architect. La licence OFL doit accompagner les
+polices en cas de redistribution.
+
+
+2. Drapeaux des pays (fichiers SVG)
+------------------------------------------------------------------
+Source : https://www.drapeauxdespays.fr
+
+Les drapeaux fournis dans assets/images/svg/ proviennent de ce site et sont
+libres de droits, y compris pour un usage commercial. Attribution donnée, par
+courtoisie, au site drapeauxdespays.fr comme source des images.
+
+
+3. Codes de pays — ISO 3166-1 alpha-3
+------------------------------------------------------------------
+Source : ISO — Online Browsing Platform (https://www.iso.org/obp/ui/fr/).
+
+Les codes de pays à trois lettres (utilisés dans assets/data/Countries.json)
+proviennent de la plateforme de consultation en ligne de l'ISO, en accès
+gratuit.
+
+
+4. Codes de langue — ISO 639-3
+------------------------------------------------------------------
+Source : SIL International (https://iso639-3.sil.org).
+
+Attribution : « Codes ISO 639-3 — source : iso639-3.sil.org ».
+
+Conditions d'utilisation des tables de codes ISO 639-3 (SIL) :
+  - l'attribution est donnée à iso639-3.sil.org comme source des codes ;
+  - les identifiants de l'ensemble de codes ne sont ni modifiés ni étendus,
+    sauf accord privé utilisant la zone d'usage privé (plage qaa à qtz), ces
+    extensions ne devant alors pas être distribuées publiquement ;
+  - le produit, le système ou l'appareil ne fournit pas de moyen de
+    redistribuer l'ensemble de codes ;
+  - le site iso639-3.sil.org est le seul site de distribution autorisé pour les
+    tables de codes ISO 639-3.
+
+Données ajoutées (hors norme) : les fichiers assets/data/Languages.json et
+assets/data/CountryLanguages.json enrichissent les codes ISO 639-3
+d'informations qui NE FONT PAS PARTIE de la norme (endonymes, police associée,
+correspondances pays <-> langues, regroupements). Ces informations sont
+propres à XIMOD Architect et clairement identifiées comme telles, conformément
+aux conditions ci-dessus. Les identifiants ISO 639-3 eux-mêmes ne sont ni
+modifiés ni étendus.
+
+Point de conformité : la fonction « Envoyer » de l'éditeur de traduction ne
+doit pas constituer un moyen de redistribuer l'ensemble des codes ISO 639-3.
+Il est recommandé de n'inclure dans l'archive d'envoi que le fichier de
+traduction (main.ftl) et, au besoin, les seules entrées strictement
+nécessaires — et non l'intégralité de Languages.json.
+
+
+5. Bibliothèques Rust (dépendances)
+------------------------------------------------------------------
+XIMOD Architect est compilé avec de nombreuses bibliothèques (« crates ») de
+l'écosystème Rust, très majoritairement sous licences permissives compatibles
+avec la licence MIT.
+
+Dépendances directes et leurs licences :
+  eframe .................... MIT OR Apache-2.0
+  egui_extras ............... MIT OR Apache-2.0
+  image ..................... MIT OR Apache-2.0
+  quick-xml ................. MIT
+  serde ..................... MIT OR Apache-2.0
+  serde_json ................ MIT OR Apache-2.0
+  indexmap .................. Apache-2.0 OR MIT
+  rfd ....................... MIT
+  fluent .................... Apache-2.0 OR MIT
+  fluent-bundle ............. Apache-2.0 OR MIT
+  unic-langid ............... MIT OR Apache-2.0
+  dirs ...................... MIT OR Apache-2.0
+  thiserror ................. MIT OR Apache-2.0
+  anyhow .................... MIT OR Apache-2.0
+  tracing ................... MIT
+  tracing-subscriber ........ MIT
+  chrono .................... MIT OR Apache-2.0
+  zip ....................... MIT
+  uuid ...................... Apache-2.0 OR MIT
+  walkdir ................... Unlicense OR MIT
+  rand ...................... MIT OR Apache-2.0
+  windows-sys (Windows) ..... MIT OR Apache-2.0
+  x11 (Linux) ............... MIT
+  objc (macOS) .............. MIT
+  cocoa (macOS) ............. MIT OR Apache-2.0
+  winres (build, Windows) ... MIT
+
+Répartition des licences sur l'ensemble du graphe de résolution (469 paquets,
+dépendances transitives, de développement et cibles multiples comprises ; le
+binaire distribué n'en embarque qu'un sous-ensemble) :
+
+  MIT et/ou Apache-2.0 (diverses formulations, souvent au choix) ... ~430
+  Unicode-3.0 ..................................................... 18
+  MPL-2.0 (copyleft au fichier) ................................... 5
+      option-ext, resvg, usvg, usvg-parser, usvg-tree
+  BSD-2-Clause / BSD-3-Clause / Zlib / BSL-1.0 / ISC / 0BSD ....... quelques-uns
+  CC0-1.0 ......................................................... 1
+  OFL-1.1 + UFL-1.0 (police intégrée à une dépendance) ............ 1
+
+Remarques :
+  - Les composants sous MPL-2.0 (notamment resvg / usvg, le moteur de rendu
+    SVG utilisé pour les drapeaux) relèvent d'un copyleft « au fichier » :
+    compatible avec la distribution de XIMOD Architect sous MIT. Si l'un de ces
+    fichiers est modifié, sa version modifiée doit rester disponible sous
+    MPL-2.0.
+  - self_cell est proposé sous « Apache-2.0 OR GPL-2.0-only » : l'option
+    Apache-2.0 est retenue ; aucune obligation GPL ne s'applique.
+  - Pour régénérer la liste exhaustive, paquet par paquet, avec le texte
+    complet des licences :
+        cargo install cargo-about && cargo about generate
+    ou :
+        cargo install cargo-license && cargo license
+
+
+6. Format FOMOD
+------------------------------------------------------------------
+Le schéma « ModuleConfig 5.0 » référencé par les fichiers générés
+(http://qconsulting.ca/fo3/ModConfig5.0.xsd) est un standard de la communauté
+du modding. XIMOD Architect produit des fichiers conformes à ce format mais ne
+distribue pas le schéma lui-même.

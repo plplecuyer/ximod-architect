@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=XIMOD Architect
+GenericName=FOMOD Creator
+Comment=Cross-platform FOMOD installer creation tool for Bethesda game mods
+Exec=ximod-architect %F
+Icon=ximod-architect
+Terminal=false
+Categories=Development;Utility;Game;
+Keywords=fomod;mod;modding;skyrim;fallout;starfield;bethesda;
+MimeType=application/xml;
+StartupNotify=true
+StartupWMClass=ximod-architect
