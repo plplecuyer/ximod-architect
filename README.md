@@ -22,7 +22,7 @@ This is a Rust port of Wenderer's original FOMOD Creation Tool, offering improve
 
 ### Prerequisites
 
-- Rust 1.70+ (install from https://rustup.rs)
+- Rust 1.85+ (install from https://rustup.rs)
 - On Linux, the system development libraries. The quickest way is the helper script,
   which detects your distribution (Debian/Ubuntu, Fedora, Arch):
 
