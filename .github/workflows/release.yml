@@ -1,177 +1,95 @@
 name: Release
 
-# Produit les binaires Linux, Windows et macOS a chaque tag "vX.Y.Z",
-# puis cree une Release GitHub avec les archives en pieces jointes.
-# Declenchable aussi manuellement (workflow_dispatch) pour tester.
-
 on:
   push:
-    tags: ["v*"]
-  workflow_dispatch: {}
+    tags:
+      - 'v*'          # se déclenche sur les tags v1.0.0, v1.2.3, v2.0.0-beta, etc.
+  workflow_dispatch:  # permet aussi un lancement manuel (test)
 
 permissions:
-  contents: write        # necessaire pour creer la Release
+  contents: write     # requis pour créer la release et y déposer les fichiers
 
 env:
-  BIN_NAME: ximod-architect
-  # Si le crate n'est PAS a la racine du depot, indiquez ici son sous-dossier
-  # (ex: "app"). Par defaut, la racine.
-  MANIFEST_DIR: "."
+  CARGO_TERM_COLOR: always
 
 jobs:
-  # ---------------------------------------------------------------- Linux -----
-  linux:
-    runs-on: ubuntu-22.04          # glibc plus ancienne => binaire plus portable
-    steps:
-      - uses: actions/checkout@v5
-      - name: Dependances systeme
-        run: |
-          chmod +x "${MANIFEST_DIR}/packaging/linux/build-deps.sh"
-          "${MANIFEST_DIR}/packaging/linux/build-deps.sh" -y
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: ${{ env.MANIFEST_DIR }}
-      - name: Compilation (release)
-        working-directory: ${{ env.MANIFEST_DIR }}
-        run: cargo build --release
-      - name: Empaquetage (.tar.gz)
-        run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          STAGE="ximod-architect-${VERSION}-linux-x86_64"
-          mkdir -p "$STAGE"
-          cp "${MANIFEST_DIR}/target/release/${BIN_NAME}" "$STAGE/"
-          cp -r "${MANIFEST_DIR}/assets" "$STAGE/assets"
-          # Marqueur "portable" : la presence d'un Config.ini a cote du binaire
-          # force XIMOD a ranger ses reglages ici (et non dans ~/.config), pour
-          # que l'archive extraite reste autonome.
-          printf '%s\n' '; XIMOD Architect - portable configuration marker.' \
-            '; Its presence keeps settings in this folder instead of ~/.config.' \
-            > "$STAGE/Config.ini"
-          cp "${MANIFEST_DIR}/packaging/linux/install.sh" "$STAGE/" 2>/dev/null || true
-          cp "${MANIFEST_DIR}/packaging/linux/ximod-architect.desktop" "$STAGE/" 2>/dev/null || true
-          tar czf "${STAGE}.tar.gz" "$STAGE"
-      - uses: actions/upload-artifact@v5
-        with:
-          name: linux
-          path: "*.tar.gz"
-
-  # -------------------------------------------------------------- Windows -----
-  windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: ${{ env.MANIFEST_DIR }}
-      - name: Compilation (release)
-        working-directory: ${{ env.MANIFEST_DIR }}
-        run: cargo build --release
-      - name: Empaquetage (.zip)
-        shell: pwsh
-        run: |
-          $Version = $env:GITHUB_REF_NAME -replace '^v',''
-          $Stage = "ximod-architect-$Version-windows-x86_64"
-          New-Item -ItemType Directory -Force -Path $Stage | Out-Null
-          Copy-Item "$env:MANIFEST_DIR/target/release/$($env:BIN_NAME).exe" $Stage
-          Copy-Item -Recurse "$env:MANIFEST_DIR/assets" "$Stage/assets"
-          # Marqueur "portable" : la presence d'un Config.ini a cote de l'exe force
-          # XIMOD a ranger ses reglages ici (et non dans %APPDATA%), pour que le zip
-          # extrait reste autonome. L'installateur Program Files n'inclut PAS ce
-          # fichier, donc l'app installee utilise bien %APPDATA%.
-          @(
-            '; XIMOD Architect - portable configuration marker.'
-            '; Its presence keeps settings in this folder instead of %APPDATA%.'
-          ) | Set-Content -Path "$Stage/Config.ini" -Encoding ascii
-          Compress-Archive -Path "$Stage/*" -DestinationPath "$Stage.zip" -Force
-      - uses: actions/upload-artifact@v5
-        with:
-          name: windows
-          path: "*.zip"
-      - name: Installer Inno Setup
-        run: choco install innosetup -y --no-progress
-      - name: Construire l'installateur (Inno Setup, version du tag)
-        shell: pwsh
-        working-directory: ${{ env.MANIFEST_DIR }}
-        run: |
-          $Version = $env:GITHUB_REF_NAME -replace '^v',''
-          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
-          & "$iscc" "/DMyAppVersion=$Version" "packaging\windows\ximod-architect.iss"
-      - uses: actions/upload-artifact@v5
-        with:
-          name: windows-installer
-          path: ${{ env.MANIFEST_DIR }}/installer/*.exe
-
-  # ---------------------------------------------------------------- macOS -----
-  macos:
-    runs-on: macos-14              # runner Apple Silicon
-    steps:
-      - uses: actions/checkout@v5
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: aarch64-apple-darwin,x86_64-apple-darwin
-      - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: ${{ env.MANIFEST_DIR }}
-      - name: Compilation universelle + bundle (+ signature/notarisation si secrets)
-        working-directory: ${{ env.MANIFEST_DIR }}
-        env:
-          MACOS_CERT_B64:  ${{ secrets.MACOS_CERTIFICATE_BASE64 }}
-          MACOS_CERT_PW:   ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
-          MACOS_IDENTITY:  ${{ secrets.MACOS_SIGN_IDENTITY }}
-          AC_APPLE_ID:     ${{ secrets.AC_APPLE_ID }}
-          AC_TEAM_ID:      ${{ secrets.AC_TEAM_ID }}
-          AC_PASSWORD:     ${{ secrets.AC_PASSWORD }}
-        run: |
-          set -euo pipefail
-          chmod +x packaging/macos/create-bundle.sh
-          if [ -n "${MACOS_CERT_B64:-}" ]; then
-            echo "Certificat present : signature Developer ID"
-            KEYCHAIN="$RUNNER_TEMP/build.keychain-db"
-            KPW="$(uuidgen)"
-            security create-keychain -p "$KPW" "$KEYCHAIN"
-            security set-keychain-settings -lut 21600 "$KEYCHAIN"
-            security unlock-keychain -p "$KPW" "$KEYCHAIN"
-            echo "$MACOS_CERT_B64" | base64 --decode > "$RUNNER_TEMP/cert.p12"
-            security import "$RUNNER_TEMP/cert.p12" -k "$KEYCHAIN" -P "${MACOS_CERT_PW:-}" -T /usr/bin/codesign
-            security list-keychains -d user -s "$KEYCHAIN" login.keychain-db
-            security set-key-partition-list -S apple-tool:,apple: -s -k "$KPW" "$KEYCHAIN" >/dev/null
-            NOTARY=()
-            if [ -n "${AC_APPLE_ID:-}" ] && [ -n "${AC_TEAM_ID:-}" ] && [ -n "${AC_PASSWORD:-}" ]; then
-              NOTARY=(--notarize --apple-id "$AC_APPLE_ID" --team-id "$AC_TEAM_ID" --password "$AC_PASSWORD")
-            fi
-            ./packaging/macos/create-bundle.sh --target universal --identity "$MACOS_IDENTITY" --dmg "${NOTARY[@]+"${NOTARY[@]}"}"
-          else
-            echo "Aucun certificat : bundle universel signe ad-hoc (non notarise)"
-            ./packaging/macos/create-bundle.sh --target universal --dmg
-          fi
-      - name: Renommage des artefacts
-        working-directory: ${{ env.MANIFEST_DIR }}
-        run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          cd dist
-          ditto -c -k --keepParent "XIMOD Architect.app" "ximod-architect-${VERSION}-macos-universal.app.zip"
-          for f in *.dmg; do [ -f "$f" ] && mv "$f" "ximod-architect-${VERSION}-macos-universal.dmg"; done
-      - uses: actions/upload-artifact@v5
-        with:
-          name: macos
-          path: |
-            ${{ env.MANIFEST_DIR }}/dist/*.app.zip
-            ${{ env.MANIFEST_DIR }}/dist/*.dmg
-
-  # -------------------------------------------------------------- Release -----
   release:
-    needs: [linux, windows, macos]
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
+    name: Release (${{ matrix.target-name }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target-name: windows
+            bin: ximod-architect.exe
+          - os: ubuntu-latest
+            target-name: linux
+            bin: ximod-architect
+          - os: macos-latest
+            target-name: macos
+            bin: ximod-architect
+
     steps:
-      - uses: actions/download-artifact@v5
-        with:
-          path: artifacts
-      - name: Publier la Release GitHub
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libgtk-3-dev \
+            libxcb-render0-dev \
+            libxcb-shape0-dev \
+            libxcb-xfixes0-dev \
+            libxkbcommon-dev \
+            libspeechd-dev \
+            libssl-dev \
+            libx11-dev
+
+      - name: Install Rust toolchain (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build (release)
+        run: cargo build --release --verbose
+
+      # --- Empaquetage Linux / macOS : exécutable + assets dans un .tar.gz ---
+      - name: Package (Linux/macOS)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME}"
+          STAGE="XIMOD_Architect_${VERSION}_${{ matrix.target-name }}"
+          mkdir -p "dist/${STAGE}"
+          cp "target/release/${{ matrix.bin }}" "dist/${STAGE}/"
+          cp -r assets "dist/${STAGE}/"
+          [ -f README.md ] && cp README.md "dist/${STAGE}/" || true
+          tar -czf "dist/${STAGE}.tar.gz" -C dist "${STAGE}"
+          echo "ASSET=dist/${STAGE}.tar.gz" >> "$GITHUB_ENV"
+
+      # --- Empaquetage Windows : exécutable + assets dans un .zip ---
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $Version = $env:GITHUB_REF_NAME
+          $Stage = "XIMOD_Architect_${Version}_windows"
+          New-Item -ItemType Directory -Force -Path "dist/$Stage" | Out-Null
+          Copy-Item "target/release/${{ matrix.bin }}" "dist/$Stage/"
+          Copy-Item -Recurse "assets" "dist/$Stage/"
+          if (Test-Path "README.md") { Copy-Item "README.md" "dist/$Stage/" }
+          Compress-Archive -Path "dist/$Stage" -DestinationPath "dist/$Stage.zip"
+          "ASSET=dist/$Stage.zip" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/**/*
+          files: ${{ env.ASSET }}
+          draft: false
+          prerelease: false
           generate_release_notes: true
           fail_on_unmatched_files: true
