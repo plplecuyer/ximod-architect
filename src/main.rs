@@ -37,6 +37,11 @@ pub const APP_NAME: &str = "XIMOD Architect";
 /// Application version
 pub const APP_VERSION: &str = env!("CARGO_PKG_VERSION");
 
+/// Public page of the application, embedded in the "Created with…" signature
+/// comment of generated XML files. Leave empty to omit the URL from the
+/// comment; set it to the Nexus/GitHub page once published.
+pub const APP_URL: &str = "";
+
 /// Default window size
 pub const DEFAULT_WINDOW_WIDTH: f32 = 1280.0;
 pub const DEFAULT_WINDOW_HEIGHT: f32 = 800.0;

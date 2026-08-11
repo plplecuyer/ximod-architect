@@ -735,7 +735,7 @@ mod tests {
 
         let install: Vec<String> = compute_install(&m, &sel, &files)
             .into_iter()
-            .map(|f| f.destination)
+            .map(|f| f.source)
             .collect();
         assert!(install.iter().any(|d| d == "base.esp"));
         assert!(install.iter().any(|d| d.contains("a.dds")));
@@ -757,7 +757,7 @@ mod tests {
 
         let install: Vec<String> = compute_install(&m, &sel, &files)
             .into_iter()
-            .map(|f| f.destination)
+            .map(|f| f.source)
             .collect();
         assert!(install.iter().any(|d| d == "patch4k.esp")); // conditional applied
         assert!(install.iter().any(|d| d.contains("b.dds")));

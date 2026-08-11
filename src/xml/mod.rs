@@ -61,6 +61,9 @@ fn write_info_xml<W: Write>(mut w: W, ximod: &Ximod, bom: bool) -> Result<()> {
     xml_writer.write_event(Event::Decl(BytesDecl::new("1.0", Some("utf-8"), None)))?;
     xml_writer.write_event(Event::Text(BytesText::new("\n")))?;
 
+    // Tool signature (must come after the declaration, never before it)
+    write_tool_signature(&mut xml_writer)?;
+
     // Root element
     xml_writer.write_event(Event::Start(BytesStart::new(INSTALLER_DIR)))?;
 
@@ -126,6 +129,9 @@ fn write_module_config_xml<W: Write>(mut w: W, ximod: &Ximod, bom: bool) -> Resu
     xml_writer.write_event(Event::Decl(BytesDecl::new("1.0", Some("utf-8"), None)))?;
     xml_writer.write_event(Event::Text(BytesText::new("\n")))?;
 
+    // Tool signature (must come after the declaration, never before it)
+    write_tool_signature(&mut xml_writer)?;
+
     // Root element with schema
     let mut config = BytesStart::new("config");
     config.push_attribute(("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance"));
@@ -182,6 +188,46 @@ fn write_module_config_xml<W: Write>(mut w: W, ximod: &Ximod, bom: bool) -> Resu
     Ok(())
 }
 
+/// Write the "Created with…" tool signature as an XML comment.
+///
+/// Placed immediately after the XML declaration (a comment must never precede
+/// the `<?xml ?>` declaration, which has to be the very first thing in the
+/// document). The URL is included only when [`crate::APP_URL`] is set.
+fn write_tool_signature<W: Write>(writer: &mut Writer<W>) -> Result<()> {
+    let comment = if crate::APP_URL.is_empty() {
+        format!(" Created with {} {} ", crate::APP_NAME, crate::APP_VERSION)
+    } else {
+        format!(
+            " Created with {} {} [{}] ",
+            crate::APP_NAME,
+            crate::APP_VERSION,
+            crate::APP_URL
+        )
+    };
+    writer.write_event(Event::Comment(BytesText::from_escaped(comment)))?;
+    writer.write_event(Event::Text(BytesText::new("\n")))?;
+    Ok(())
+}
+
+/// Strip characters that must never appear in an XML attribute value: C0/C1
+/// control characters (including a stray CR/LF/TAB left by a paste), the
+/// Unicode replacement character U+FFFD, zero-width characters and a BOM.
+/// XML 1.0 forbids raw control characters, so cleaning them here both removes
+/// the "invisible garbage" users occasionally saw after a name and guarantees
+/// well-formed output.
+fn clean_attr(s: &str) -> String {
+    s.chars()
+        .filter(|&c| {
+            !(c.is_control()
+                || c == '\u{FFFD}'
+                || c == '\u{200B}'
+                || c == '\u{200C}'
+                || c == '\u{200D}'
+                || c == '\u{FEFF}')
+        })
+        .collect()
+}
+
 /// Write a text element
 fn write_text_element<W: Write>(writer: &mut Writer<W>, name: &str, content: &str) -> Result<()> {
     writer.write_event(Event::Start(BytesStart::new(name)))?;
@@ -194,8 +240,10 @@ fn write_text_element<W: Write>(writer: &mut Writer<W>, name: &str, content: &st
 fn write_install_file<W: Write>(writer: &mut Writer<W>, file: &InstallFile) -> Result<()> {
     let tag_name = file.file_type.as_str();
     let mut elem = BytesStart::new(tag_name);
-    elem.push_attribute(("source", file.source.as_str()));
-    elem.push_attribute(("destination", file.destination.as_str()));
+    let source = clean_attr(&file.source);
+    let destination = clean_attr(&file.destination);
+    elem.push_attribute(("source", source.as_str()));
+    elem.push_attribute(("destination", destination.as_str()));
     elem.push_attribute(("priority", file.priority.to_string().as_str()));
     writer.write_event(Event::Empty(elem))?;
     Ok(())
@@ -204,7 +252,8 @@ fn write_install_file<W: Write>(writer: &mut Writer<W>, file: &InstallFile) -> R
 /// Write an install step
 fn write_step<W: Write>(writer: &mut Writer<W>, step: &Step) -> Result<()> {
     let mut step_elem = BytesStart::new("installStep");
-    step_elem.push_attribute(("name", step.name.as_str()));
+    let step_name = clean_attr(&step.name);
+    step_elem.push_attribute(("name", step_name.as_str()));
     writer.write_event(Event::Start(step_elem))?;
 
     // Visibility conditions
@@ -230,7 +279,8 @@ fn write_step<W: Write>(writer: &mut Writer<W>, step: &Step) -> Result<()> {
 /// Write a plugin group
 fn write_plugin_group<W: Write>(writer: &mut Writer<W>, group: &PluginGroup) -> Result<()> {
     let mut group_elem = BytesStart::new("group");
-    group_elem.push_attribute(("name", group.name.as_str()));
+    let group_name = clean_attr(&group.name);
+    group_elem.push_attribute(("name", group_name.as_str()));
     group_elem.push_attribute(("type", group.selection_type.as_str()));
     writer.write_event(Event::Start(group_elem))?;
 
@@ -251,7 +301,8 @@ fn write_plugin_group<W: Write>(writer: &mut Writer<W>, group: &PluginGroup) -> 
 /// Write a plugin
 fn write_plugin<W: Write>(writer: &mut Writer<W>, plugin: &Plugin) -> Result<()> {
     let mut plugin_elem = BytesStart::new("plugin");
-    plugin_elem.push_attribute(("name", plugin.name.as_str()));
+    let plugin_name = clean_attr(&plugin.name);
+    plugin_elem.push_attribute(("name", plugin_name.as_str()));
     writer.write_event(Event::Start(plugin_elem))?;
 
     // Description
@@ -260,7 +311,8 @@ fn write_plugin<W: Write>(writer: &mut Writer<W>, plugin: &Plugin) -> Result<()>
     // Image
     if let Some(ref img) = plugin.image_path {
         let mut img_elem = BytesStart::new("image");
-        img_elem.push_attribute(("path", img.as_str()));
+        let img_path = clean_attr(img);
+        img_elem.push_attribute(("path", img_path.as_str()));
         writer.write_event(Event::Empty(img_elem))?;
     }
 
@@ -269,9 +321,11 @@ fn write_plugin<W: Write>(writer: &mut Writer<W>, plugin: &Plugin) -> Result<()>
         writer.write_event(Event::Start(BytesStart::new("conditionFlags")))?;
         for flag in &plugin.condition_flags {
             let mut flag_elem = BytesStart::new("flag");
-            flag_elem.push_attribute(("name", flag.name.as_str()));
+            let flag_name = clean_attr(&flag.name);
+            flag_elem.push_attribute(("name", flag_name.as_str()));
             writer.write_event(Event::Start(flag_elem))?;
-            writer.write_event(Event::Text(BytesText::new(&flag.value)))?;
+            let flag_value = clean_attr(&flag.value);
+            writer.write_event(Event::Text(BytesText::new(&flag_value)))?;
             writer.write_event(Event::End(BytesEnd::new("flag")))?;
         }
         writer.write_event(Event::End(BytesEnd::new("conditionFlags")))?;
@@ -340,15 +394,17 @@ fn write_dependencies<W: Write>(
     writer.write_event(Event::Start(deps_elem))?;
 
     for dep in deps {
+        let dep_name = clean_attr(&dep.name);
+        let dep_value = clean_attr(&dep.value);
         if dep.dep_type == "file" {
             let mut elem = BytesStart::new("fileDependency");
-            elem.push_attribute(("file", dep.name.as_str()));
-            elem.push_attribute(("state", dep.value.as_str()));
+            elem.push_attribute(("file", dep_name.as_str()));
+            elem.push_attribute(("state", dep_value.as_str()));
             writer.write_event(Event::Empty(elem))?;
         } else {
             let mut elem = BytesStart::new("flagDependency");
-            elem.push_attribute(("flag", dep.name.as_str()));
-            elem.push_attribute(("value", dep.value.as_str()));
+            elem.push_attribute(("flag", dep_name.as_str()));
+            elem.push_attribute(("value", dep_value.as_str()));
             writer.write_event(Event::Empty(elem))?;
         }
     }

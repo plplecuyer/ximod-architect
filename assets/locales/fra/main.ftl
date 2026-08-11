@@ -333,3 +333,25 @@ prop-select-lang = Sélectionnez une langue pour voir ses détails.
 # Direct link to Nexus Mods (game slug)
 btn-nexus = Nexus ↗
 nexus-open-hint = Ouvrir la page Nexus Mods du jeu
+
+# Vérification des fichiers référencés (V2)
+verify-no-root = Vérification des fichiers ignorée : aucun répertoire racine défini
+loc-header = image d'en-tête
+loc-required = fichiers requis
+loc-conditional = ensemble conditionnel { $num }
+loc-plugin = étape { $step }, groupe { $group }, option « { $plugin } »
+verify-missing-file = Fichier introuvable : { $path } ({ $loc })
+verify-missing-folder = Dossier introuvable : { $path } ({ $loc })
+verify-missing-image = Image introuvable : { $path } ({ $loc })
+verify-absolute = Chemin absolu (non portable) : { $path } ({ $loc })
+verify-outside = Chemin hors du répertoire racine : { $path } ({ $loc })
+verify-orphan = Fichier orphelin (référencé par aucune option) : { $path }
+
+# Onglets multi-FOMOD & alerte de fermeture (V2)
+menu-close-fomod = Fermer le Fomod
+menu-close-all-fomods = Fermer tous les Fomods
+tab-untitled = (sans titre)
+msg-drop-not-fomod = L'élément déposé n'est pas un FOMOD (dossier « fomod » introuvable)
+exit-title = Modifications non enregistrées
+exit-unsaved = Le fichier n'a pas été sauvegardé. Voulez-vous le sauvegarder ?
+tab-close-hint = Fermer ce FOMOD

@@ -22,13 +22,60 @@ pub enum Tab {
     ConditionalInstalls,
 }
 
+/// One open FOMOD document (one tab). Snapshots the active working copy so a
+/// tab can be left and returned to without losing its data or view.
+#[derive(Clone)]
+pub struct DocState {
+    pub ximod: Ximod,
+    pub root_directory: Option<PathBuf>,
+    pub modified: bool,
+    pub tab: Tab,
+    pub step: Option<usize>,
+    pub group: Option<usize>,
+    pub plugin: Option<usize>,
+    pub file: Option<usize>,
+    pub flag: Option<usize>,
+    pub dependency: Option<usize>,
+    pub cond_file: Option<usize>,
+    pub cond_pattern: Option<usize>,
+    pub req_file: Option<usize>,
+}
+
+impl DocState {
+    /// A pristine blank document (no root, nothing selected).
+    fn blank() -> Self {
+        Self {
+            ximod: Ximod::default(),
+            root_directory: None,
+            modified: false,
+            tab: Tab::Info,
+            step: None,
+            group: None,
+            plugin: None,
+            file: None,
+            flag: None,
+            dependency: None,
+            cond_file: None,
+            cond_pattern: None,
+            req_file: None,
+        }
+    }
+}
+
+/// Which documents a pending close affects.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CloseScope {
+    /// Close the active FOMOD only.
+    Active,
+    /// Close every FOMOD.
+    All,
+}
+
 /// A pending action awaiting user confirmation.
 #[derive(Debug, Clone)]
 pub enum ConfirmAction {
     /// Delete an installation step (destructive: removes its groups/plugins).
     DeleteStep(usize),
-    /// Start a new project, discarding unsaved changes.
-    NewProject,
     /// Save a project that did not pass validation. Carries the ready-to-display
     /// warning text (the list of problems) so the dialog can show it verbatim.
     SaveAnyway(String),
@@ -183,9 +230,29 @@ pub struct XimodApp {
     // Flag to apply theme on first frame
     pub theme_applied: bool,
 
+    // Font size currently pushed into egui's text styles. Used to apply the
+    // size only when it actually changes (live preview while the Settings
+    // dialog is open, saved value otherwise). Sentinel < 0 forces a first apply.
+    pub applied_font_size: f32,
+
     // Status
     pub status_message: String,
     pub project_modified: bool,
+
+    // Multi-FOMOD documents (one tab each). `self.ximod` / `root_directory` /
+    // `project_modified` and the `current_*` indices are the ACTIVE working copy;
+    // `docs[active_doc]` mirrors it (synced on tab switch / close). There is
+    // always at least one document.
+    pub docs: Vec<DocState>,
+    pub active_doc: usize,
+    /// Unsaved-changes prompt shown when closing XIMOD.
+    pub show_exit_prompt: bool,
+    /// Set once the user chose Save/Don't-save, so the next close is allowed.
+    pub exit_confirmed: bool,
+    /// A graceful close was requested (menu Exit / Ctrl+Q); handled in `update`.
+    pub request_close: bool,
+    /// A pending close of a modified document awaiting confirmation.
+    pub close_prompt: Option<CloseScope>,
 
     // Temporary edit values
     pub temp_flag_name: String,
@@ -362,8 +429,15 @@ impl Default for XimodApp {
             settings_focus: 0,
             screen_info: crate::ScreenInfo::default(),
             theme_applied: false,
+            applied_font_size: -1.0,
             status_message: String::new(),
             project_modified: false,
+            docs: Vec::new(),
+            active_doc: 0,
+            show_exit_prompt: false,
+            exit_confirmed: false,
+            request_close: false,
+            close_prompt: None,
             temp_flag_name: String::new(),
             temp_flag_value: String::new(),
             temp_dep_type: "flag".to_string(),
@@ -475,26 +549,244 @@ impl XimodApp {
                 }
             }
         }
+        // Font size is handled by the per-frame live sync in `update()` (which
+        // reflects the Settings preview immediately); nothing to do here.
     }
 
+    /// Push a font size into egui's text styles so the "Font size" setting
+    /// actually changes the rendered text. Sizes for the other text styles are
+    /// derived proportionally from the base (body) size.
+    fn apply_font_size_value(&self, ctx: &egui::Context, base: f32) {
+        use egui::{FontFamily, FontId, TextStyle};
+        let base = base.clamp(8.0, 24.0);
+        let mut style = (*ctx.style()).clone();
+        style.text_styles = [
+            (TextStyle::Small, FontId::new((base * 0.85).round(), FontFamily::Proportional)),
+            (TextStyle::Body, FontId::new(base, FontFamily::Proportional)),
+            (TextStyle::Button, FontId::new(base, FontFamily::Proportional)),
+            (TextStyle::Monospace, FontId::new((base * 0.95).round(), FontFamily::Monospace)),
+            (TextStyle::Heading, FontId::new((base * 1.3).round(), FontFamily::Proportional)),
+        ]
+        .into();
+        ctx.set_style(style);
+    }
+
+    /// Start a new blank project. With FOMOD tabs this adds a new tab (replacing
+    /// the current one only when it is a pristine blank project), so nothing is
+    /// discarded and no confirmation is needed.
     fn new_project(&mut self) {
+        self.ensure_doc();
+        if !self.active_is_pristine() {
+            self.commit_active();
+            let clone = self.docs[self.active_doc].clone();
+            self.docs.push(clone);
+            self.active_doc = self.docs.len() - 1;
+        }
         self.ximod = Ximod::default();
         self.root_directory = None;
-        self.current_step_index = None;
-        self.current_group_index = None;
-        self.current_plugin_index = None;
         self.project_modified = false;
+        self.reset_navigation();
+        self.commit_active();
         self.status_message = self.i18n.t("status-ready");
     }
 
-    /// Start a new project, asking for confirmation first if there are unsaved
-    /// changes. Shared by the "New" menu item and the Ctrl+N shortcut.
+    /// Shared by the "New" menu item and the Ctrl+N shortcut.
     fn request_new_project(&mut self) {
+        self.new_project();
+    }
+
+    // ---- Multi-FOMOD document (tab) helpers ----
+
+    /// Snapshot the active working copy into a `DocState`.
+    fn make_doc_snapshot(&self) -> DocState {
+        DocState {
+            ximod: self.ximod.clone(),
+            root_directory: self.root_directory.clone(),
+            modified: self.project_modified,
+            tab: self.current_tab,
+            step: self.current_step_index,
+            group: self.current_group_index,
+            plugin: self.current_plugin_index,
+            file: self.current_file_index,
+            flag: self.current_flag_index,
+            dependency: self.current_dependency_index,
+            cond_file: self.current_cond_file_index,
+            cond_pattern: self.current_cond_pattern_index,
+            req_file: self.current_req_file_index,
+        }
+    }
+
+    /// Guarantee at least one document, mirroring the initial working copy.
+    fn ensure_doc(&mut self) {
+        if self.docs.is_empty() {
+            self.docs.push(self.make_doc_snapshot());
+            self.active_doc = 0;
+        } else if self.active_doc >= self.docs.len() {
+            self.active_doc = self.docs.len() - 1;
+        }
+    }
+
+    /// Copy the active working copy into its `docs` slot.
+    fn commit_active(&mut self) {
+        self.ensure_doc();
+        let snap = self.make_doc_snapshot();
+        self.docs[self.active_doc] = snap;
+    }
+
+    /// Load `docs[active_doc]` into the active working copy.
+    fn checkout_active(&mut self) {
+        self.ensure_doc();
+        let d = self.docs[self.active_doc].clone();
+        self.ximod = d.ximod;
+        self.root_directory = d.root_directory;
+        self.project_modified = d.modified;
+        self.current_tab = d.tab;
+        self.current_step_index = d.step;
+        self.current_group_index = d.group;
+        self.current_plugin_index = d.plugin;
+        self.current_file_index = d.file;
+        self.current_flag_index = d.flag;
+        self.current_dependency_index = d.dependency;
+        self.current_cond_file_index = d.cond_file;
+        self.current_cond_pattern_index = d.cond_pattern;
+        self.current_req_file_index = d.req_file;
+    }
+
+    /// Switch the active document to `index`.
+    fn switch_doc(&mut self, index: usize) {
+        if index >= self.docs.len() || index == self.active_doc {
+            return;
+        }
+        self.commit_active();
+        self.active_doc = index;
+        self.checkout_active();
+    }
+
+    /// True when the active document is an untouched blank project.
+    fn active_is_pristine(&self) -> bool {
+        self.root_directory.is_none()
+            && !self.project_modified
+            && self.ximod.name.is_empty()
+            && self.ximod.steps.is_empty()
+            && self.ximod.required_files.is_empty()
+            && self.ximod.conditional_files.is_empty()
+    }
+
+    /// Reset the navigation selection to a freshly-loaded project's defaults.
+    fn reset_navigation(&mut self) {
+        self.current_tab = Tab::Info;
+        self.current_step_index = if self.ximod.steps.is_empty() { None } else { Some(0) };
+        self.current_group_index = None;
+        self.current_plugin_index = None;
+        self.current_file_index = None;
+        self.current_flag_index = None;
+        self.current_dependency_index = None;
+        self.current_cond_file_index = None;
+        self.current_cond_pattern_index = None;
+        self.current_req_file_index = None;
+    }
+
+    /// Make a freshly-loaded project the active document — a new tab, unless the
+    /// current document is a pristine blank project (then it is replaced).
+    fn open_loaded(&mut self, ximod: Ximod, root: PathBuf) {
+        self.ensure_doc();
+        // If this FOMOD is already open, just focus its tab.
+        if let Some(i) = self
+            .docs
+            .iter()
+            .position(|d| d.root_directory.as_deref() == Some(root.as_path()))
+        {
+            self.switch_doc(i);
+            return;
+        }
+        if !self.active_is_pristine() {
+            self.commit_active();
+            let clone = self.docs[self.active_doc].clone();
+            self.docs.push(clone);
+            self.active_doc = self.docs.len() - 1;
+        }
+        self.ximod = ximod;
+        self.root_directory = Some(root);
+        self.project_modified = false;
+        self.reset_navigation();
+        self.commit_active();
+    }
+
+    /// Full (untruncated) name of a document: its root folder name, else the mod
+    /// name, else empty.
+    fn doc_full_name(d: &DocState) -> String {
+        if let Some(root) = &d.root_directory {
+            if let Some(name) = root.file_name().and_then(|n| n.to_str()) {
+                return name.to_string();
+            }
+        }
+        if !d.ximod.name.is_empty() {
+            return d.ximod.name.clone();
+        }
+        String::new()
+    }
+
+    /// Close the active FOMOD, asking for confirmation first if it has unsaved
+    /// changes. A pristine blank tab closes without prompting.
+    fn close_active_fomod(&mut self) {
+        self.ensure_doc();
         if self.project_modified {
-            self.confirm_action = Some(ConfirmAction::NewProject);
-            self.show_confirm = true;
+            self.close_prompt = Some(CloseScope::Active);
         } else {
-            self.new_project();
+            self.close_active_fomod_force();
+        }
+    }
+
+    /// Close the active FOMOD unconditionally. The last remaining document
+    /// becomes a blank one.
+    fn close_active_fomod_force(&mut self) {
+        self.ensure_doc();
+        if self.docs.len() <= 1 {
+            self.docs[0] = DocState::blank();
+            self.active_doc = 0;
+        } else {
+            self.docs.remove(self.active_doc);
+            if self.active_doc >= self.docs.len() {
+                self.active_doc = self.docs.len() - 1;
+            }
+        }
+        self.checkout_active();
+        self.status_message = self.i18n.t("status-ready");
+    }
+
+    /// Close every FOMOD, asking for confirmation first if any has unsaved
+    /// changes.
+    fn close_all_fomods(&mut self) {
+        self.commit_active();
+        if self.docs.iter().any(|d| d.modified) {
+            self.close_prompt = Some(CloseScope::All);
+        } else {
+            self.close_all_fomods_force();
+        }
+    }
+
+    /// Close every FOMOD unconditionally, leaving a single blank project.
+    fn close_all_fomods_force(&mut self) {
+        self.docs.clear();
+        self.docs.push(DocState::blank());
+        self.active_doc = 0;
+        self.checkout_active();
+        self.status_message = self.i18n.t("status-ready");
+    }
+
+    /// Save every modified document that has a destination folder.
+    fn save_all_modified(&mut self) {
+        self.commit_active();
+        for i in 0..self.docs.len() {
+            if self.docs[i].modified && self.docs[i].root_directory.is_some() {
+                if i != self.active_doc {
+                    self.commit_active();
+                    self.active_doc = i;
+                    self.checkout_active();
+                }
+                self.write_project();
+                self.commit_active();
+            }
         }
     }
 
@@ -612,20 +904,10 @@ impl XimodApp {
     fn load_project(&mut self, path: PathBuf) {
         match xml::load_ximod(&path) {
             Ok(ximod) => {
-                self.ximod = ximod;
-                self.root_directory = Some(path.clone());
+                // Open in a new tab (or focus/replace as appropriate).
+                self.open_loaded(ximod, path.clone());
                 self.config.add_recent_file(path);
                 let _ = self.config.save();
-
-                self.current_step_index = if !self.ximod.steps.is_empty() {
-                    Some(0)
-                } else {
-                    None
-                };
-                self.current_group_index = None;
-                self.current_plugin_index = None;
-                self.project_modified = false;
-
                 self.status_message = self.i18n.t("msg-load-success");
             }
             Err(e) => {
@@ -750,6 +1032,13 @@ impl XimodApp {
             Ok(()) => {
                 self.project_modified = false;
                 self.status_message = self.i18n.t("msg-save-success");
+
+                // Record the saved project in the recent-files list. Previously
+                // only "Open folder/file" did this, so a project that was created
+                // and only ever saved (never re-opened) never appeared in
+                // File → Recent and the [RecentFiles] section stayed empty.
+                self.config.add_recent_file(root.clone());
+                let _ = self.config.save();
 
                 // Post-save script
                 if !self.config.post_save_script.is_empty() {
@@ -897,8 +1186,58 @@ impl XimodApp {
                 report.push(self.translate_schema_issue(&issue));
             }
         }
+        // Referenced-file verification (V2 priority 1): needs the root folder on
+        // disk. Skipped with a note when no root is set.
+        match &self.root_directory {
+            Some(root) => {
+                let issues = crate::models::verify::verify_files(&self.ximod, root);
+                for issue in &issues {
+                    report.push(self.translate_file_issue(issue));
+                }
+            }
+            None => report.push(self.i18n.t("verify-no-root")),
+        }
         self.validation_report = report;
         self.show_validation_report = true;
+    }
+
+    /// Build a human context string for a referenced-file location.
+    fn file_ref_location(&self, loc: &crate::models::verify::RefLoc) -> String {
+        use crate::models::verify::RefLoc as L;
+        match loc {
+            L::Header => self.i18n.t("loc-header"),
+            L::RequiredFiles => self.i18n.t("loc-required"),
+            L::ConditionalSet { index } => self.i18n.t_num("loc-conditional", *index as i64),
+            L::Plugin { step, group, plugin } => {
+                let mut args = FluentArgs::new();
+                args.set("step", *step as i64);
+                args.set("group", *group as i64);
+                args.set("plugin", plugin.clone());
+                self.i18n.t_with_args("loc-plugin", Some(&args))
+            }
+        }
+    }
+
+    /// Localise a referenced-file issue.
+    pub fn translate_file_issue(&self, issue: &crate::models::verify::FileIssue) -> String {
+        use crate::models::verify::FileIssue as F;
+        let with = |key: &str, loc: &crate::models::verify::RefLoc, path: &str| {
+            let mut args = FluentArgs::new();
+            args.set("loc", self.file_ref_location(loc));
+            args.set("path", path.to_string());
+            self.i18n.t_with_args(key, Some(&args))
+        };
+        match issue {
+            F::MissingSource { loc, path, folder } => {
+                with(if *folder { "verify-missing-folder" } else { "verify-missing-file" }, loc, path)
+            }
+            F::MissingImage { loc, path } => with("verify-missing-image", loc, path),
+            F::AbsolutePath { loc, path } => with("verify-absolute", loc, path),
+            F::OutsideRoot { loc, path } => with("verify-outside", loc, path),
+            F::OrphanFile { path } => {
+                self.i18n.t_arg("verify-orphan", "path", path)
+            }
+        }
     }
 
     /// Render the validation report window.
@@ -972,7 +1311,6 @@ impl XimodApp {
         let title = self.i18n.t("confirm-title");
         let message = match &action {
             ConfirmAction::DeleteStep(_) => self.i18n.t("confirm-delete"),
-            ConfirmAction::NewProject => self.i18n.t("confirm-discard"),
             ConfirmAction::SaveAnyway(msg) => msg.clone(),
         };
 
@@ -1033,9 +1371,6 @@ impl XimodApp {
                     self.project_modified = true;
                 }
             }
-            ConfirmAction::NewProject => {
-                self.new_project();
-            }
             ConfirmAction::SaveAnyway(_) => {
                 self.write_project();
             }
@@ -1081,7 +1416,7 @@ impl XimodApp {
         } else if ctx.input_mut(|i| i.consume_shortcut(&sc.about)) {
             self.show_about = true;
         } else if ctx.input_mut(|i| i.consume_shortcut(&sc.quit)) {
-            std::process::exit(0);
+            self.request_close = true;
         }
     }
 
@@ -1096,6 +1431,8 @@ impl XimodApp {
         let menu_save = self.i18n.t("menu-save");
         let menu_merge = self.i18n.t("menu-merge");
         let menu_export = self.i18n.t("menu-export");
+        let menu_close_fomod = self.i18n.t("menu-close-fomod");
+        let menu_close_all = self.i18n.t("menu-close-all-fomods");
         let menu_recent = self.i18n.t("menu-recent");
         let menu_exit = self.i18n.t("menu-exit");
         let menu_options = self.i18n.t("menu-options");
@@ -1191,6 +1528,22 @@ impl XimodApp {
 
                         ui.separator();
 
+                        // Close the active FOMOD / all FOMODs.
+                        let btn_close = egui::Button::new(&menu_close_fomod)
+                            .wrap_mode(egui::TextWrapMode::Extend);
+                        if ui.add(btn_close).clicked() {
+                            self.close_active_fomod();
+                            ui.close_menu();
+                        }
+                        let btn_close_all = egui::Button::new(&menu_close_all)
+                            .wrap_mode(egui::TextWrapMode::Extend);
+                        if ui.add(btn_close_all).clicked() {
+                            self.close_all_fomods();
+                            ui.close_menu();
+                        }
+
+                        ui.separator();
+
                         // Recent files submenu with unique ID
                         ui.push_id(("recent_menu", lv), |ui| {
                             ui.menu_button(&menu_recent, |ui| {
@@ -1215,7 +1568,8 @@ impl XimodApp {
                             .wrap_mode(egui::TextWrapMode::Extend)
                             .shortcut_text(&sct_quit);
                         if ui.add(btn_exit).clicked() {
-                            std::process::exit(0);
+                            self.request_close = true;
+                            ui.close_menu();
                         }
                     });
                 });
@@ -2144,7 +2498,17 @@ impl XimodApp {
                                 self.current_file_index = Some(idx);
                             }
                             ui.label(src);
-                            ui.label(dst);
+                            let mut dst_buf = dst.clone();
+                            if ui
+                                .add(egui::TextEdit::singleline(&mut dst_buf).desired_width(220.0))
+                                .changed()
+                            {
+                                self.ximod.steps[step_idx].plugin_groups[group_idx].plugins
+                                    [plugin_idx]
+                                    .files[idx]
+                                    .destination = dst_buf;
+                                self.project_modified = true;
+                            }
                             ui.label(pri.to_string());
                             ui.end_row();
                         }
@@ -2245,7 +2609,14 @@ impl XimodApp {
                                 self.current_req_file_index = Some(idx);
                             }
                             ui.label(src);
-                            ui.label(dst);
+                            let mut dst_buf = dst.clone();
+                            if ui
+                                .add(egui::TextEdit::singleline(&mut dst_buf).desired_width(220.0))
+                                .changed()
+                            {
+                                self.ximod.required_files[idx].destination = dst_buf;
+                                self.project_modified = true;
+                            }
                             ui.label(pri.to_string());
                             ui.end_row();
                         }
@@ -2506,7 +2877,15 @@ impl XimodApp {
                                     self.current_cond_file_index = Some(idx);
                                 }
                                 ui.label(src);
-                                ui.label(dst);
+                                let mut dst_buf = dst.clone();
+                                if ui
+                                    .add(egui::TextEdit::singleline(&mut dst_buf).desired_width(220.0))
+                                    .changed()
+                                {
+                                    self.ximod.conditional_files[pattern_idx].files[idx]
+                                        .destination = dst_buf;
+                                    self.project_modified = true;
+                                }
                                 ui.label(pri.to_string());
                                 ui.end_row();
                             }
@@ -3376,6 +3755,232 @@ impl XimodApp {
             self.show_script_dialog = false;
         }
     }
+
+    /// The FOMOD tab strip (one tab per open document).
+    fn render_fomod_tabs(&mut self, ctx: &egui::Context, modal_open: bool) {
+        let active = self.active_doc;
+        let untitled = self.i18n.t("tab-untitled");
+        let close_hint = self.i18n.t("tab-close-hint");
+        // Precompute (label, tooltip, modified) to avoid borrow issues.
+        let entries: Vec<(String, String, bool)> = self
+            .docs
+            .iter()
+            .map(|d| {
+                let full = Self::doc_full_name(d);
+                let mut label = elide_tab(&full, 22);
+                if label.is_empty() {
+                    label = untitled.clone();
+                }
+                let tooltip = d
+                    .root_directory
+                    .as_ref()
+                    .map(|p| p.display().to_string())
+                    .unwrap_or_else(|| if full.is_empty() { untitled.clone() } else { full.clone() });
+                (label, tooltip, d.modified)
+            })
+            .collect();
+
+        let mut switch_to: Option<usize> = None;
+        let mut close_tab: Option<usize> = None;
+        egui::TopBottomPanel::top("fomod_tabs").show(ctx, |ui| {
+            if modal_open {
+                ui.disable();
+            }
+            egui::ScrollArea::horizontal().show(ui, |ui| {
+                ui.horizontal(|ui| {
+                    for (i, (label, tooltip, modified)) in entries.iter().enumerate() {
+                        let text = if *modified {
+                            format!("● {label}")
+                        } else {
+                            label.clone()
+                        };
+                        if ui
+                            .selectable_label(i == active, text)
+                            .on_hover_text(tooltip)
+                            .clicked()
+                        {
+                            switch_to = Some(i);
+                        }
+                        // Per-tab close button (delete icon) with save check.
+                        if crate::ui::components::delete_button(ui)
+                            .on_hover_text(&close_hint)
+                            .clicked()
+                        {
+                            close_tab = Some(i);
+                        }
+                        ui.separator();
+                    }
+                });
+            });
+        });
+        // Closing takes precedence over a plain selection click.
+        if let Some(i) = close_tab {
+            self.switch_doc(i);
+            self.close_active_fomod();
+        } else if let Some(i) = switch_to {
+            self.switch_doc(i);
+        }
+    }
+
+    /// Open any FOMOD folder / config file dropped onto the window.
+    fn handle_dropped_files(&mut self, ctx: &egui::Context) {
+        let dropped: Vec<PathBuf> = ctx.input(|i| {
+            i.raw
+                .dropped_files
+                .iter()
+                .filter_map(|f| f.path.clone())
+                .collect()
+        });
+        for p in dropped {
+            match fomod_root_from_drop(&p) {
+                Some(root) => self.load_project(root),
+                None => self.status_message = self.i18n.t("msg-drop-not-fomod"),
+            }
+        }
+    }
+
+    /// The unsaved-changes prompt shown when closing XIMOD (Yes / No / Cancel).
+    fn render_exit_prompt(&mut self, ctx: &egui::Context) {
+        if !self.show_exit_prompt {
+            return;
+        }
+        let title = self.i18n.t("exit-title");
+        let message = self.i18n.t("exit-unsaved");
+        let yes = self.i18n.t("btn-yes");
+        let no = self.i18n.t("btn-no");
+        let cancel = self.i18n.t("btn-cancel");
+        let mut choice = 0u8;
+        egui::Window::new(title)
+            .collapsible(false)
+            .resizable(false)
+            .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
+            .show(ctx, |ui| {
+                ui.label(message);
+                ui.add_space(12.0);
+                ui.horizontal(|ui| {
+                    if ui.button(yes).clicked() {
+                        choice = 1;
+                    }
+                    if ui.button(no).clicked() {
+                        choice = 2;
+                    }
+                    if ui.button(cancel).clicked() {
+                        choice = 3;
+                    }
+                });
+            });
+        match choice {
+            1 => {
+                self.save_all_modified();
+                self.show_exit_prompt = false;
+                self.exit_confirmed = true;
+                ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+            }
+            2 => {
+                self.show_exit_prompt = false;
+                self.exit_confirmed = true;
+                ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+            }
+            3 => self.show_exit_prompt = false,
+            _ => {}
+        }
+    }
+
+    /// Confirmation shown when closing a modified FOMOD (Yes / No / Cancel).
+    fn render_close_prompt(&mut self, ctx: &egui::Context) {
+        let Some(scope) = self.close_prompt else {
+            return;
+        };
+        let title = self.i18n.t("exit-title");
+        let message = self.i18n.t("exit-unsaved");
+        let yes = self.i18n.t("btn-yes");
+        let no = self.i18n.t("btn-no");
+        let cancel = self.i18n.t("btn-cancel");
+        let mut choice = 0u8;
+        egui::Window::new(title)
+            .collapsible(false)
+            .resizable(false)
+            .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
+            .show(ctx, |ui| {
+                ui.label(message);
+                ui.add_space(12.0);
+                ui.horizontal(|ui| {
+                    if ui.button(yes).clicked() {
+                        choice = 1;
+                    }
+                    if ui.button(no).clicked() {
+                        choice = 2;
+                    }
+                    if ui.button(cancel).clicked() {
+                        choice = 3;
+                    }
+                });
+            });
+        match choice {
+            1 => {
+                // Save, then close.
+                match scope {
+                    CloseScope::Active => {
+                        if self.root_directory.is_some() {
+                            self.write_project();
+                        }
+                        self.close_active_fomod_force();
+                    }
+                    CloseScope::All => {
+                        self.save_all_modified();
+                        self.close_all_fomods_force();
+                    }
+                }
+                self.close_prompt = None;
+            }
+            2 => {
+                // Close without saving.
+                match scope {
+                    CloseScope::Active => self.close_active_fomod_force(),
+                    CloseScope::All => self.close_all_fomods_force(),
+                }
+                self.close_prompt = None;
+            }
+            3 => self.close_prompt = None,
+            _ => {}
+        }
+    }
+}
+
+/// Elide a string to `max` characters, appending an ellipsis when truncated.
+fn elide_tab(s: &str, max: usize) -> String {
+    let chars: Vec<char> = s.chars().collect();
+    if chars.len() <= max {
+        s.to_string()
+    } else {
+        let mut t: String = chars[..max.saturating_sub(1)].iter().collect();
+        t.push('…');
+        t
+    }
+}
+
+/// Resolve a dropped path to a FOMOD root (the folder that contains `fomod/`).
+fn fomod_root_from_drop(path: &std::path::Path) -> Option<PathBuf> {
+    if path.is_dir() {
+        let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
+        if name.eq_ignore_ascii_case("fomod") {
+            return path.parent().map(|p| p.to_path_buf());
+        }
+        if path.join("fomod").is_dir() {
+            return Some(path.to_path_buf());
+        }
+        return None;
+    }
+    if path.is_file() {
+        // A FOMOD xml lives in <root>/fomod/ModuleConfig.xml (or info.xml).
+        let parent = path.parent()?;
+        let pname = parent.file_name().and_then(|n| n.to_str()).unwrap_or("");
+        if pname.eq_ignore_ascii_case("fomod") {
+            return parent.parent().map(|p| p.to_path_buf());
+        }
+        return parent.parent().map(|p| p.to_path_buf());
+    }
+    None
 }
 
 impl eframe::App for XimodApp {
@@ -3386,10 +3991,41 @@ impl eframe::App for XimodApp {
             self.theme_applied = true;
         }
 
+        // Live font size: while the Settings dialog is open, preview the value
+        // being edited (temp_font_size); otherwise use the saved size. Applied
+        // only when it actually changes, so cancelling the dialog automatically
+        // reverts the preview to the saved size on the next frame.
+        let desired_font = if self.show_settings {
+            self.temp_font_size
+        } else {
+            self.config.font_size
+        };
+        if (desired_font - self.applied_font_size).abs() > f32::EPSILON {
+            self.apply_font_size_value(ctx, desired_font);
+            self.applied_font_size = desired_font;
+        }
+
+        // Keep the active document's slot in sync so the tab strip, save-state
+        // and exit check all see the live state.
+        self.ensure_doc();
+        self.commit_active();
+
+        // A graceful close requested from the menu / Ctrl+Q.
+        if self.request_close {
+            self.request_close = false;
+            ctx.send_viewport_cmd(egui::ViewportCommand::Close);
+        }
+
+        // Files dropped onto the window open the corresponding FOMOD(s).
+        self.handle_dropped_files(ctx);
+
         // Check if a modal dialog is open
-        let modal_open = self.show_settings || self.show_about || self.show_script_dialog || self.show_confirm || (self.show_xml_editor && self.xml_editor_editing);
+        let modal_open = self.show_settings || self.show_about || self.show_script_dialog || self.show_confirm || self.show_exit_prompt || self.close_prompt.is_some() || (self.show_xml_editor && self.xml_editor_editing);
 
         self.render_menu_bar(ctx);
+
+        // Document (FOMOD) tab strip.
+        self.render_fomod_tabs(ctx, modal_open);
 
         // Global keyboard shortcuts (Ctrl+N, Ctrl+S, …) matching the menu.
         self.handle_menu_shortcuts(ctx);
@@ -3463,6 +4099,18 @@ impl eframe::App for XimodApp {
         self.render_validation_report(ctx);
         self.render_properties(ctx);
         self.render_flag_picker(ctx);
+        self.render_exit_prompt(ctx);
+        self.render_close_prompt(ctx);
+
+        // Intercept the window's close request: if any FOMOD has unsaved changes,
+        // veto the close and ask the user (Yes / No / Cancel).
+        if ctx.input(|i| i.viewport().close_requested()) && !self.exit_confirmed {
+            self.commit_active();
+            if self.docs.iter().any(|d| d.modified) {
+                ctx.send_viewport_cmd(egui::ViewportCommand::CancelClose);
+                self.show_exit_prompt = true;
+            }
+        }
 
         // Install the fonts needed by the current state (no-op when the required
         // set has not changed). Run *after* the windows have rendered so that a

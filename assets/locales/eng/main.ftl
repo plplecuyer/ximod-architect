@@ -333,3 +333,25 @@ prop-select-lang = Select a language to see its details.
 # Direct link to Nexus Mods (game slug)
 btn-nexus = Nexus ↗
 nexus-open-hint = Open the game's Nexus Mods page
+
+# Referenced-file verification (V2)
+verify-no-root = File verification skipped: no root folder is set
+loc-header = header image
+loc-required = required files
+loc-conditional = conditional set { $num }
+loc-plugin = step { $step }, group { $group }, option "{ $plugin }"
+verify-missing-file = Missing file: { $path } ({ $loc })
+verify-missing-folder = Missing folder: { $path } ({ $loc })
+verify-missing-image = Missing image: { $path } ({ $loc })
+verify-absolute = Absolute path (not portable): { $path } ({ $loc })
+verify-outside = Path escapes the root folder: { $path } ({ $loc })
+verify-orphan = Orphan file (not referenced by any option): { $path }
+
+# Multi-FOMOD tabs & exit prompt (V2)
+menu-close-fomod = Close FOMOD
+menu-close-all-fomods = Close all FOMODs
+tab-untitled = (untitled)
+msg-drop-not-fomod = Dropped item is not a FOMOD (no "fomod" folder found)
+exit-title = Unsaved changes
+exit-unsaved = A FOMOD has not been saved. Do you want to save it?
+tab-close-hint = Close this FOMOD

@@ -260,23 +260,26 @@ pub struct InstallFile {
 
 impl InstallFile {
     pub fn new_file(source: impl Into<String>) -> Self {
-        let src = source.into();
-        let dst = get_proper_destination_path(&src);
+        // Destination is left empty by default: an empty destination installs
+        // the item at the root of the game's Data folder, which is the correct
+        // and predictable default. It used to be auto-derived from the source
+        // (see `get_proper_destination_path`), but that produced wrong paths
+        // for packages whose folders are not recognizable game directories
+        // (e.g. "00 Data/1. Ultra Version"). The user sets the destination
+        // explicitly in the Files table when a different target is needed.
         Self {
             file_type: FileType::File,
-            source: src,
-            destination: dst,
+            source: source.into(),
+            destination: String::new(),
             priority: 0,
         }
     }
 
     pub fn new_folder(source: impl Into<String>) -> Self {
-        let src = source.into();
-        let dst = get_proper_destination_path(&src);
         Self {
             file_type: FileType::Folder,
-            source: src,
-            destination: dst,
+            source: source.into(),
+            destination: String::new(),
             priority: 0,
         }
     }
