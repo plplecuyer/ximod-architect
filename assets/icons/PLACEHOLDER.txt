@@ -1,0 +1,10 @@
+# Icon Placeholder
+
+Place your icon files here:
+- ximod-architect.ico (Windows)
+- ximod-architect.icns (macOS)  
+- ximod-architect.svg (Linux)
+- ximod-architect.png (Runtime, 256x256)
+- ximod-architect_NNxNN.png (Linux, various sizes)
+
+See README.md in this directory for creation instructions.

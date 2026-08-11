@@ -1,0 +1,14 @@
+# Splash Image
+
+Place your `splash.png` file here.
+
+Recommended specifications:
+- Format: PNG with transparency (alpha channel)
+- Size: Up to 1024×1024 pixels (will be scaled to ~26% of screen width)
+- Content: Application logo or branding image
+
+The splash screen will:
+1. Display centered on the primary screen
+2. Show for the duration specified in Config.ini (SplashScreenSeconds)
+3. Fade out smoothly over 500ms
+4. Support full transparency on all platforms
