@@ -58,39 +58,35 @@ jobs:
   # Vérifications de qualité (consultatif : n'échoue pas le workflow)
   # ---------------------------------------------------------------------------
   lint:
-    name: Format & Clippy
-    runs-on: ubuntu-latest
-    continue-on-error: true   # <-- le job reste informatif, il ne bloque pas
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install Linux dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libgtk-3-dev \
-            libxcb-render0-dev \
-            libxcb-shape0-dev \
-            libxcb-xfixes0-dev \
-            libxkbcommon-dev \
-            libspeechd-dev \
-            libssl-dev \
-            libx11-dev
-
-      - name: Install Rust toolchain (stable + rustfmt + clippy)
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt, clippy
-
-      - name: Cache cargo
-        uses: Swatinem/rust-cache@v2
-
-      # Vérifie le formatage sans faire échouer le job (continue-on-error au niveau du job).
-      - name: Check formatting
-        run: cargo fmt --all -- --check
-
-      # Clippy en mode informatif. Pour rendre les avertissements bloquants
-      # plus tard : cargo clippy --all-targets -- -D warnings
-      - name: Clippy
-        run: cargo clippy --all-targets
+      name: Format & Clippy
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+  
+        - name: Install Linux dependencies
+          run: |
+            sudo apt-get update
+            sudo apt-get install -y \
+              libgtk-3-dev \
+              libxcb-render0-dev \
+              libxcb-shape0-dev \
+              libxcb-xfixes0-dev \
+              libxkbcommon-dev \
+              libspeechd-dev \
+              libssl-dev \
+              libx11-dev
+  
+        - name: Install Rust toolchain (stable + rustfmt + clippy)
+          uses: dtolnay/rust-toolchain@stable
+          with:
+            components: rustfmt, clippy
+  
+        - name: Cache cargo
+          uses: Swatinem/rust-cache@v2
+  
+        - name: Check formatting (informational)
+          run: cargo fmt --all -- --check || echo "::notice::Des différences de formatage existent (cargo fmt). Non bloquant."
+  
+        - name: Clippy (informational)
+          run: cargo clippy --all-targets || echo "::notice::Clippy a signalé des remarques. Non bloquant."
