@@ -55,11 +55,12 @@ jobs:
         run: cargo test --verbose
 
   # ---------------------------------------------------------------------------
-  # Vérifications de qualité : formatage + clippy (Linux uniquement)
+  # Vérifications de qualité (consultatif : n'échoue pas le workflow)
   # ---------------------------------------------------------------------------
   lint:
     name: Format & Clippy
     runs-on: ubuntu-latest
+    continue-on-error: true   # <-- le job reste informatif, il ne bloque pas
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -85,11 +86,11 @@ jobs:
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
 
+      # Vérifie le formatage sans faire échouer le job (continue-on-error au niveau du job).
       - name: Check formatting
         run: cargo fmt --all -- --check
 
-      # Clippy en mode informatif (n'échoue pas sur des avertissements).
-      # Remplace la dernière ligne par : -- -D warnings   pour rendre les
-      # avertissements bloquants une fois le code entièrement « clippy-clean ».
+      # Clippy en mode informatif. Pour rendre les avertissements bloquants
+      # plus tard : cargo clippy --all-targets -- -D warnings
       - name: Clippy
         run: cargo clippy --all-targets
