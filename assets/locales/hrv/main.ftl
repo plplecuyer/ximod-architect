@@ -159,6 +159,7 @@ macro-time = $TIME$ - Trenutno vrijeme (HH:MM:SS)
 macro-random = $RANDOM$ - Slučajan broj
 
 # Plugin Dependencies
+label-plugin-dependencies = Ovisnosti o dodatku
 label-default-type = Zadani tip:
 label-pattern-type = Tip uzorka:
 label-pattern-operator = Operator uzorka:

@@ -159,6 +159,7 @@ macro-time = $TIME$ — pašreizējais laiks (HH:MM:SS)
 macro-random = $RANDOM$ — nejaušs skaitlis
 
 # Plugin Dependencies
+label-plugin-dependencies = Spraudņa atkarības
 label-default-type = Noklusējuma tips:
 label-pattern-type = Veidnes tips:
 label-pattern-operator = Veidnes operators:

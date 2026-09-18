@@ -159,6 +159,7 @@ macro-time = $TIME$ – Trenutni čas (HH:MM:SS)
 macro-random = $RANDOM$ – Naključno število
 
 # Plugin Dependencies
+label-plugin-dependencies = Odvisnosti od vtičnika
 label-default-type = Privzeti tip:
 label-pattern-type = Tip vzorca:
 label-pattern-operator = Operator vzorca:

@@ -149,7 +149,11 @@ impl XimodApp {
 
         let countries = &self.countries;
         let country_languages = &self.country_languages;
+        let country_names = &self.country_names;
         let i18n = &self.i18n;
+        // Current UI locale (ISO 639-3): country names are shown in this
+        // language when available, otherwise in English.
+        let loc = i18n.current_locale().to_string();
         // Flags live in the application's asset folder (assets/images/svg),
         // not under the mod project root.
         let flags_dir = crate::data::flags_dir();
@@ -171,10 +175,22 @@ impl XimodApp {
 
                     match st.tab {
                         PropTab::Countries => {
-                            // Filtered country list (a3, French name).
+                            // Filtered country list (a3, localized name) — names
+                            // shown in the current UI locale, English fallback.
                             let needle = st.country_filter.trim().to_lowercase();
-                            let list: Vec<(String, String)> = countries
-                                .country_list()
+                            let mut list: Vec<(String, String)> = countries
+                                .countries
+                                .iter()
+                                .map(|c| {
+                                    let name = country_names
+                                        .name_for(&c.a3, &loc)
+                                        .unwrap_or(&c.name_en)
+                                        .to_string();
+                                    (c.a3.clone(), name)
+                                })
+                                .collect();
+                            list.sort_by(|a, b| a.1.to_lowercase().cmp(&b.1.to_lowercase()));
+                            let list: Vec<(String, String)> = list
                                 .into_iter()
                                 .filter(|(a3, name)| {
                                     needle.is_empty()
@@ -264,8 +280,11 @@ impl XimodApp {
                                                     .with_fallback(" ")
                                                     .show(ui, abs.as_deref());
                                                 ui.add_space(4.0);
+                                                let disp_name = country_names
+                                                    .name_for(&c.a3, &loc)
+                                                    .unwrap_or(&c.name_en);
                                                 ui.label(
-                                                    RichText::new(&c.name_fr).strong().size(15.0),
+                                                    RichText::new(disp_name).strong().size(15.0),
                                                 );
                                                 ui.label(
                                                     RichText::new(format!("{} — {}", c.name_en, c.a3))

@@ -39,6 +39,9 @@ pub struct DocState {
     pub cond_file: Option<usize>,
     pub cond_pattern: Option<usize>,
     pub req_file: Option<usize>,
+    pub plugin_pattern: Option<usize>,
+    pub plugin_dep: Option<usize>,
+    pub visibility_dep: Option<usize>,
 }
 
 impl DocState {
@@ -58,6 +61,9 @@ impl DocState {
             cond_file: None,
             cond_pattern: None,
             req_file: None,
+            plugin_pattern: None,
+            plugin_dep: None,
+            visibility_dep: None,
         }
     }
 }
@@ -117,6 +123,11 @@ pub struct XimodApp {
     pub current_cond_file_index: Option<usize>,
     pub current_cond_pattern_index: Option<usize>,
     pub current_req_file_index: Option<usize>,
+    /// Selected pattern / dependency inside a plugin's "Plugin dependencies" panel.
+    pub current_plugin_pattern_index: Option<usize>,
+    pub current_plugin_dep_index: Option<usize>,
+    /// Selected dependency inside a step's "Visibility conditions" panel.
+    pub current_visibility_dep_index: Option<usize>,
 
     // Dialogs
     pub show_settings: bool,
@@ -175,6 +186,7 @@ pub struct XimodApp {
     pub temp_country: String,
     pub countries: crate::data::CountriesData,
     pub country_languages: crate::data::CountryLanguagesData,
+    pub country_names: crate::data::CountryNamesData,
     pub show_flag_picker: bool,
     /// Which window the flag picker is currently serving.
     pub flag_target: crate::ui::flag_picker::FlagTarget,
@@ -260,6 +272,14 @@ pub struct XimodApp {
     pub temp_dep_type: String,
     pub temp_dep_name: String,
     pub temp_dep_value: String,
+    /// Temporary edit values for a plugin's "Plugin dependencies" panel.
+    pub temp_pdep_type: String,
+    pub temp_pdep_name: String,
+    pub temp_pdep_value: String,
+    /// Temporary edit values for a step's "Visibility conditions" panel.
+    pub temp_vdep_type: String,
+    pub temp_vdep_name: String,
+    pub temp_vdep_value: String,
 }
 
 /// Settings dialog tab
@@ -277,6 +297,13 @@ pub enum SettingsTab {
 /// keyed by viewport id. Called each frame from inside a viewport closure (with
 /// the child context). Takes `&mut AppConfig` so it works both when the closure
 /// borrows the whole app and when it only borrows the config field disjointly.
+/// Fixed size of the "About" window (independent, non-resizable).
+const ABOUT_SIZE: [f32; 2] = [430.0, 300.0];
+
+/// Fixed size of the "Settings" window (independent, movable, non-resizable:
+/// no automatic and no manual sizing).
+const SETTINGS_SIZE: [f32; 2] = [770.0, 495.0];
+
 pub(crate) fn record_win_geom(
     config: &mut crate::config::AppConfig,
     ctx: &egui::Context,
@@ -297,37 +324,6 @@ pub(crate) fn record_win_geom(
             config.window_sizes.insert(id.to_string(), (sz.x, sz.y));
         }
     }
-}
-
-/// Used for recent-file paths, where the tail (mod name) identifies the entry
-/// far better than the head (drive and parent folders).
-fn elide_start(ui: &egui::Ui, text: &str, max_width: f32) -> String {
-    let font_id = egui::TextStyle::Body.resolve(ui.style());
-    let width_of = |s: &str| -> f32 {
-        ui.fonts(|f| {
-            f.layout_no_wrap(s.to_string(), font_id.clone(), egui::Color32::WHITE)
-                .rect
-                .width()
-        })
-    };
-
-    if max_width <= 0.0 || width_of(text) <= max_width {
-        return text.to_string();
-    }
-
-    let chars: Vec<char> = text.chars().collect();
-    // Binary search for the smallest start offset whose "…" + tail still fits.
-    let (mut lo, mut hi) = (0usize, chars.len());
-    while lo < hi {
-        let mid = (lo + hi) / 2;
-        let candidate: String = std::iter::once('…').chain(chars[mid..].iter().copied()).collect();
-        if width_of(&candidate) <= max_width {
-            hi = mid;
-        } else {
-            lo = mid + 1;
-        }
-    }
-    std::iter::once('…').chain(chars[lo..].iter().copied()).collect()
 }
 
 impl Default for XimodApp {
@@ -376,6 +372,9 @@ impl Default for XimodApp {
             current_cond_file_index: None,
             current_cond_pattern_index: None,
             current_req_file_index: None,
+            current_plugin_pattern_index: None,
+            current_plugin_dep_index: None,
+            current_visibility_dep_index: None,
             show_settings: first_launch,
             show_about: false,
             show_script_dialog: false,
@@ -405,6 +404,7 @@ impl Default for XimodApp {
             temp_country,
             countries: crate::data::CountriesData::load(),
             country_languages: crate::data::CountryLanguagesData::load(),
+            country_names: crate::data::CountryNamesData::load(),
             show_flag_picker: false,
             flag_target: crate::ui::flag_picker::FlagTarget::Settings,
             flag_filter: String::new(),
@@ -443,6 +443,12 @@ impl Default for XimodApp {
             temp_dep_type: "flag".to_string(),
             temp_dep_name: String::new(),
             temp_dep_value: String::new(),
+            temp_pdep_type: "file".to_string(),
+            temp_pdep_name: String::new(),
+            temp_pdep_value: String::new(),
+            temp_vdep_type: "file".to_string(),
+            temp_vdep_name: String::new(),
+            temp_vdep_value: String::new(),
         }
     }
 }
@@ -486,6 +492,13 @@ impl XimodApp {
         title: String,
         size: [f32; 2],
     ) -> egui::ViewportBuilder {
+        let mut builder = egui::ViewportBuilder::default().with_title(title);
+        // Apply the saved (or centered) geometry ONLY on the opening frame.
+        // Re-applying `with_inner_size`/`with_position` every frame made egui/winit
+        // keep snapping the window back to that exact size and position — which
+        // showed up as a constant tremble and fought the user's manual moves and
+        // resizes. After the first frame we leave the geometry to the OS/user, and
+        // `record_win_geom` (called each frame in the window body) persists it.
         if !self.win_initialized.contains(id) {
             // Size: the saved size if the window was resized before, else the
             // caller's default.
@@ -513,17 +526,12 @@ impl XimodApp {
             self.win_pos.insert(id.to_string(), pos);
             self.win_size.insert(id.to_string(), (win_size[0], win_size[1]));
             self.win_initialized.insert(id.to_string());
+            builder = builder
+                .with_inner_size(win_size)
+                .with_position(pos)
+                .with_active(true);
         }
-        let pos = self
-            .win_pos
-            .get(id)
-            .copied()
-            .unwrap_or_else(|| egui::pos2(80.0, 80.0));
-        let sz = self.win_size.get(id).copied().unwrap_or((size[0], size[1]));
-        egui::ViewportBuilder::default()
-            .with_title(title)
-            .with_inner_size([sz.0, sz.1])
-            .with_position(pos)
+        builder
     }
 
     /// Called when a free window closes: persist its geometry (the live position
@@ -613,6 +621,9 @@ impl XimodApp {
             cond_file: self.current_cond_file_index,
             cond_pattern: self.current_cond_pattern_index,
             req_file: self.current_req_file_index,
+            plugin_pattern: self.current_plugin_pattern_index,
+            plugin_dep: self.current_plugin_dep_index,
+            visibility_dep: self.current_visibility_dep_index,
         }
     }
 
@@ -650,6 +661,9 @@ impl XimodApp {
         self.current_cond_file_index = d.cond_file;
         self.current_cond_pattern_index = d.cond_pattern;
         self.current_req_file_index = d.req_file;
+        self.current_plugin_pattern_index = d.plugin_pattern;
+        self.current_plugin_dep_index = d.plugin_dep;
+        self.current_visibility_dep_index = d.visibility_dep;
     }
 
     /// Switch the active document to `index`.
@@ -684,6 +698,9 @@ impl XimodApp {
         self.current_cond_file_index = None;
         self.current_cond_pattern_index = None;
         self.current_req_file_index = None;
+        self.current_plugin_pattern_index = None;
+        self.current_plugin_dep_index = None;
+        self.current_visibility_dep_index = None;
     }
 
     /// Make a freshly-loaded project the active document — a new tab, unless the
@@ -843,6 +860,17 @@ impl XimodApp {
         // tofu boxes, so — as for the Properties window — load every distinct
         // language font while the editor is open (a few dozen after dedup).
         if self.show_translation {
+            for e in &self.i18n.languages().languages {
+                if !e.font.is_empty() && !wanted.contains(&e.font) {
+                    wanted.push(e.font.clone());
+                }
+            }
+        }
+        // The flag picker ("Choose a country") shows every country's name in its
+        // own endonym language (Georgian, Japanese, Khmer, Hebrew, …). Load all
+        // language fonts while it is open so none of those captions render as a
+        // tofu box.
+        if self.show_flag_picker {
             for e in &self.i18n.languages().languages {
                 if !e.font.is_empty() && !wanted.contains(&e.font) {
                     wanted.push(e.font.clone());
@@ -1249,48 +1277,56 @@ impl XimodApp {
         let ok = self.i18n.t("validate-ok");
         let close = self.i18n.t("btn-ok");
         let report = self.validation_report.clone();
-        let mut open = true;
         let mut do_close = false;
 
-        egui::Window::new(&title)
-            .open(&mut open)
-            .collapsible(false)
-            .resizable(true)
-            .default_size([580.0, 400.0])
-            .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
-            .show(ctx, |ui| {
-                if report.is_empty() {
-                    ui.label(
-                        egui::RichText::new(&ok).color(egui::Color32::from_rgb(60, 160, 60)),
-                    );
-                } else {
-                    ui.label(
-                        egui::RichText::new(format!("{} — {}", title, report.len())).strong(),
-                    );
-                    ui.add_space(4.0);
-                    egui::ScrollArea::vertical()
-                        .auto_shrink([false, false])
-                        .max_height(320.0)
-                        .show(ui, |ui| {
-                            for line in &report {
-                                ui.horizontal_wrapped(|ui| {
-                                    ui.label("•");
-                                    ui.label(line);
-                                });
-                            }
-                        });
-                }
-                ui.separator();
-                if ui.button(&close).clicked() {
+        // Independent, freely movable OS-level window; resizable, with its
+        // position and size remembered in Config.ini.
+        let vb = self.free_viewport_builder(ctx, "ximod_validate", title.clone(), [580.0, 400.0]);
+        let cfg = &mut self.config;
+        ctx.show_viewport_immediate(
+            egui::ViewportId::from_hash_of("ximod_validate"),
+            vb,
+            |ctx, _class| {
+                egui::CentralPanel::default().show(ctx, |ui| {
+                    if report.is_empty() {
+                        ui.label(
+                            egui::RichText::new(&ok).color(egui::Color32::from_rgb(60, 160, 60)),
+                        );
+                    } else {
+                        ui.label(
+                            egui::RichText::new(format!("{} — {}", title, report.len())).strong(),
+                        );
+                        ui.add_space(4.0);
+                        egui::ScrollArea::vertical()
+                            .auto_shrink([false, false])
+                            .max_height(ui.available_height() - 40.0)
+                            .show(ui, |ui| {
+                                for line in &report {
+                                    ui.horizontal_wrapped(|ui| {
+                                        ui.label("•");
+                                        ui.label(line);
+                                    });
+                                }
+                            });
+                    }
+                    ui.separator();
+                    if ui.button(&close).clicked() {
+                        do_close = true;
+                    }
+                });
+
+                record_win_geom(cfg, ctx, "ximod_validate");
+                if ctx.input(|i| i.viewport().close_requested())
+                    || ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Escape))
+                {
                     do_close = true;
                 }
-            });
+            },
+        );
 
-        if ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Escape)) {
-            do_close = true;
-        }
-        if do_close || !open {
+        if do_close {
             self.show_validation_report = false;
+            self.free_window_closed("ximod_validate");
         }
     }
 
@@ -1420,9 +1456,36 @@ impl XimodApp {
         }
     }
 
+    /// Close the (top-level) menu owned by `ui` as soon as the pointer leaves its
+    /// popup — so a click-opened menu disappears on mouse-out without a second
+    /// click. `child` is the rect of an open sub-menu popup (e.g. "Recent"), so
+    /// the parent stays open while that sub-menu is hovered. egui's own menu-bar
+    /// handling still switches between top-level menus when the mouse glides
+    /// across the bar (this only works because the menu buttons are direct
+    /// children of `menu::bar`, not wrapped in a `push_id`).
+    fn close_menu_if_pointer_left(ui: &mut egui::Ui, child: Option<egui::Rect>) {
+        const BRIDGE_UP: f32 = 28.0; // reach the menu-bar button above the popup
+        const PAD: f32 = 6.0; // edge tolerance so grazing the border doesn't flicker
+        let mut zone = ui.min_rect();
+        if let Some(c) = child {
+            zone = zone.union(c);
+        }
+        zone.min.y -= BRIDGE_UP;
+        let zone = zone.expand(PAD);
+        let close = match ui.input(|i| i.pointer.hover_pos()) {
+            Some(p) => !zone.contains(p),
+            None => false, // pointer outside the window -> keep open
+        };
+        if close {
+            ui.close_menu();
+        }
+    }
+
     fn render_menu_bar(&mut self, ctx: &egui::Context) {
-        // Check if a modal dialog is open
-        let modal_open = self.show_settings || self.show_about || self.show_script_dialog || self.show_confirm || (self.show_xml_editor && self.xml_editor_editing);
+        // Check if a modal dialog is open. The Settings, About and Script
+        // windows are now independent, freely movable OS-level windows, so they
+        // no longer block the main window.
+        let modal_open = self.show_confirm || (self.show_xml_editor && self.xml_editor_editing);
         
         let menu_file = self.i18n.t("menu-file");
         let menu_new = self.i18n.t("menu-new");
@@ -1462,8 +1525,11 @@ impl XimodApp {
         let sct_quit = ctx.format_shortcut(&sc.quit);
         let sct_about = ctx.format_shortcut(&sc.about);
 
-        // Use locale_version to create unique IDs for menu recreation
-        let lv = self.locale_version;
+        // Menus are now direct children of `menu::bar` (needed for egui's native
+        // hover-switch between top-level menus), so they are no longer keyed by
+        // locale_version. The locale change still forces a rebuild via the memory
+        // clear in the settings handler; this read just keeps the field "used".
+        let _ = self.locale_version;
 
         egui::TopBottomPanel::top("menu_bar").show(ctx, |ui| {
             // Disable menu when modal is open
@@ -1472,228 +1538,230 @@ impl XimodApp {
             }
             
             egui::menu::bar(ui, |ui| {
-                // File menu with unique ID based on locale_version
-                ui.push_id(("file_menu", lv), |ui| {
-                    ui.menu_button(&menu_file, |ui| {
-                        let btn_new = egui::Button::new(&menu_new)
-                            .wrap_mode(egui::TextWrapMode::Extend)
-                            .shortcut_text(&sct_new);
-                        if ui.add(btn_new).clicked() {
-                            self.request_new_project();
-                            ui.close_menu();
-                        }
+                // File menu — direct child of the bar (enables egui's hover-switch).
+                ui.menu_button(&menu_file, |ui| {
+                    let btn_new = egui::Button::new(&menu_new)
+                        .wrap_mode(egui::TextWrapMode::Extend)
+                        .shortcut_text(&sct_new);
+                    if ui.add(btn_new).clicked() {
+                        self.request_new_project();
+                        ui.close_menu();
+                    }
 
-                        // Open Folder menu - always visible
-                        let btn_open = egui::Button::new(&menu_open)
-                            .wrap_mode(egui::TextWrapMode::Extend)
-                            .shortcut_text(&sct_open);
-                        if ui.add(btn_open).clicked() {
-                            self.open_directory();
-                            ui.close_menu();
-                        }
+                    let btn_open = egui::Button::new(&menu_open)
+                        .wrap_mode(egui::TextWrapMode::Extend)
+                        .shortcut_text(&sct_open);
+                    if ui.add(btn_open).clicked() {
+                        self.open_directory();
+                        ui.close_menu();
+                    }
 
-                        // Open File menu - always visible
-                        let btn_open_file = egui::Button::new(&menu_open_file)
-                            .wrap_mode(egui::TextWrapMode::Extend)
-                            .shortcut_text(&sct_open_file);
-                        if ui.add(btn_open_file).clicked() {
-                            self.open_file();
-                            ui.close_menu();
-                        }
+                    let btn_open_file = egui::Button::new(&menu_open_file)
+                        .wrap_mode(egui::TextWrapMode::Extend)
+                        .shortcut_text(&sct_open_file);
+                    if ui.add(btn_open_file).clicked() {
+                        self.open_file();
+                        ui.close_menu();
+                    }
 
-                        let btn_save = egui::Button::new(&menu_save)
-                            .wrap_mode(egui::TextWrapMode::Extend)
-                            .shortcut_text(&sct_save);
-                        if ui.add_enabled(has_root, btn_save).clicked() {
-                            self.save_project();
-                            ui.close_menu();
-                        }
+                    let btn_save = egui::Button::new(&menu_save)
+                        .wrap_mode(egui::TextWrapMode::Extend)
+                        .shortcut_text(&sct_save);
+                    if ui.add_enabled(has_root, btn_save).clicked() {
+                        self.save_project();
+                        ui.close_menu();
+                    }
 
-                        // Merge FOMOD - append a donor's steps/files to the
-                        // current project. Only usable once a recipient exists.
-                        let btn_merge = egui::Button::new(&menu_merge)
-                            .wrap_mode(egui::TextWrapMode::Extend);
-                        if ui.add_enabled(has_root, btn_merge).clicked() {
-                            self.merge_fomod();
-                            ui.close_menu();
-                        }
+                    // Merge FOMOD — append a donor's steps/files (needs a recipient).
+                    let btn_merge = egui::Button::new(&menu_merge)
+                        .wrap_mode(egui::TextWrapMode::Extend);
+                    if ui.add_enabled(has_root, btn_merge).clicked() {
+                        self.merge_fomod();
+                        ui.close_menu();
+                    }
 
-                        // Export a ready-to-upload distribution archive (.zip).
-                        let btn_export = egui::Button::new(&menu_export)
-                            .wrap_mode(egui::TextWrapMode::Extend);
-                        if ui.add_enabled(has_root, btn_export).clicked() {
-                            self.export_distribution();
-                            ui.close_menu();
-                        }
+                    // Export a ready-to-upload distribution archive (.zip).
+                    let btn_export = egui::Button::new(&menu_export)
+                        .wrap_mode(egui::TextWrapMode::Extend);
+                    if ui.add_enabled(has_root, btn_export).clicked() {
+                        self.export_distribution();
+                        ui.close_menu();
+                    }
 
-                        ui.separator();
+                    ui.separator();
 
-                        // Close the active FOMOD / all FOMODs.
-                        let btn_close = egui::Button::new(&menu_close_fomod)
-                            .wrap_mode(egui::TextWrapMode::Extend);
-                        if ui.add(btn_close).clicked() {
-                            self.close_active_fomod();
-                            ui.close_menu();
-                        }
-                        let btn_close_all = egui::Button::new(&menu_close_all)
-                            .wrap_mode(egui::TextWrapMode::Extend);
-                        if ui.add(btn_close_all).clicked() {
-                            self.close_all_fomods();
-                            ui.close_menu();
-                        }
+                    let btn_close = egui::Button::new(&menu_close_fomod)
+                        .wrap_mode(egui::TextWrapMode::Extend);
+                    if ui.add(btn_close).clicked() {
+                        self.close_active_fomod();
+                        ui.close_menu();
+                    }
+                    let btn_close_all = egui::Button::new(&menu_close_all)
+                        .wrap_mode(egui::TextWrapMode::Extend);
+                    if ui.add(btn_close_all).clicked() {
+                        self.close_all_fomods();
+                        ui.close_menu();
+                    }
 
-                        ui.separator();
+                    ui.separator();
 
-                        // Recent files submenu with unique ID
-                        ui.push_id(("recent_menu", lv), |ui| {
-                            ui.menu_button(&menu_recent, |ui| {
-                                for path in &recent_files {
-                                    let display = path.to_string_lossy().to_string();
-                                    let btn_path = egui::Button::new(&display)
-                                        .wrap_mode(egui::TextWrapMode::Extend);
-                                    if ui.add(btn_path).clicked() {
-                                        self.load_project(path.clone());
-                                        ui.close_menu();
-                                    }
-                                }
-                                if recent_files.is_empty() {
-                                    ui.label(self.i18n.t("label-empty"));
-                                }
-                            });
-                        });
-
-                        ui.separator();
-
-                        let btn_exit = egui::Button::new(&menu_exit)
-                            .wrap_mode(egui::TextWrapMode::Extend)
-                            .shortcut_text(&sct_quit);
-                        if ui.add(btn_exit).clicked() {
-                            self.request_close = true;
-                            ui.close_menu();
-                        }
-                    });
-                });
-
-                // Options menu with unique ID based on locale_version
-                ui.push_id(("options_menu", lv), |ui| {
-                    ui.menu_button(&menu_options, |ui| {
-                        // Use buttons with explicit wrap_mode to prevent text wrapping
-                        let btn = egui::Button::new(&menu_settings)
-                            .wrap_mode(egui::TextWrapMode::Extend)
-                            .shortcut_text(&sct_settings);
-                        if ui.add(btn).clicked() {
-                            self.open_settings();
-                            ui.close_menu();
-                        }
-
-                        ui.separator();
-
-                        let btn_pre = egui::Button::new(&menu_pre_save)
-                            .wrap_mode(egui::TextWrapMode::Extend);
-                        if ui.add(btn_pre).clicked() {
-                            self.editing_pre_script = true;
-                            self.script_content = self.config.pre_save_script.clone();
-                            self.show_script_dialog = true;
-                            ui.close_menu();
-                        }
-
-                        let btn_post = egui::Button::new(&menu_post_save)
-                            .wrap_mode(egui::TextWrapMode::Extend);
-                        if ui.add(btn_post).clicked() {
-                            self.editing_pre_script = false;
-                            self.script_content = self.config.post_save_script.clone();
-                            self.show_script_dialog = true;
-                            ui.close_menu();
-                        }
-
-                        ui.separator();
-
-                        let btn_trans = egui::Button::new(&menu_translation)
-                            .wrap_mode(egui::TextWrapMode::Extend);
-                        if ui.add(btn_trans).clicked() {
-                            // Translate FROM English by default.
-                            self.trans_source_lang = "eng".to_string();
-                            // Start from the user's own country, as configured
-                            // in the settings.
-                            if self.trans_country.is_empty() {
-                                self.trans_country = self.config.country.clone();
-                            }
-                            // Keep the target language consistent with the country
-                            // shown by the flag: prefer the current UI language when
-                            // it is spoken there, otherwise the country's first
-                            // language. Otherwise the flag and the info card can
-                            // disagree (e.g. a Japanese flag with French details).
-                            let ui_locale = self.i18n.current_locale().to_string();
-                            let langs = self.country_languages.languages_for(&self.trans_country);
-                            self.trans_target_lang = if langs.iter().any(|l| *l == ui_locale) {
-                                ui_locale
-                            } else if let Some(first) = langs.first() {
-                                first.clone()
-                            } else {
-                                ui_locale
-                            };
-                            self.load_translation_entries();
-                            self.show_translation = true;
-                            ui.close_menu();
-                        }
-
-                        ui.separator();
-
-                        // XML editor: view/edit info.xml and ModuleConfig.xml.
-                        ui.menu_button(&menu_xml_editor, |ui| {
-                            let btn_info = egui::Button::new("info.xml")
+                    // Recent files sub-menu. Its popup rect is returned so the File
+                    // menu stays open while the pointer is over the sub-menu.
+                    let r = ui.menu_button(&menu_recent, |ui| {
+                        for path in &recent_files {
+                            // Show only the last path component (the mod's root
+                            // folder name); the full path stays as a tooltip.
+                            let display = path
+                                .file_name()
+                                .map(|n| n.to_string_lossy().to_string())
+                                .unwrap_or_else(|| path.to_string_lossy().to_string());
+                            let btn_path = egui::Button::new(&display)
                                 .wrap_mode(egui::TextWrapMode::Extend);
-                            if ui.add(btn_info).clicked() {
-                                self.open_xml_editor(crate::ui::xml_editor::XmlTarget::InfoXml);
+                            if ui
+                                .add(btn_path)
+                                .on_hover_text(path.to_string_lossy())
+                                .clicked()
+                            {
+                                self.load_project(path.clone());
                                 ui.close_menu();
                             }
-                            let btn_config = egui::Button::new("ModuleConfig.xml")
-                                .wrap_mode(egui::TextWrapMode::Extend);
-                            if ui.add(btn_config).clicked() {
-                                self.open_xml_editor(crate::ui::xml_editor::XmlTarget::ModuleConfig);
-                                ui.close_menu();
-                            }
-                        });
-
-                        ui.separator();
-
-                        // FOMOD installer preview (interactive simulation).
-                        let btn_preview = egui::Button::new(&menu_preview)
-                            .wrap_mode(egui::TextWrapMode::Extend);
-                        if ui.add(btn_preview).clicked() {
-                            self.open_preview();
-                            ui.close_menu();
                         }
-
-                        // Full FOMOD validation (project + ModConfig 5.0 schema).
-                        let btn_validate = egui::Button::new(&menu_validate)
-                            .wrap_mode(egui::TextWrapMode::Extend);
-                        if ui.add(btn_validate).clicked() {
-                            self.run_full_validation();
-                            ui.close_menu();
+                        if recent_files.is_empty() {
+                            ui.label(self.i18n.t("label-empty"));
                         }
-
-                        // Country/language database explorer.
-                        let btn_properties = egui::Button::new(&menu_properties)
-                            .wrap_mode(egui::TextWrapMode::Extend);
-                        if ui.add(btn_properties).clicked() {
-                            self.open_properties();
-                            ui.close_menu();
-                        }
+                        ui.min_rect()
                     });
+                    let recent_child = r.inner;
+
+                    ui.separator();
+
+                    let btn_exit = egui::Button::new(&menu_exit)
+                        .wrap_mode(egui::TextWrapMode::Extend)
+                        .shortcut_text(&sct_quit);
+                    if ui.add(btn_exit).clicked() {
+                        self.request_close = true;
+                        ui.close_menu();
+                    }
+
+                    Self::close_menu_if_pointer_left(ui, recent_child);
                 });
 
-                // Help menu with unique ID based on locale_version
-                ui.push_id(("help_menu", lv), |ui| {
-                    ui.menu_button(&menu_help, |ui| {
-                        let btn_about = egui::Button::new(&menu_about)
-                            .wrap_mode(egui::TextWrapMode::Extend)
-                            .shortcut_text(&sct_about);
-                        if ui.add(btn_about).clicked() {
-                            self.show_about = true;
+                // Options menu.
+                ui.menu_button(&menu_options, |ui| {
+                    let btn = egui::Button::new(&menu_settings)
+                        .wrap_mode(egui::TextWrapMode::Extend)
+                        .shortcut_text(&sct_settings);
+                    if ui.add(btn).clicked() {
+                        self.open_settings();
+                        ui.close_menu();
+                    }
+
+                    ui.separator();
+
+                    let btn_pre = egui::Button::new(&menu_pre_save)
+                        .wrap_mode(egui::TextWrapMode::Extend);
+                    if ui.add(btn_pre).clicked() {
+                        self.editing_pre_script = true;
+                        self.script_content = self.config.pre_save_script.clone();
+                        self.show_script_dialog = true;
+                        ui.close_menu();
+                    }
+
+                    let btn_post = egui::Button::new(&menu_post_save)
+                        .wrap_mode(egui::TextWrapMode::Extend);
+                    if ui.add(btn_post).clicked() {
+                        self.editing_pre_script = false;
+                        self.script_content = self.config.post_save_script.clone();
+                        self.show_script_dialog = true;
+                        ui.close_menu();
+                    }
+
+                    ui.separator();
+
+                    let btn_trans = egui::Button::new(&menu_translation)
+                        .wrap_mode(egui::TextWrapMode::Extend);
+                    if ui.add(btn_trans).clicked() {
+                        // Translate FROM English by default.
+                        self.trans_source_lang = "eng".to_string();
+                        if self.trans_country.is_empty() {
+                            self.trans_country = self.config.country.clone();
+                        }
+                        // Keep the target language consistent with the country flag.
+                        let ui_locale = self.i18n.current_locale().to_string();
+                        let langs = self.country_languages.languages_for(&self.trans_country);
+                        self.trans_target_lang = if langs.iter().any(|l| *l == ui_locale) {
+                            ui_locale
+                        } else if let Some(first) = langs.first() {
+                            first.clone()
+                        } else {
+                            ui_locale
+                        };
+                        self.load_translation_entries();
+                        self.show_translation = true;
+                        ui.close_menu();
+                    }
+
+                    ui.separator();
+
+                    // XML editor: view/edit info.xml and ModuleConfig.xml.
+                    // Capture the nested submenu's rect so the parent (Options)
+                    // menu does not close when the pointer slides into it.
+                    let xr = ui.menu_button(&menu_xml_editor, |ui| {
+                        let btn_info = egui::Button::new("info.xml")
+                            .wrap_mode(egui::TextWrapMode::Extend);
+                        if ui.add(btn_info).clicked() {
+                            self.open_xml_editor(crate::ui::xml_editor::XmlTarget::InfoXml);
                             ui.close_menu();
                         }
+                        let btn_config = egui::Button::new("ModuleConfig.xml")
+                            .wrap_mode(egui::TextWrapMode::Extend);
+                        if ui.add(btn_config).clicked() {
+                            self.open_xml_editor(crate::ui::xml_editor::XmlTarget::ModuleConfig);
+                            ui.close_menu();
+                        }
+                        ui.min_rect()
                     });
+                    let xml_child = xr.inner;
+
+                    ui.separator();
+
+                    let btn_preview = egui::Button::new(&menu_preview)
+                        .wrap_mode(egui::TextWrapMode::Extend);
+                    if ui.add(btn_preview).clicked() {
+                        self.open_preview();
+                        ui.close_menu();
+                    }
+
+                    let btn_validate = egui::Button::new(&menu_validate)
+                        .wrap_mode(egui::TextWrapMode::Extend);
+                    if ui.add(btn_validate).clicked() {
+                        self.run_full_validation();
+                        ui.close_menu();
+                    }
+
+                    let btn_properties = egui::Button::new(&menu_properties)
+                        .wrap_mode(egui::TextWrapMode::Extend);
+                    if ui.add(btn_properties).clicked() {
+                        self.open_properties();
+                        ui.close_menu();
+                    }
+
+                    // Keep Options open while the pointer is over its nested
+                    // "XML editor" submenu (info.xml / ModuleConfig.xml).
+                    Self::close_menu_if_pointer_left(ui, xml_child);
+                });
+
+                // Help menu.
+                ui.menu_button(&menu_help, |ui| {
+                    let btn_about = egui::Button::new(&menu_about)
+                        .wrap_mode(egui::TextWrapMode::Extend)
+                        .shortcut_text(&sct_about);
+                    if ui.add(btn_about).clicked() {
+                        self.show_about = true;
+                        ui.close_menu();
+                    }
+
+                    Self::close_menu_if_pointer_left(ui, None);
                 });
             });
         });
@@ -1975,6 +2043,15 @@ impl XimodApp {
                     }
                 });
 
+                // Step visibility conditions (the step's <visible> block).
+                let vis_title = self.i18n.t("label-visibility");
+                egui::CollapsingHeader::new(&vis_title)
+                    .id_salt("step_visibility_header")
+                    .default_open(!self.ximod.steps[step_idx].visibility_dependencies.is_empty())
+                    .show(ui, |ui| {
+                        self.render_step_visibility(ui, step_idx);
+                    });
+
                 ui.separator();
 
                 ui.columns(2, |columns| {
@@ -1983,6 +2060,129 @@ impl XimodApp {
                 });
             }
         }
+    }
+
+    /// "Visibility conditions" panel for a step: edits the step's `<visible>`
+    /// block (`visibility_operator` + `visibility_dependencies`). When it holds
+    /// conditions, the step is shown in the wizard only when they are met (for
+    /// example only if a given `.esp` is Active, or a flag was set earlier).
+    fn render_step_visibility(&mut self, ui: &mut egui::Ui, step_idx: usize) {
+        let label_operator = self.i18n.t("label-operator");
+        let btn_add_dep = self.i18n.t("btn-add-dependency");
+        let btn_remove_dep = self.i18n.t("btn-remove-dependency");
+        let hdr_dependencies = self.i18n.t("label-dependencies");
+        let dep_type_flag = self.i18n.t("dep-type-flag");
+        let dep_type_file = self.i18n.t("dep-type-file");
+
+        let current_op = self.ximod.steps[step_idx].visibility_operator;
+        ui.horizontal(|ui| {
+            ui.label(&label_operator);
+            egui::ComboBox::from_id_salt("vis_operator")
+                .selected_text(current_op.as_str())
+                .show_ui(ui, |ui| {
+                    for op in LogicalOperator::variants() {
+                        if ui.selectable_label(current_op == *op, op.as_str()).clicked() {
+                            self.ximod.steps[step_idx].visibility_operator = *op;
+                            self.project_modified = true;
+                        }
+                    }
+                });
+        });
+
+        subsection_header(ui, &hdr_dependencies);
+
+        let deps: Vec<String> = self.ximod.steps[step_idx]
+            .visibility_dependencies
+            .iter()
+            .map(|d| d.display_name())
+            .collect();
+
+        egui::ScrollArea::vertical()
+            .id_salt("vis_deps_list")
+            .max_height(100.0)
+            .show(ui, |ui| {
+                for (idx, dep) in deps.iter().enumerate() {
+                    let selected = self.current_visibility_dep_index == Some(idx);
+                    if ui.selectable_label(selected, dep).clicked() {
+                        self.current_visibility_dep_index = Some(idx);
+                    }
+                }
+            });
+
+        let temp_type = self.temp_vdep_type.clone();
+        let all_dep_names = self.ximod.get_all_dependency_names();
+        let dep_value_candidates: Vec<String> = if temp_type == "file" {
+            crate::models::FileState::variants()
+                .iter()
+                .map(|s| s.as_str().to_string())
+                .collect()
+        } else {
+            self.ximod.get_all_flag_values()
+        };
+        let dep_type_display = if temp_type == "file" {
+            dep_type_file.clone()
+        } else {
+            dep_type_flag.clone()
+        };
+
+        ui.horizontal(|ui| {
+            egui::ComboBox::from_id_salt("vis_dep_type")
+                .selected_text(&dep_type_display)
+                .show_ui(ui, |ui| {
+                    if ui
+                        .selectable_label(temp_type == "flag", &dep_type_flag)
+                        .clicked()
+                    {
+                        self.temp_vdep_type = "flag".to_string();
+                    }
+                    if ui
+                        .selectable_label(temp_type == "file", &dep_type_file)
+                        .clicked()
+                    {
+                        self.temp_vdep_type = "file".to_string();
+                    }
+                });
+            crate::ui::components::autocomplete_edit(
+                ui,
+                "ac_vdep_name",
+                &mut self.temp_vdep_name,
+                &all_dep_names,
+            );
+            ui.label("=");
+            crate::ui::components::autocomplete_edit(
+                ui,
+                "ac_vdep_value",
+                &mut self.temp_vdep_value,
+                &dep_value_candidates,
+            );
+
+            if ui.button(&btn_add_dep).clicked() && !self.temp_vdep_name.is_empty() {
+                let dep = Dependency {
+                    dep_type: self.temp_vdep_type.clone(),
+                    name: self.temp_vdep_name.clone(),
+                    value: self.temp_vdep_value.clone(),
+                };
+                self.ximod.steps[step_idx].visibility_dependencies.push(dep);
+                self.temp_vdep_name.clear();
+                self.temp_vdep_value.clear();
+                self.project_modified = true;
+            }
+
+            let can_remove = self.current_visibility_dep_index.is_some();
+            if ui
+                .add_enabled(can_remove, egui::Button::new(&btn_remove_dep))
+                .clicked()
+            {
+                if let Some(dep_idx) = self.current_visibility_dep_index {
+                    let deps = &mut self.ximod.steps[step_idx].visibility_dependencies;
+                    if dep_idx < deps.len() {
+                        deps.remove(dep_idx);
+                        self.current_visibility_dep_index = None;
+                        self.project_modified = true;
+                    }
+                }
+            }
+        });
     }
 
     fn render_groups_panel(&mut self, ui: &mut egui::Ui, step_idx: usize) {
@@ -2364,6 +2564,10 @@ impl XimodApp {
             self.render_condition_flags(ui, step_idx, group_idx, plugin_idx);
 
             ui.add_space(8.0);
+            section_header(ui, &self.i18n.t("label-plugin-dependencies"));
+            self.render_plugin_dependencies(ui, step_idx, group_idx, plugin_idx);
+
+            ui.add_space(8.0);
             section_header(ui, &label_files);
             self.render_plugin_files(ui, step_idx, group_idx, plugin_idx);
         });
@@ -2443,6 +2647,234 @@ impl XimodApp {
                         .remove(flag_idx);
                     self.current_flag_index = None;
                     self.project_modified = true;
+                }
+            }
+        });
+    }
+
+    /// "Plugin dependencies" panel: edits a plugin's dynamic type
+    /// (`dependency_patterns`). Each pattern gives the option a `Type name`
+    /// (Optional / Required / Recommended / NotUsable / CouldBeUsable) that
+    /// applies when its file/flag conditions are met, otherwise the plugin's
+    /// Default Type is used. This mirrors the "Plugin dependencies" tab of the
+    /// original FOMOD Creation Tool.
+    fn render_plugin_dependencies(
+        &mut self,
+        ui: &mut egui::Ui,
+        step_idx: usize,
+        group_idx: usize,
+        plugin_idx: usize,
+    ) {
+        let label_operator = self.i18n.t("label-pattern-operator");
+        let label_type_name = self.i18n.t("label-pattern-type");
+        let btn_new_pattern = self.i18n.t("btn-add-pattern");
+        let btn_delete_pattern = self.i18n.t("btn-remove-pattern");
+        let btn_add_dep = self.i18n.t("btn-add-dependency");
+        let btn_remove_dep = self.i18n.t("btn-remove-dependency");
+        let hdr_dependencies = self.i18n.t("label-dependencies");
+        let dep_type_flag = self.i18n.t("dep-type-flag");
+        let dep_type_file = self.i18n.t("dep-type-file");
+
+        let pattern_count = self.ximod.steps[step_idx].plugin_groups[group_idx].plugins
+            [plugin_idx]
+            .dependency_patterns
+            .len();
+
+        let pattern_labels: Vec<String> = (0..pattern_count)
+            .map(|idx| self.i18n.t_num("pattern-label", (idx + 1) as i64))
+            .collect();
+
+        ui.horizontal(|ui| {
+            for idx in 0..pattern_count {
+                let selected = self.current_plugin_pattern_index == Some(idx);
+                if ui.selectable_label(selected, &pattern_labels[idx]).clicked() {
+                    self.current_plugin_pattern_index = Some(idx);
+                    self.current_plugin_dep_index = None;
+                }
+            }
+
+            if ui.button(&btn_new_pattern).clicked() {
+                self.ximod.steps[step_idx].plugin_groups[group_idx].plugins[plugin_idx]
+                    .dependency_patterns
+                    .push(DependencyPattern::new());
+                let n = self.ximod.steps[step_idx].plugin_groups[group_idx].plugins[plugin_idx]
+                    .dependency_patterns
+                    .len();
+                self.current_plugin_pattern_index = Some(n - 1);
+                self.current_plugin_dep_index = None;
+                self.project_modified = true;
+            }
+
+            let can_remove = self.current_plugin_pattern_index.is_some();
+            if ui
+                .add_enabled(can_remove, egui::Button::new(&btn_delete_pattern))
+                .clicked()
+            {
+                if let Some(idx) = self.current_plugin_pattern_index {
+                    let patterns = &mut self.ximod.steps[step_idx].plugin_groups[group_idx]
+                        .plugins[plugin_idx]
+                        .dependency_patterns;
+                    if idx < patterns.len() {
+                        patterns.remove(idx);
+                        self.current_plugin_pattern_index = if patterns.is_empty() {
+                            None
+                        } else {
+                            Some(idx.saturating_sub(1).min(patterns.len() - 1))
+                        };
+                        self.current_plugin_dep_index = None;
+                        self.project_modified = true;
+                    }
+                }
+            }
+        });
+
+        let pattern_idx = match self.current_plugin_pattern_index {
+            Some(i) if i < pattern_count => i,
+            _ => return,
+        };
+
+        ui.separator();
+
+        // Operator (And / Or) and Type name (the type applied when the pattern matches).
+        let current_op = self.ximod.steps[step_idx].plugin_groups[group_idx].plugins[plugin_idx]
+            .dependency_patterns[pattern_idx]
+            .operator;
+        ui.horizontal(|ui| {
+            ui.label(&label_operator);
+            egui::ComboBox::from_id_salt("pdep_operator")
+                .selected_text(current_op.as_str())
+                .show_ui(ui, |ui| {
+                    for op in LogicalOperator::variants() {
+                        if ui.selectable_label(current_op == *op, op.as_str()).clicked() {
+                            self.ximod.steps[step_idx].plugin_groups[group_idx].plugins[plugin_idx]
+                                .dependency_patterns[pattern_idx]
+                                .operator = *op;
+                            self.project_modified = true;
+                        }
+                    }
+                });
+        });
+
+        let current_type = self.ximod.steps[step_idx].plugin_groups[group_idx].plugins[plugin_idx]
+            .dependency_patterns[pattern_idx]
+            .pattern_type
+            .clone();
+        ui.horizontal(|ui| {
+            ui.label(&label_type_name);
+            egui::ComboBox::from_id_salt("pdep_type_name")
+                .selected_text(&current_type)
+                .show_ui(ui, |ui| {
+                    for pt in PluginType::variants() {
+                        let name = pt.as_str();
+                        if ui.selectable_label(current_type == name, name).clicked() {
+                            self.ximod.steps[step_idx].plugin_groups[group_idx].plugins[plugin_idx]
+                                .dependency_patterns[pattern_idx]
+                                .pattern_type = name.to_string();
+                            self.project_modified = true;
+                        }
+                    }
+                });
+        });
+
+        subsection_header(ui, &hdr_dependencies);
+
+        let deps: Vec<String> = self.ximod.steps[step_idx].plugin_groups[group_idx].plugins
+            [plugin_idx]
+            .dependency_patterns[pattern_idx]
+            .dependencies
+            .iter()
+            .map(|d| d.display_name())
+            .collect();
+
+        egui::ScrollArea::vertical()
+            .id_salt("pdep_deps_list")
+            .max_height(100.0)
+            .show(ui, |ui| {
+                for (idx, dep) in deps.iter().enumerate() {
+                    let selected = self.current_plugin_dep_index == Some(idx);
+                    if ui.selectable_label(selected, dep).clicked() {
+                        self.current_plugin_dep_index = Some(idx);
+                    }
+                }
+            });
+
+        let temp_type = self.temp_pdep_type.clone();
+        let all_dep_names = self.ximod.get_all_dependency_names();
+        let dep_value_candidates: Vec<String> = if temp_type == "file" {
+            crate::models::FileState::variants()
+                .iter()
+                .map(|s| s.as_str().to_string())
+                .collect()
+        } else {
+            self.ximod.get_all_flag_values()
+        };
+        let dep_type_display = if temp_type == "file" {
+            dep_type_file.clone()
+        } else {
+            dep_type_flag.clone()
+        };
+
+        ui.horizontal(|ui| {
+            egui::ComboBox::from_id_salt("pdep_dep_type")
+                .selected_text(&dep_type_display)
+                .show_ui(ui, |ui| {
+                    if ui
+                        .selectable_label(temp_type == "flag", &dep_type_flag)
+                        .clicked()
+                    {
+                        self.temp_pdep_type = "flag".to_string();
+                    }
+                    if ui
+                        .selectable_label(temp_type == "file", &dep_type_file)
+                        .clicked()
+                    {
+                        self.temp_pdep_type = "file".to_string();
+                    }
+                });
+            crate::ui::components::autocomplete_edit(
+                ui,
+                "ac_pdep_name",
+                &mut self.temp_pdep_name,
+                &all_dep_names,
+            );
+            ui.label("=");
+            crate::ui::components::autocomplete_edit(
+                ui,
+                "ac_pdep_value",
+                &mut self.temp_pdep_value,
+                &dep_value_candidates,
+            );
+
+            if ui.button(&btn_add_dep).clicked() && !self.temp_pdep_name.is_empty() {
+                let dep = Dependency {
+                    dep_type: self.temp_pdep_type.clone(),
+                    name: self.temp_pdep_name.clone(),
+                    value: self.temp_pdep_value.clone(),
+                };
+                self.ximod.steps[step_idx].plugin_groups[group_idx].plugins[plugin_idx]
+                    .dependency_patterns[pattern_idx]
+                    .dependencies
+                    .push(dep);
+                self.temp_pdep_name.clear();
+                self.temp_pdep_value.clear();
+                self.project_modified = true;
+            }
+
+            let can_remove = self.current_plugin_dep_index.is_some();
+            if ui
+                .add_enabled(can_remove, egui::Button::new(&btn_remove_dep))
+                .clicked()
+            {
+                if let Some(dep_idx) = self.current_plugin_dep_index {
+                    let deps = &mut self.ximod.steps[step_idx].plugin_groups[group_idx].plugins
+                        [plugin_idx]
+                        .dependency_patterns[pattern_idx]
+                        .dependencies;
+                    if dep_idx < deps.len() {
+                        deps.remove(dep_idx);
+                        self.current_plugin_dep_index = None;
+                        self.project_modified = true;
+                    }
                 }
             }
         });
@@ -2943,24 +3375,6 @@ impl XimodApp {
             return;
         }
 
-        // Modal overlay - blocks interaction with main window
-        let screen_rect = ctx.screen_rect();
-        let modal_layer = egui::LayerId::new(egui::Order::Middle, egui::Id::new("settings_modal_bg"));
-        let painter = ctx.layer_painter(modal_layer);
-        painter.rect_filled(
-            screen_rect,
-            0.0,
-            egui::Color32::from_rgba_unmultiplied(0, 0, 0, 128),
-        );
-        
-        // Capture all mouse events on the modal layer
-        let _modal_response = egui::Area::new(egui::Id::new("modal_capture"))
-            .order(egui::Order::Middle)
-            .fixed_pos(egui::pos2(0.0, 0.0))
-            .show(ctx, |ui| {
-                ui.allocate_response(screen_rect.size(), egui::Sense::click_and_drag());
-            });
-
         // Pre-translate all strings
         let title = self.i18n.t("settings-title");
         let tab_general = self.i18n.t("settings-tab-general");
@@ -3021,10 +3435,19 @@ impl XimodApp {
             FOCUS_CANCEL
         };
 
-        // Clear any focus from main window widgets
-        ctx.memory_mut(|mem| mem.surrender_focus(egui::Id::NULL));
-
-        // Use input_mut to consume keyboard events
+        // Independent, freely movable OS-level window of FIXED size (not
+        // resizable): no automatic and no manual sizing. Only its position is
+        // remembered in Config.ini.
+        let vb = self
+            .free_viewport_builder(ctx, "ximod_settings", title, SETTINGS_SIZE)
+            .with_resizable(false)
+            .with_min_inner_size(SETTINGS_SIZE)
+            .with_max_inner_size(SETTINGS_SIZE);
+        ctx.show_viewport_immediate(
+            egui::ViewportId::from_hash_of("ximod_settings"),
+            vb,
+            |ctx, _class| {
+        // Use input_mut to consume keyboard events (child viewport context)
         ctx.input_mut(|i| {
             // Consume and handle Tab navigation
             if i.consume_key(egui::Modifiers::NONE, egui::Key::Tab) {
@@ -3169,17 +3592,8 @@ impl XimodApp {
 
         // Helper function for focused style
         let focused_stroke = egui::Stroke::new(2.0_f32, egui::Color32::from_rgb(100, 149, 237));
-        
-        egui::Window::new(&title)
-            .collapsible(false)
-            // Exact, constant size: the Recent Files tab lists full paths, which
-            // would otherwise widen the window (and egui remembers the enlarged
-            // size, so it never came back). Long paths are truncated instead.
-            .resizable(false)
-            .fixed_size([770.0, 495.0])
-            .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
-            .order(egui::Order::Foreground)
-            .show(ctx, |ui| {
+
+        egui::CentralPanel::default().show(ctx, |ui| {
                 // Tabs with focus indication
                 ui.horizontal(|ui| {
                     let tab_gen_response = ui.selectable_label(self.settings_tab == SettingsTab::General, &tab_general);
@@ -3469,22 +3883,28 @@ impl XimodApp {
                                     // changed the elided path every frame and made
                                     // the whole list tremble. Reserve room for the
                                     // index, the ✕ button, spacing and scrollbar.
-                                    let path_w = (content_size.x - 84.0).max(60.0);
                                     for (idx, path) in self.config.recent_files.iter().enumerate() {
                                         ui.horizontal(|ui| {
                                             ui.label(format!("{}.", idx + 1));
-                                            // Button first: the path label takes
-                                            // all remaining width, which would
+                                            // Button first: the label takes all
+                                            // remaining width, which would
                                             // otherwise push it out of view.
                                             if crate::ui::components::delete_button(ui).clicked() {
                                                 remove_index = Some(idx);
                                             }
-                                            // Keep the *end* of the path visible
-                                            // (mod name) rather than the drive.
+                                            // Show only the folder name (the mod's
+                                            // root); the full path stays as a
+                                            // tooltip. Displaying the short name
+                                            // avoids the width-dependent elision
+                                            // that made the longest line flicker
+                                            // between two truncations each frame.
                                             let full = path.display().to_string();
-                                            let shown = elide_start(ui, &full, path_w);
+                                            let name = path
+                                                .file_name()
+                                                .map(|n| n.to_string_lossy().to_string())
+                                                .unwrap_or_else(|| full.clone());
                                             ui.add(
-                                                egui::Label::new(shown)
+                                                egui::Label::new(name)
                                                     .wrap_mode(egui::TextWrapMode::Truncate),
                                             )
                                             .on_hover_text(full);
@@ -3532,7 +3952,14 @@ impl XimodApp {
                         self.settings_focus = FOCUS_CANCEL;
                     }
                 });
-            });
+                });
+
+                record_win_geom(&mut self.config, ctx, "ximod_settings");
+                if ctx.input(|i| i.viewport().close_requested()) {
+                    should_close = true;
+                }
+            },
+        );
 
         // Handle recent files modifications
         if let Some(idx) = remove_index {
@@ -3591,11 +4018,6 @@ impl XimodApp {
             }
         }
 
-        // Escape closes the settings without saving (same as Cancel).
-        if ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Escape)) {
-            should_close = true;
-        }
-
         if should_close {
             // Reset temp values to current config on cancel
             if !should_save {
@@ -3612,6 +4034,7 @@ impl XimodApp {
             self.show_settings = false;
             self.settings_tab = SettingsTab::General;
             self.settings_focus = 0;
+            self.free_window_closed("ximod_settings");
         }
     }
 
@@ -3631,39 +4054,61 @@ impl XimodApp {
 
         let mut should_close = false;
 
-        egui::Window::new(&title)
-            .collapsible(false)
-            .resizable(false)
-            .default_width(400.0)
-            .show(ctx, |ui| {
-                ui.vertical_centered(|ui| {
-                    ui.heading(&app_name);
-                    ui.label(&version_str);
-                    ui.add_space(8.0);
-                    ui.label(&desc);
-                    ui.add_space(8.0);
-                    ui.label(&license);
-                    ui.add_space(4.0);
-                    ui.label(&copyright);
-                    ui.add_space(12.0);
-                    // Credit to the original author (as agreed with Wenderer):
-                    // a line of text plus a clickable link to the original tool.
-                    ui.label(&credit);
-                    ui.hyperlink_to(
-                        "Wenderer — FOMOD Creation Tool",
-                        "https://www.nexusmods.com/fallout4/mods/6821",
-                    );
-                    ui.add_space(16.0);
-                    if ui.button(&ok_text).clicked() {
-                        should_close = true;
-                    }
+        // Independent OS-level window (freely movable, incl. onto another
+        // screen), but of FIXED size: not resizable by the user. Only its
+        // position is remembered in Config.ini.
+        let vb = self
+            .free_viewport_builder(ctx, "ximod_about", title, ABOUT_SIZE)
+            .with_resizable(false)
+            .with_min_inner_size(ABOUT_SIZE)
+            .with_max_inner_size(ABOUT_SIZE);
+        let cfg = &mut self.config;
+        ctx.show_viewport_immediate(
+            egui::ViewportId::from_hash_of("ximod_about"),
+            vb,
+            |ctx, _class| {
+                egui::CentralPanel::default().show(ctx, |ui| {
+                    egui::ScrollArea::vertical()
+                        .auto_shrink([false, false])
+                        .show(ui, |ui| {
+                            ui.vertical_centered(|ui| {
+                                ui.add_space(6.0);
+                                ui.heading(&app_name);
+                                ui.label(&version_str);
+                                ui.add_space(8.0);
+                                ui.label(&desc);
+                                ui.add_space(8.0);
+                                ui.label(&license);
+                                ui.add_space(4.0);
+                                ui.label(&copyright);
+                                ui.add_space(12.0);
+                                // Credit to the original author (as agreed with
+                                // Wenderer): a line of text plus a link.
+                                ui.label(&credit);
+                                ui.hyperlink_to(
+                                    "Wenderer — FOMOD Creation Tool",
+                                    "https://www.nexusmods.com/fallout4/mods/6821",
+                                );
+                                ui.add_space(16.0);
+                                if ui.button(&ok_text).clicked() {
+                                    should_close = true;
+                                }
+                            });
+                        });
                 });
-            });
 
-        if should_close
-            || ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Escape))
-        {
+                record_win_geom(cfg, ctx, "ximod_about");
+                if ctx.input(|i| i.viewport().close_requested())
+                    || ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Escape))
+                {
+                    should_close = true;
+                }
+            },
+        );
+
+        if should_close {
             self.show_about = false;
+            self.free_window_closed("ximod_about");
         }
     }
 
@@ -3695,38 +4140,53 @@ impl XimodApp {
         let mut should_save = false;
         let mut content = self.script_content.clone();
 
-        egui::Window::new(&title)
-            .collapsible(false)
-            .resizable(true)
-            .default_width(500.0)
-            .show(ctx, |ui| {
-                ui.label(&info);
+        // Independent, freely movable OS-level window; resizable, with its
+        // position and size remembered in Config.ini.
+        let vb = self.free_viewport_builder(ctx, "ximod_script", title, [500.0, 420.0]);
+        let cfg = &mut self.config;
+        ctx.show_viewport_immediate(
+            egui::ViewportId::from_hash_of("ximod_script"),
+            vb,
+            |ctx, _class| {
+                egui::CentralPanel::default().show(ctx, |ui| {
+                    ui.label(&info);
 
-                ui.collapsing(&macros_title, |ui| {
-                    for line in &macro_lines {
-                        ui.label(line);
-                    }
+                    ui.collapsing(&macros_title, |ui| {
+                        for line in &macro_lines {
+                            ui.label(line);
+                        }
+                    });
+
+                    ui.add_space(8.0);
+
+                    let editor_height = (ui.available_height() - 48.0).max(80.0);
+                    ui.add_sized(
+                        [ui.available_width(), editor_height],
+                        egui::TextEdit::multiline(&mut content).font(egui::TextStyle::Monospace),
+                    );
+
+                    ui.add_space(16.0);
+
+                    ui.horizontal(|ui| {
+                        if ui.button(&btn_save).clicked() {
+                            should_save = true;
+                            should_close = true;
+                        }
+                        if ui.button(&btn_cancel).clicked() {
+                            should_close = true;
+                        }
+                    });
                 });
 
-                ui.add_space(8.0);
-
-                ui.add_sized(
-                    [ui.available_width(), 200.0],
-                    egui::TextEdit::multiline(&mut content).font(egui::TextStyle::Monospace),
-                );
-
-                ui.add_space(16.0);
-
-                ui.horizontal(|ui| {
-                    if ui.button(&btn_save).clicked() {
-                        should_save = true;
-                        should_close = true;
-                    }
-                    if ui.button(&btn_cancel).clicked() {
-                        should_close = true;
-                    }
-                });
-            });
+                record_win_geom(cfg, ctx, "ximod_script");
+                // Escape closes the script editor without saving (same as Cancel).
+                if ctx.input(|i| i.viewport().close_requested())
+                    || ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Escape))
+                {
+                    should_close = true;
+                }
+            },
+        );
 
         self.script_content = content;
 
@@ -3747,12 +4207,9 @@ impl XimodApp {
             }
         }
 
-        // Escape closes the script editor without saving (same as Cancel).
-        if ctx.input_mut(|i| i.consume_key(egui::Modifiers::NONE, egui::Key::Escape)) {
-            should_close = true;
-        }
         if should_close {
             self.show_script_dialog = false;
+            self.free_window_closed("ximod_script");
         }
     }
 
@@ -4019,8 +4476,10 @@ impl eframe::App for XimodApp {
         // Files dropped onto the window open the corresponding FOMOD(s).
         self.handle_dropped_files(ctx);
 
-        // Check if a modal dialog is open
-        let modal_open = self.show_settings || self.show_about || self.show_script_dialog || self.show_confirm || self.show_exit_prompt || self.close_prompt.is_some() || (self.show_xml_editor && self.xml_editor_editing);
+        // Check if a modal dialog is open. The Settings, About and Script
+        // windows are now independent, freely movable OS-level windows, so they
+        // no longer block the main window.
+        let modal_open = self.show_confirm || self.show_exit_prompt || self.close_prompt.is_some() || (self.show_xml_editor && self.xml_editor_editing);
 
         self.render_menu_bar(ctx);
 

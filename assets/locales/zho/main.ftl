@@ -159,6 +159,7 @@ macro-time = $TIME$ - 当前时间（HH:MM:SS）
 macro-random = $RANDOM$ - 随机数
 
 # Plugin Dependencies
+label-plugin-dependencies = 插件依赖项
 label-default-type = 默认类型：
 label-pattern-type = 模式类型：
 label-pattern-operator = 模式运算符：

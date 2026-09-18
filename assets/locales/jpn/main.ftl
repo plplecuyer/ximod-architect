@@ -159,6 +159,7 @@ macro-time = $TIME$ - 現在の時刻 (HH:MM:SS)
 macro-random = $RANDOM$ - 乱数
 
 # Plugin Dependencies
+label-plugin-dependencies = プラグイン依存関係
 label-default-type = デフォルトのタイプ:
 label-pattern-type = パターンのタイプ:
 label-pattern-operator = パターンの演算子:

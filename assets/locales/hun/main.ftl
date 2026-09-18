@@ -159,6 +159,7 @@ macro-time = $TIME$ - Aktuális idő (ÓÓ:PP:MM)
 macro-random = $RANDOM$ - Véletlen szám
 
 # Plugin Dependencies
+label-plugin-dependencies = Bővítményfüggőségek
 label-default-type = Alapértelmezett típus:
 label-pattern-type = Minta típusa:
 label-pattern-operator = Minta operátora:

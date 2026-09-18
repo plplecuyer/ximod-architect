@@ -159,6 +159,7 @@ macro-time = $TIME$ - 현재 시간 (HH:MM:SS)
 macro-random = $RANDOM$ - 난수
 
 # Plugin Dependencies
+label-plugin-dependencies = 플러그인 종속성
 label-default-type = 기본 유형:
 label-pattern-type = 패턴 유형:
 label-pattern-operator = 패턴 연산자:

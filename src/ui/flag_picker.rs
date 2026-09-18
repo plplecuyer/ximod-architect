@@ -22,8 +22,11 @@ pub enum FlagTarget {
 
 /// Flags per row in the grid.
 const COLUMNS: usize = 6;
+// Left inset so the leftmost cell's selection/cursor stroke is never clipped
+// against the panel edge.
+const GRID_LEAD: f32 = 3.0;
 /// Drawn size of one flag.
-const CELL_W: f32 = 104.0;
+const CELL_W: f32 = 96.0;
 const CELL_H: f32 = 70.0;
 /// Row height = flag + caption + spacing.
 const ROW_H: f32 = CELL_H + 26.0;
@@ -204,11 +207,21 @@ impl XimodApp {
                         || c.a3.to_lowercase().contains(&needle)
                 })
                 .map(|c| {
-                    let label = if c.name_fr.is_empty() {
-                        c.name_en.clone()
-                    } else {
-                        c.name_fr.clone()
-                    };
+                    // Caption under the flag: the country's name in its first
+                    // official (endonym) language; fall back to English, then French.
+                    let label = c
+                        .languages
+                        .iter()
+                        .map(|l| l.country_endonym.trim())
+                        .find(|s| !s.is_empty())
+                        .map(|s| s.to_string())
+                        .unwrap_or_else(|| {
+                            if c.name_en.is_empty() {
+                                c.name_fr.clone()
+                            } else {
+                                c.name_en.clone()
+                            }
+                        });
                     (c.a3.clone(), label, d.join(&c.flag))
                 })
                 .filter(|(_, _, p)| p.is_file())
@@ -221,7 +234,7 @@ impl XimodApp {
 
         // Independent OS-level window (viewport): freely movable, including onto
         // a second screen and over the (also free) translation editor window.
-        let vb = self.free_viewport_builder(ctx, "ximod_flag_picker", title, [720.0, 520.0]);
+        let vb = self.free_viewport_builder(ctx, "ximod_flag_picker", title, [760.0, 520.0]);
         ctx.show_viewport_immediate(
             egui::ViewportId::from_hash_of("ximod_flag_picker"),
             vb,
@@ -282,8 +295,13 @@ impl XimodApp {
                     area = area.vertical_scroll_offset(off);
                 }
                 let out = area.show_rows(ui, ROW_H, rows, |ui, range| {
+                    // Tight, predictable cell metrics so the six columns fit the
+                    // window width without overflowing (which clipped a column).
+                    ui.spacing_mut().item_spacing = egui::vec2(6.0, 4.0);
+                    ui.spacing_mut().button_padding = egui::vec2(0.0, 0.0);
                     for row in range {
                         ui.horizontal(|ui| {
+                            ui.add_space(GRID_LEAD);
                             for col in 0..COLUMNS {
                                 let idx = row * COLUMNS + col;
                                 let Some((a3, label, path)) = entries.get(idx) else {
@@ -348,13 +366,23 @@ impl XimodApp {
             match self.flag_target {
                 FlagTarget::Settings => {
                     self.temp_country = a3;
-                    // If the current language is not spoken in the new country,
-                    // fall back to its first one so the drop-down never shows a
-                    // stale value.
-                    let langs = self.country_languages.languages_for(&self.temp_country);
-                    if !langs.iter().any(|l| *l == self.temp_locale) {
-                        if let Some(first) = langs.first() {
-                            self.temp_locale = first.clone();
+                    // Automatically select the country's first official language
+                    // and show it in the "Language" field.
+                    let first_official = self
+                        .countries
+                        .languages_for(&self.temp_country)
+                        .first()
+                        .map(|l| l.iso3.clone());
+                    if let Some(code) = first_official {
+                        self.temp_locale = code;
+                    } else {
+                        // No official language listed: fall back to the first
+                        // spoken language so the drop-down never shows a stale value.
+                        let langs = self.country_languages.languages_for(&self.temp_country);
+                        if !langs.iter().any(|l| *l == self.temp_locale) {
+                            if let Some(first) = langs.first() {
+                                self.temp_locale = first.clone();
+                            }
                         }
                     }
                 }

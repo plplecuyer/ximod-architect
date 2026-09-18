@@ -159,6 +159,7 @@ macro-time = $TIME$ - Aktuell tid (HH:MM:SS)
 macro-random = $RANDOM$ - Slumptal
 
 # Plugin Dependencies
+label-plugin-dependencies = Plugin-beroenden
 label-default-type = Standardtyp:
 label-pattern-type = Mönstertyp:
 label-pattern-operator = Mönsteroperator:

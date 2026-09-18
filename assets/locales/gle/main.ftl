@@ -159,6 +159,7 @@ macro-time = $TIME$ - An t-am reatha (HH:MM:SS)
 macro-random = $RANDOM$ - Uimhir randamach
 
 # Plugin Dependencies
+label-plugin-dependencies = Spleáchais breiseáin
 label-default-type = Cineál Réamhshocraithe:
 label-pattern-type = Cineál Patrúin:
 label-pattern-operator = Oibritheoir Patrúin:

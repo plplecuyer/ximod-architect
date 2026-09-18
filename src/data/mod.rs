@@ -356,3 +356,38 @@ impl CountriesData {
         self.countries.is_empty()
     }
 }
+
+// ============================================================================
+// Localized country names — assets/data/CountryNames.json
+// ============================================================================
+
+/// Country display names translated per UI locale (ISO 639-3).
+///
+/// Keyed by ISO 3166-1 alpha-3 country code, then by locale code. Used by the
+/// "Properties" window to show country names in the language chosen by the user
+/// (falling back to the English name when the locale is not covered).
+#[derive(Debug, Clone, Default, Deserialize)]
+pub struct CountryNamesData {
+    #[serde(default)]
+    pub names: HashMap<String, HashMap<String, String>>,
+}
+
+impl CountryNamesData {
+    /// Load `assets/data/CountryNames.json`.
+    pub fn load() -> Self {
+        load_json("CountryNames.json")
+    }
+
+    /// Localized name of country `a3` in `locale` (ISO 639-3), if present.
+    pub fn name_for(&self, a3: &str, locale: &str) -> Option<&str> {
+        self.names
+            .get(&a3.to_uppercase())
+            .and_then(|m| m.get(locale))
+            .map(|s| s.as_str())
+            .filter(|s| !s.is_empty())
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.names.is_empty()
+    }
+}

@@ -159,6 +159,7 @@ macro-time = $TIME$ - Gjeldende tid (TT:MM:SS)
 macro-random = $RANDOM$ - Tilfeldig tall
 
 # Plugin Dependencies
+label-plugin-dependencies = Plugin-avhengigheter
 label-default-type = Standardtype:
 label-pattern-type = Mønstertype:
 label-pattern-operator = Mønsteroperator:

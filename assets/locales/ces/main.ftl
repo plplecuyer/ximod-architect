@@ -159,6 +159,7 @@ macro-time = $TIME$ - Aktuální čas (HH:MM:SS)
 macro-random = $RANDOM$ - Náhodné číslo
 
 # Plugin Dependencies
+label-plugin-dependencies = Závislosti pluginu
 label-default-type = Výchozí typ:
 label-pattern-type = Typ vzoru:
 label-pattern-operator = Operátor vzoru:

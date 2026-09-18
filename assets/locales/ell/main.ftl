@@ -159,6 +159,7 @@ macro-time = $TIME$ - Τρέχουσα ώρα (HH:MM:SS)
 macro-random = $RANDOM$ - Τυχαίος αριθμός
 
 # Plugin Dependencies
+label-plugin-dependencies = Εξαρτήσεις προσθέτου
 label-default-type = Προεπιλεγμένος τύπος:
 label-pattern-type = Τύπος προτύπου:
 label-pattern-operator = Τελεστής προτύπου:

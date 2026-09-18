@@ -159,6 +159,7 @@ macro-time = $TIME$ - Nykyinen kellonaika (TT:MM:SS)
 macro-random = $RANDOM$ - Satunnaisluku
 
 # Plugin Dependencies
+label-plugin-dependencies = Laajennusriippuvuudet
 label-default-type = Oletustyyppi:
 label-pattern-type = Mallin tyyppi:
 label-pattern-operator = Mallin operaattori:

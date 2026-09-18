@@ -159,6 +159,7 @@ macro-time = $TIME$ - Güncel saat (SS:DD:SS)
 macro-random = $RANDOM$ - Rastgele sayı
 
 # Plugin Dependencies
+label-plugin-dependencies = Eklenti bağımlılıkları
 label-default-type = Varsayılan Tür:
 label-pattern-type = Desen Türü:
 label-pattern-operator = Desen İşleci:

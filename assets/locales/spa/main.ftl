@@ -159,6 +159,7 @@ macro-time = $TIME$ - Hora actual (HH:MM:SS)
 macro-random = $RANDOM$ - Número aleatorio
 
 # Plugin Dependencies
+label-plugin-dependencies = Dependencias de plugin
 label-default-type = Tipo predeterminado:
 label-pattern-type = Tipo de patrón:
 label-pattern-operator = Operador de patrón:

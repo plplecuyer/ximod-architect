@@ -159,6 +159,7 @@ macro-time = $TIME$ – praegune kellaaeg (HH:MM:SS)
 macro-random = $RANDOM$ – juhuslik number
 
 # Plugin Dependencies
+label-plugin-dependencies = Plugina sõltuvused
 label-default-type = Vaikimisi tüüp:
 label-pattern-type = Mustri tüüp:
 label-pattern-operator = Mustri operaator:

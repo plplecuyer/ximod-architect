@@ -159,6 +159,7 @@ macro-time = $TIME$ - Ora curentă (HH:MM:SS)
 macro-random = $RANDOM$ - Număr aleatoriu
 
 # Plugin Dependencies
+label-plugin-dependencies = Dependențe de plugin
 label-default-type = Tip implicit:
 label-pattern-type = Tip model:
 label-pattern-operator = Operator model:

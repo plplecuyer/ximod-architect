@@ -159,6 +159,7 @@ macro-time = $TIME$ - Bieżący czas (GG:MM:SS)
 macro-random = $RANDOM$ - Liczba losowa
 
 # Plugin Dependencies
+label-plugin-dependencies = Zależności wtyczek
 label-default-type = Typ domyślny:
 label-pattern-type = Typ wzorca:
 label-pattern-operator = Operator wzorca:

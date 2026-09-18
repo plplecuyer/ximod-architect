@@ -159,6 +159,7 @@ macro-time = $TIME$ - Ura actuala (HH:MM:SS)
 macro-random = $RANDOM$ - Numer casual
 
 # Plugin Dependencies
+label-plugin-dependencies = Dependenzas da plugin
 label-default-type = Tip standard:
 label-pattern-type = Tip da muster:
 label-pattern-operator = Operatur dal muster:

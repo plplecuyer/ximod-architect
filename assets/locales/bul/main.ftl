@@ -159,6 +159,7 @@ macro-time = $TIME$ – Текущо време (ЧЧ:ММ:СС)
 macro-random = $RANDOM$ – Случайно число
 
 # Plugin Dependencies
+label-plugin-dependencies = Зависимости от приставка
 label-default-type = Тип по подразбиране:
 label-pattern-type = Тип на шаблона:
 label-pattern-operator = Оператор на шаблона:

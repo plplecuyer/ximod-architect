@@ -159,6 +159,7 @@ macro-time = $TIME$ – Dabartinis laikas (HH:MM:SS)
 macro-random = $RANDOM$ – Atsitiktinis skaičius
 
 # Plugin Dependencies
+label-plugin-dependencies = Papildinio priklausomybės
 label-default-type = Numatytasis tipas:
 label-pattern-type = Šablono tipas:
 label-pattern-operator = Šablono operatorius:

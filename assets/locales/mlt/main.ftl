@@ -159,6 +159,7 @@ macro-time = $TIME$ - Il-ħin kurrenti (HH:MM:SS)
 macro-random = $RANDOM$ - Numru każwali
 
 # Plugin Dependencies
+label-plugin-dependencies = Dipendenzi tal-plugin
 label-default-type = Tip Default:
 label-pattern-type = Tip tal-Mudell:
 label-pattern-operator = Operatur tal-Mudell:

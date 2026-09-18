@@ -159,6 +159,7 @@ macro-time = $TIME$ - Huidige tijd (UU:MM:SS)
 macro-random = $RANDOM$ - Willekeurig getal
 
 # Plugin Dependencies
+label-plugin-dependencies = Plugin-afhankelijkheden
 label-default-type = Standaardtype:
 label-pattern-type = Patroontype:
 label-pattern-operator = Patroonoperator:
