@@ -44,7 +44,18 @@ menu-translation = Translation...
 
 # Menu - Help
 menu-help = Help
+menu-check-updates = Check for updates…
 menu-about = About
+
+# Update check
+update-checking = Checking for updates…
+update-up-to-date = XIMOD Architect is up to date.
+update-check-failed = Could not check for updates. Please try again later.
+update-available-status = Version { $version } is available.
+update-banner-text = XIMOD Architect { $version } is available.
+update-download = Download:
+update-skip = Skip this version
+update-later = Later
 
 # Tabs
 tab-info = Mod Info
@@ -131,6 +142,7 @@ settings-language = Language:
 settings-theme = Theme:
 settings-font-size = Font Size:
 settings-replace-newlines = Process newlines in descriptions
+settings-check-updates = Check for updates on startup
 settings-max-recent = Max Recent Files:
 settings-window-width = Window Width:
 settings-window-height = Window Height:

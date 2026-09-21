@@ -133,7 +133,7 @@ impl XimodApp {
         }
 
         let title = self.i18n.t("prop-title");
-        let vb = self.free_viewport_builder(ctx, "ximod_properties", title, [820.0, 600.0]);
+        let vb = self.free_viewport_builder(ctx, "ximod_properties", title, [820.0, 600.0], false);
         let l_tab_countries = self.i18n.t("prop-tab-countries");
         let l_tab_languages = self.i18n.t("prop-tab-languages");
         let l_filter = self.i18n.t("prop-filter");

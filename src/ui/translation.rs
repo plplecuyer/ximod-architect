@@ -984,7 +984,7 @@ impl XimodApp {
         // Independent OS-level window (viewport): freely movable and resizable,
         // including onto a second screen, like the Preview / Properties / XML
         // editor windows.
-        let vb = self.free_viewport_builder(ctx, "ximod_translation", title, [980.0, 640.0]);
+        let vb = self.free_viewport_builder(ctx, "ximod_translation", title, [980.0, 640.0], false);
         ctx.show_viewport_immediate(
             egui::ViewportId::from_hash_of("ximod_translation"),
             vb,

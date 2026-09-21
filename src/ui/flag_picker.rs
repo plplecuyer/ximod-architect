@@ -234,7 +234,7 @@ impl XimodApp {
 
         // Independent OS-level window (viewport): freely movable, including onto
         // a second screen and over the (also free) translation editor window.
-        let vb = self.free_viewport_builder(ctx, "ximod_flag_picker", title, [760.0, 520.0]);
+        let vb = self.free_viewport_builder(ctx, "ximod_flag_picker", title, [760.0, 520.0], false);
         ctx.show_viewport_immediate(
             egui::ViewportId::from_hash_of("ximod_flag_picker"),
             vb,

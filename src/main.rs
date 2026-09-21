@@ -25,6 +25,7 @@ mod icon;
 mod models;
 mod splash;
 mod ui;
+mod update;
 mod xml;
 
 use eframe::egui;

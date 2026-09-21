@@ -296,7 +296,7 @@ impl XimodApp {
 
         // Labels (fetched before borrowing fields, so i18n isn't captured).
         let title = self.i18n.t("preview-title");
-        let vb = self.free_viewport_builder(ctx, "ximod_preview", title, [860.0, 620.0]);
+        let vb = self.free_viewport_builder(ctx, "ximod_preview", title, [860.0, 620.0], false);
         let l_refresh = self.i18n.t("preview-refresh");
         let l_assume = self.i18n.t("preview-assumptions");
         let l_back = self.i18n.t("preview-back");

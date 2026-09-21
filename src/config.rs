@@ -163,6 +163,18 @@ pub struct AppConfig {
     /// saved the settings at least once.
     pub first_start_done: bool,
 
+    /// Whether XIMOD checks for a newer release on startup (once per day) and
+    /// shows a discreet banner when one is available. Stored as `CheckUpdates`.
+    pub check_updates: bool,
+
+    /// Date (YYYY-MM-DD) of the last successful update check, so the startup
+    /// check runs at most once per day. Stored as `LastUpdateCheck`.
+    pub last_update_check: String,
+
+    /// A release version the user chose to ignore ("Skip this version"), so the
+    /// banner does not reappear for it. Stored as `SkipUpdateVersion`.
+    pub skip_update_version: String,
+
     /// Saved on-screen positions (outer top-left, in points) of the free tool
     /// windows, keyed by viewport id (e.g. "ximod_translation"). A window with
     /// no saved position opens centered on the main window; once the user moves
@@ -191,6 +203,9 @@ impl Default for AppConfig {
             replace_newlines: true,
             splash_screen_seconds: 2,
             first_start_done: false,
+            check_updates: true,
+            last_update_check: String::new(),
+            skip_update_version: String::new(),
             window_positions: std::collections::HashMap::new(),
             window_sizes: std::collections::HashMap::new(),
         }
@@ -308,6 +323,15 @@ impl AppConfig {
         if let Some(v) = values.get("SplashScreenSeconds") {
             config.splash_screen_seconds = v.parse().unwrap_or(2);
         }
+        if let Some(v) = values.get("CheckUpdates") {
+            config.check_updates = v == "1" || v.to_lowercase() == "true";
+        }
+        if let Some(v) = values.get("LastUpdateCheck") {
+            config.last_update_check = v.clone();
+        }
+        if let Some(v) = values.get("SkipUpdateVersion") {
+            config.skip_update_version = v.clone();
+        }
         if let Some(v) = values.get("WindowWidth") {
             config.window_width = v.parse().unwrap_or(1280.0);
         }
@@ -389,6 +413,12 @@ impl AppConfig {
         ));
         lines.push(format!("MaxRecentFiles={}", self.max_recent_files));
         lines.push(format!("SplashScreenSeconds={}", self.splash_screen_seconds));
+        lines.push(format!(
+            "CheckUpdates={}",
+            if self.check_updates { "1" } else { "0" }
+        ));
+        lines.push(format!("LastUpdateCheck={}", self.last_update_check));
+        lines.push(format!("SkipUpdateVersion={}", self.skip_update_version));
         lines.push(String::new());
 
         lines.push("[Window]".to_string());

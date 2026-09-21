@@ -235,7 +235,20 @@ pub struct XimodApp {
     pub temp_max_recent_files: usize,
     pub temp_window_width: f32,
     pub temp_window_height: f32,
-    
+    pub temp_check_updates: bool,
+
+    // ---- Update check (query GitHub Releases on startup, once per day) ----
+    /// Receiver for the in-flight background check, if one is running.
+    pub update_rx: Option<std::sync::mpsc::Receiver<crate::update::UpdateCheck>>,
+    /// Newer version to advertise in the banner; `None` = no banner shown.
+    pub update_available: Option<String>,
+    /// Whether the in-flight check was started manually (Help → Check for
+    /// updates). A manual check reports "up to date" and errors; the automatic
+    /// startup check stays silent on those outcomes.
+    pub update_manual: bool,
+    /// Set once the automatic startup check has been considered this session.
+    pub update_started: bool,
+
     // Screen info for window positioning
     pub screen_info: crate::ScreenInfo,
     
@@ -298,11 +311,11 @@ pub enum SettingsTab {
 /// the child context). Takes `&mut AppConfig` so it works both when the closure
 /// borrows the whole app and when it only borrows the config field disjointly.
 /// Fixed size of the "About" window (independent, non-resizable).
-const ABOUT_SIZE: [f32; 2] = [430.0, 300.0];
+const ABOUT_SIZE: [f32; 2] = [430.0, 250.0];
 
 /// Fixed size of the "Settings" window (independent, movable, non-resizable:
 /// no automatic and no manual sizing).
-const SETTINGS_SIZE: [f32; 2] = [770.0, 495.0];
+const SETTINGS_SIZE: [f32; 2] = [770.0, 395.0];
 
 pub(crate) fn record_win_geom(
     config: &mut crate::config::AppConfig,
@@ -359,6 +372,11 @@ impl Default for XimodApp {
             temp_max_recent_files: config.max_recent_files,
             temp_window_width: config.window_width,
             temp_window_height: config.window_height,
+            temp_check_updates: config.check_updates,
+            update_rx: None,
+            update_available: None,
+            update_manual: false,
+            update_started: false,
             config,
             i18n,
             locale_version: 0,
@@ -491,8 +509,15 @@ impl XimodApp {
         id: &str,
         title: String,
         size: [f32; 2],
+        fixed_size: bool,
     ) -> egui::ViewportBuilder {
         let mut builder = egui::ViewportBuilder::default().with_title(title);
+        // Fixed-size windows (Settings, About) must always open at their coded
+        // size, so drop any size that a previous session saved in Config.ini —
+        // otherwise the stale saved size would override the constant.
+        if fixed_size {
+            self.config.window_sizes.remove(id);
+        }
         // Apply the saved (or centered) geometry ONLY on the opening frame.
         // Re-applying `with_inner_size`/`with_position` every frame made egui/winit
         // keep snapping the window back to that exact size and position — which
@@ -542,6 +567,144 @@ impl XimodApp {
             self.win_pos.remove(id);
             self.win_size.remove(id);
             let _ = self.config.save();
+        }
+    }
+
+    /// Today's date as `YYYY-MM-DD` (local), used to rate-limit the update check.
+    fn today_str() -> String {
+        chrono::Local::now().format("%Y-%m-%d").to_string()
+    }
+
+    /// Start a background update check.
+    ///
+    /// `manual` = the user asked for it (Help → Check for updates): it always
+    /// runs and reports the outcome. Otherwise it is the automatic startup check,
+    /// which runs at most once per day and stays silent when up to date or on
+    /// error.
+    fn start_update_check(&mut self, manual: bool) {
+        // Never run two checks at once.
+        if self.update_rx.is_some() {
+            return;
+        }
+        if !manual {
+            if !self.config.check_updates {
+                return;
+            }
+            if self.config.last_update_check == Self::today_str() {
+                return;
+            }
+        }
+        self.update_manual = manual;
+        self.update_rx = Some(crate::update::spawn_check());
+        if manual {
+            self.status_message = self.i18n.t("update-checking");
+        }
+    }
+
+    /// Poll the in-flight update check (called once per frame). Applies the
+    /// result: shows the banner, updates the status line, and records the
+    /// last-check date in the config.
+    fn poll_update_check(&mut self, ctx: &egui::Context) {
+        let Some(rx) = &self.update_rx else { return };
+        let msg = match rx.try_recv() {
+            Ok(m) => m,
+            Err(std::sync::mpsc::TryRecvError::Empty) => return,
+            Err(std::sync::mpsc::TryRecvError::Disconnected) => {
+                self.update_rx = None;
+                return;
+            }
+        };
+        self.update_rx = None;
+        let manual = self.update_manual;
+
+        match msg {
+            crate::update::UpdateCheck::Available(version) => {
+                // An automatic check honors a previously "skipped" version; a
+                // manual check always shows the result.
+                if manual || self.config.skip_update_version != version {
+                    self.update_available = Some(version.clone());
+                }
+                if manual {
+                    self.status_message =
+                        self.i18n.t_arg("update-available-status", "version", &version);
+                }
+                // Record a successful check (only the automatic one is rate-limited,
+                // but stamping the date here is harmless for both).
+                self.config.last_update_check = Self::today_str();
+                let _ = self.config.save();
+                ctx.request_repaint();
+            }
+            crate::update::UpdateCheck::UpToDate => {
+                if manual {
+                    self.status_message = self.i18n.t("update-up-to-date");
+                }
+                self.config.last_update_check = Self::today_str();
+                let _ = self.config.save();
+            }
+            crate::update::UpdateCheck::Failed(_e) => {
+                if manual {
+                    self.status_message = self.i18n.t("update-check-failed");
+                }
+                // A failed automatic check is not stamped, so it retries next launch.
+            }
+        }
+    }
+
+    /// Draw the "new version available" banner at the top of the window, when one
+    /// is pending. Returns nothing; mutates state on the user's actions.
+    fn render_update_banner(&mut self, ctx: &egui::Context) {
+        let Some(version) = self.update_available.clone() else { return };
+
+        let msg = self
+            .i18n
+            .t_arg("update-banner-text", "version", &version);
+        let btn_download = self.i18n.t("update-download");
+        let btn_skip = self.i18n.t("update-skip");
+        let btn_later = self.i18n.t("update-later");
+
+        let mut dismiss = false;
+        let mut skip = false;
+
+        egui::TopBottomPanel::top("update_banner")
+            .frame(
+                egui::Frame::none()
+                    .fill(egui::Color32::from_rgb(46, 92, 138))
+                    .inner_margin(egui::Margin::symmetric(10.0, 6.0)),
+            )
+            .show(ctx, |ui| {
+                ui.horizontal_wrapped(|ui| {
+                    ui.label(
+                        egui::RichText::new(&msg)
+                            .color(egui::Color32::WHITE)
+                            .strong(),
+                    );
+                    ui.label(egui::RichText::new(&btn_download).color(egui::Color32::WHITE));
+                    ui.hyperlink_to(
+                        egui::RichText::new("Nexus").color(egui::Color32::WHITE),
+                        crate::update::NEXUS_URL,
+                    );
+                    ui.hyperlink_to(
+                        egui::RichText::new("GitHub").color(egui::Color32::WHITE),
+                        crate::update::RELEASES_URL,
+                    );
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        if ui.button(&btn_later).clicked() {
+                            dismiss = true;
+                        }
+                        if ui.button(&btn_skip).clicked() {
+                            skip = true;
+                        }
+                    });
+                });
+            });
+
+        if skip {
+            self.config.skip_update_version = version;
+            let _ = self.config.save();
+            self.update_available = None;
+        } else if dismiss {
+            // Hide for this session only; it may reappear on the next launch.
+            self.update_available = None;
         }
     }
 
@@ -905,6 +1068,7 @@ impl XimodApp {
         self.temp_max_recent_files = self.config.max_recent_files;
         self.temp_window_width = self.config.window_width;
         self.temp_window_height = self.config.window_height;
+        self.temp_check_updates = self.config.check_updates;
         self.settings_focus = 0;
         self.settings_tab = SettingsTab::General;
         self.show_settings = true;
@@ -1281,7 +1445,7 @@ impl XimodApp {
 
         // Independent, freely movable OS-level window; resizable, with its
         // position and size remembered in Config.ini.
-        let vb = self.free_viewport_builder(ctx, "ximod_validate", title.clone(), [580.0, 400.0]);
+        let vb = self.free_viewport_builder(ctx, "ximod_validate", title.clone(), [580.0, 400.0], false);
         let cfg = &mut self.config;
         ctx.show_viewport_immediate(
             egui::ViewportId::from_hash_of("ximod_validate"),
@@ -1509,6 +1673,7 @@ impl XimodApp {
         let menu_properties = self.i18n.t("menu-properties");
         let menu_help = self.i18n.t("menu-help");
         let menu_about = self.i18n.t("menu-about");
+        let menu_check_updates = self.i18n.t("menu-check-updates");
 
         let has_root = self.root_directory.is_some();
         let recent_files = self.config.recent_files.clone();
@@ -1753,6 +1918,15 @@ impl XimodApp {
 
                 // Help menu.
                 ui.menu_button(&menu_help, |ui| {
+                    let btn_check = egui::Button::new(&menu_check_updates)
+                        .wrap_mode(egui::TextWrapMode::Extend);
+                    if ui.add(btn_check).clicked() {
+                        self.start_update_check(true);
+                        ui.close_menu();
+                    }
+
+                    ui.separator();
+
                     let btn_about = egui::Button::new(&menu_about)
                         .wrap_mode(egui::TextWrapMode::Extend)
                         .shortcut_text(&sct_about);
@@ -3385,6 +3559,7 @@ impl XimodApp {
         let label_theme = self.i18n.t("settings-theme");
         let label_font_size = self.i18n.t("settings-font-size");
         let label_replace = self.i18n.t("settings-replace-newlines");
+        let label_check_updates = self.i18n.t("settings-check-updates");
         let label_max_recent = self.i18n.t("settings-max-recent");
         let label_window_width = self.i18n.t("settings-window-width");
         let label_window_height = self.i18n.t("settings-window-height");
@@ -3439,7 +3614,7 @@ impl XimodApp {
         // resizable): no automatic and no manual sizing. Only its position is
         // remembered in Config.ini.
         let vb = self
-            .free_viewport_builder(ctx, "ximod_settings", title, SETTINGS_SIZE)
+            .free_viewport_builder(ctx, "ximod_settings", title, SETTINGS_SIZE, true)
             .with_resizable(false)
             .with_min_inner_size(SETTINGS_SIZE)
             .with_max_inner_size(SETTINGS_SIZE);
@@ -3818,6 +3993,11 @@ impl XimodApp {
                                     self.settings_focus = FOCUS_REPLACE_NEWLINES;
                                 }
 
+                                ui.add_space(8.0);
+
+                                // Check for updates on startup
+                                ui.checkbox(&mut self.temp_check_updates, &label_check_updates);
+
                                 ui.add_space(12.0);
                                 ui.separator();
                                 ui.add_space(8.0);
@@ -3990,6 +4170,7 @@ impl XimodApp {
             self.config.max_recent_files = self.temp_max_recent_files;
             self.config.window_width = self.temp_window_width;
             self.config.window_height = self.temp_window_height;
+            self.config.check_updates = self.temp_check_updates;
 
             self.i18n.set_locale(&self.temp_locale);
             self.apply_theme(ctx);
@@ -4030,6 +4211,7 @@ impl XimodApp {
                 self.temp_max_recent_files = self.config.max_recent_files;
                 self.temp_window_width = self.config.window_width;
                 self.temp_window_height = self.config.window_height;
+                self.temp_check_updates = self.config.check_updates;
             }
             self.show_settings = false;
             self.settings_tab = SettingsTab::General;
@@ -4058,7 +4240,7 @@ impl XimodApp {
         // screen), but of FIXED size: not resizable by the user. Only its
         // position is remembered in Config.ini.
         let vb = self
-            .free_viewport_builder(ctx, "ximod_about", title, ABOUT_SIZE)
+            .free_viewport_builder(ctx, "ximod_about", title, ABOUT_SIZE, true)
             .with_resizable(false)
             .with_min_inner_size(ABOUT_SIZE)
             .with_max_inner_size(ABOUT_SIZE);
@@ -4142,7 +4324,7 @@ impl XimodApp {
 
         // Independent, freely movable OS-level window; resizable, with its
         // position and size remembered in Config.ini.
-        let vb = self.free_viewport_builder(ctx, "ximod_script", title, [500.0, 420.0]);
+        let vb = self.free_viewport_builder(ctx, "ximod_script", title, [500.0, 420.0], false);
         let cfg = &mut self.config;
         ctx.show_viewport_immediate(
             egui::ViewportId::from_hash_of("ximod_script"),
@@ -4476,12 +4658,23 @@ impl eframe::App for XimodApp {
         // Files dropped onto the window open the corresponding FOMOD(s).
         self.handle_dropped_files(ctx);
 
+        // Update check: kick off the automatic (once-per-day) check on the first
+        // frame, then poll the in-flight result every frame.
+        if !self.update_started {
+            self.update_started = true;
+            self.start_update_check(false);
+        }
+        self.poll_update_check(ctx);
+
         // Check if a modal dialog is open. The Settings, About and Script
         // windows are now independent, freely movable OS-level windows, so they
         // no longer block the main window.
         let modal_open = self.show_confirm || self.show_exit_prompt || self.close_prompt.is_some() || (self.show_xml_editor && self.xml_editor_editing);
 
         self.render_menu_bar(ctx);
+
+        // "New version available" banner, just below the menu bar.
+        self.render_update_banner(ctx);
 
         // Document (FOMOD) tab strip.
         self.render_fomod_tabs(ctx, modal_open);

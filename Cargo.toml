@@ -1,8 +1,8 @@
 [package]
 name = "ximod-architect"
-version = "1.0.2"
+version = "1.0.3"
 edition = "2024"
-rust-version = "1.97.1"
+rust-version = "1.98.1"
 authors = ["XIMOD Team"]
 description = "Cross-platform FOMOD installer creation tool for Bethesda game mods"
 license = "MIT"
@@ -40,6 +40,9 @@ anyhow = "1.0"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 chrono = "0.4"
+
+# Update check (query GitHub Releases API over HTTPS)
+ureq = { version = "2", default-features = false, features = ["tls", "json"] }
 
 # Packaging translations for submission
 zip = { version = "2", default-features = false, features = ["deflate"] }

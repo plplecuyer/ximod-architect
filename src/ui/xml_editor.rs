@@ -256,7 +256,7 @@ impl XimodApp {
         let mut do_revert = false;
         let mut do_close = false;
 
-        let vb = self.free_viewport_builder(ctx, "ximod_xml_editor", title, [760.0, 580.0]);
+        let vb = self.free_viewport_builder(ctx, "ximod_xml_editor", title, [760.0, 580.0], false);
         ctx.show_viewport_immediate(
             egui::ViewportId::from_hash_of("ximod_xml_editor"),
             vb,
