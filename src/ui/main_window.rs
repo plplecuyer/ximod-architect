@@ -117,6 +117,11 @@ pub struct XimodApp {
     pub current_step_index: Option<usize>,
     pub current_group_index: Option<usize>,
     pub current_plugin_index: Option<usize>,
+
+    /// Edit buffer for the "same destination for a whole group" field.
+    pub group_dest_buf: String,
+    /// Edit buffer for the "same destination for a whole page/step" field.
+    pub page_dest_buf: String,
     pub current_file_index: Option<usize>,
     pub current_flag_index: Option<usize>,
     pub current_dependency_index: Option<usize>,
@@ -384,6 +389,8 @@ impl Default for XimodApp {
             current_step_index: None,
             current_group_index: None,
             current_plugin_index: None,
+            group_dest_buf: String::new(),
+            page_dest_buf: String::new(),
             current_file_index: None,
             current_flag_index: None,
             current_dependency_index: None,
@@ -2146,6 +2153,72 @@ impl XimodApp {
         });
     }
 
+    /// Set `dest` as the destination of every file of every plugin in one
+    /// group, in a single action. Returns the number of files updated.
+    ///
+    /// This backs the "same destination for a whole group" control: instead of
+    /// editing the destination on each option's Files table, the author assigns
+    /// one install destination to the entire group at once.
+    fn apply_dest_to_group(&mut self, step_idx: usize, group_idx: usize, dest: &str) -> usize {
+        self.ximod
+            .steps
+            .get_mut(step_idx)
+            .and_then(|s| s.plugin_groups.get_mut(group_idx))
+            .map(|g| g.set_all_destinations(dest))
+            .unwrap_or(0)
+    }
+
+    /// Set `dest` as the destination of every file of every plugin on one
+    /// step/page (all its groups), in a single action. Returns the number of
+    /// files updated.
+    fn apply_dest_to_step(&mut self, step_idx: usize, dest: &str) -> usize {
+        self.ximod
+            .steps
+            .get_mut(step_idx)
+            .map(|s| s.set_all_destinations(dest))
+            .unwrap_or(0)
+    }
+
+    /// Panel: assign one install destination to every plugin on the current
+    /// page/step at once.
+    fn render_page_destination(&mut self, ui: &mut egui::Ui, step_idx: usize) {
+        let hint = self.i18n.t("page-dest-hint");
+        let btn_apply = self.i18n.t("btn-apply-page-dest");
+        let label_dest = self.i18n.t("label-destination");
+        let nofiles = self.i18n.t("bulk-dest-nofiles");
+
+        let file_count: usize = self
+            .ximod
+            .steps
+            .get(step_idx)
+            .map(|s| {
+                s.plugin_groups
+                    .iter()
+                    .flat_map(|g| &g.plugins)
+                    .map(|p| p.files.len())
+                    .sum()
+            })
+            .unwrap_or(0);
+
+        ui.label(egui::RichText::new(&hint).small().color(egui::Color32::GRAY));
+        ui.horizontal(|ui| {
+            ui.label(&label_dest);
+            ui.text_edit_singleline(&mut self.page_dest_buf);
+        });
+        if ui
+            .add_enabled(file_count > 0, egui::Button::new(&btn_apply))
+            .clicked()
+        {
+            let dest = self.page_dest_buf.trim().to_string();
+            let n = self.apply_dest_to_step(step_idx, &dest);
+            self.project_modified = true;
+            self.status_message = self.i18n.t_num("status-dest-applied", n as i64);
+        }
+        if file_count == 0 {
+            ui.label(egui::RichText::new(&nofiles).small().color(egui::Color32::GRAY));
+        }
+    }
+
     fn render_steps_tab(&mut self, ui: &mut egui::Ui) {
         let label_step_name = self.i18n.t("label-step-name");
         let btn_delete_step = self.i18n.t("btn-delete-step");
@@ -2224,6 +2297,15 @@ impl XimodApp {
                     .default_open(!self.ximod.steps[step_idx].visibility_dependencies.is_empty())
                     .show(ui, |ui| {
                         self.render_step_visibility(ui, step_idx);
+                    });
+
+                // Bulk destination for the whole page (all plugins, all groups).
+                let dest_title = self.i18n.t("label-page-dest");
+                egui::CollapsingHeader::new(&dest_title)
+                    .id_salt("step_dest_header")
+                    .default_open(false)
+                    .show(ui, |ui| {
+                        self.render_page_destination(ui, step_idx);
                     });
 
                 ui.separator();
@@ -2369,6 +2451,10 @@ impl XimodApp {
         let label_type = self.i18n.t("label-group-type");
         let hint_before = self.i18n.t("reorder-before");
         let hint_after = self.i18n.t("reorder-after");
+        let label_group_dest = self.i18n.t("label-group-dest");
+        let btn_apply_group_dest = self.i18n.t("btn-apply-group-dest");
+        let group_dest_hint = self.i18n.t("group-dest-hint");
+        let group_dest_nofiles = self.i18n.t("bulk-dest-nofiles");
 
         section_header(ui, &label_group);
 
@@ -2430,6 +2516,42 @@ impl XimodApp {
                             }
                         });
                 });
+
+                // Bulk destination for the whole group (all plugins in it).
+                let group_file_count: usize = self.ximod.steps[step_idx].plugin_groups[group_idx]
+                    .plugins
+                    .iter()
+                    .map(|p| p.files.len())
+                    .sum();
+                ui.add_space(4.0);
+                ui.label(
+                    egui::RichText::new(&group_dest_hint)
+                        .small()
+                        .color(egui::Color32::GRAY),
+                );
+                ui.horizontal(|ui| {
+                    ui.label(&label_group_dest);
+                    ui.text_edit_singleline(&mut self.group_dest_buf);
+                });
+                if ui
+                    .add_enabled(
+                        group_file_count > 0,
+                        egui::Button::new(&btn_apply_group_dest),
+                    )
+                    .clicked()
+                {
+                    let dest = self.group_dest_buf.trim().to_string();
+                    let n = self.apply_dest_to_group(step_idx, group_idx, &dest);
+                    self.project_modified = true;
+                    self.status_message = self.i18n.t_num("status-dest-applied", n as i64);
+                }
+                if group_file_count == 0 {
+                    ui.label(
+                        egui::RichText::new(&group_dest_nofiles)
+                            .small()
+                            .color(egui::Color32::GRAY),
+                    );
+                }
             }
         }
 

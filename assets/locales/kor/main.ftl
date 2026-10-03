@@ -334,3 +334,14 @@ prop-select-lang = 언어를 선택하여 세부 정보를 확인하세요.
 # Direct link to Nexus Mods (game slug)
 btn-nexus = Nexus ↗
 nexus-open-hint = 게임의 Nexus Mods 페이지 열기
+
+# Bulk destination — same destination for a whole group / page (1.0.4)
+label-group-dest = 전체 그룹 대상 위치
+label-page-dest = 설치 대상 위치 (전체 페이지)
+btn-apply-group-dest = 이 그룹의 모든 플러그인에 적용
+btn-apply-page-dest = 이 페이지의 모든 플러그인에 적용
+group-dest-hint = 이 그룹의 각 플러그인의 모든 파일에 단일 설치 대상을 설정합니다.
+page-dest-hint = 이 페이지의 각 플러그인의 모든 파일에 단일 설치 대상을 설정합니다 (모든 그룹).
+bulk-dest-nofiles = 아직 업데이트할 파일이 없습니다 — 먼저 플러그인에 파일을 추가하세요.
+status-dest-applied = { $num }개 파일에 대상을 적용했습니다.
+preview-hidden-steps = 현재 선택으로 { $num }개 단계가 숨겨졌습니다.

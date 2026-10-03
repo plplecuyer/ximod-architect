@@ -334,3 +334,14 @@ prop-select-lang = Ayrıntılarını görmek için bir dil seçin.
 # Direct link to Nexus Mods (game slug)
 btn-nexus = Nexus ↗
 nexus-open-hint = Oyunun Nexus Mods sayfasını aç
+
+# Bulk destination — same destination for a whole group / page (1.0.4)
+label-group-dest = Tüm grup için hedef
+label-page-dest = Kurulum hedefi (tüm sayfa)
+btn-apply-group-dest = Bu gruptaki tüm eklentilere uygula
+btn-apply-page-dest = Bu sayfadaki tüm eklentilere uygula
+group-dest-hint = Bu gruptaki her eklentinin her dosyası için tek bir kurulum hedefi ayarlar.
+page-dest-hint = Bu sayfadaki her eklentinin her dosyası için tek bir kurulum hedefi ayarlar (tüm gruplar).
+bulk-dest-nofiles = Henüz güncellenecek dosya yok — önce eklentilere dosya ekleyin.
+status-dest-applied = Hedef { $num } dosyaya uygulandı.
+preview-hidden-steps = Geçerli seçimlerle { $num } adım gizlendi.

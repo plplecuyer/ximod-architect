@@ -334,3 +334,14 @@ prop-select-lang = Pasirinkite kalbą, kad pamatytumėte jos informaciją.
 # Direct link to Nexus Mods (game slug)
 btn-nexus = „Nexus“ ↗
 nexus-open-hint = Atidaryti žaidimo „Nexus Mods“ puslapį
+
+# Bulk destination — same destination for a whole group / page (1.0.4)
+label-group-dest = Visos grupės paskirties vieta
+label-page-dest = Diegimo paskirties vieta (visas puslapis)
+btn-apply-group-dest = Taikyti visiems šios grupės papildiniams
+btn-apply-page-dest = Taikyti visiems šio puslapio papildiniams
+group-dest-hint = Nustato vieną diegimo paskirties vietą kiekvienam šios grupės kiekvieno papildinio failui.
+page-dest-hint = Nustato vieną diegimo paskirties vietą kiekvienam šio puslapio kiekvieno papildinio failui (visos grupės).
+bulk-dest-nofiles = Kol kas nėra failų, kuriuos reikia atnaujinti — pirmiausia pridėkite failų prie papildinių.
+status-dest-applied = Paskirties vieta pritaikyta { $num } failui(-ams).
+preview-hidden-steps = { $num } veiksmas(-ai) paslėptas(-i) dėl dabartinių pasirinkimų.

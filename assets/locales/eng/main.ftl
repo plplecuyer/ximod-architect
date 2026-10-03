@@ -131,6 +131,17 @@ label-source = Source
 label-destination = Destination
 label-priority = Priority
 label-file-type = Type
+
+# Bulk destination (assign one destination to a whole group or page at once)
+label-group-dest = Destination for the whole group
+label-page-dest = Install destination (whole page)
+btn-apply-group-dest = Apply to all plugins in this group
+btn-apply-page-dest = Apply to all plugins on this page
+group-dest-hint = Set one install destination for every file of every plugin in this group.
+page-dest-hint = Set one install destination for every file of every plugin on this page (all groups).
+bulk-dest-nofiles = No files to update yet — add files to the plugins first.
+status-dest-applied = Destination applied to { $num } file(s).
+preview-hidden-steps = { $num } step(s) hidden by current selections.
 label-files = Files
 label-dependencies = Dependencies
 

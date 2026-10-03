@@ -334,3 +334,14 @@ prop-select-lang = Vyberte jazyk, aby ste videli jeho podrobnosti.
 # Direct link to Nexus Mods (game slug)
 btn-nexus = Nexus ↗
 nexus-open-hint = Otvoriť stránku hry na Nexus Mods
+
+# Bulk destination — same destination for a whole group / page (1.0.4)
+label-group-dest = Cieľ pre celú skupinu
+label-page-dest = Cieľ inštalácie (celá stránka)
+btn-apply-group-dest = Použiť na všetky pluginy v tejto skupine
+btn-apply-page-dest = Použiť na všetky pluginy na tejto stránke
+group-dest-hint = Nastaví jeden cieľ inštalácie pre každý súbor každého pluginu v tejto skupine.
+page-dest-hint = Nastaví jeden cieľ inštalácie pre každý súbor každého pluginu na tejto stránke (všetky skupiny).
+bulk-dest-nofiles = Zatiaľ žiadne súbory na aktualizáciu — najprv pridajte súbory do pluginov.
+status-dest-applied = Cieľ použitý na { $num } súbor(ov).
+preview-hidden-steps = { $num } krok(ov) skrytých aktuálnym výberom.

@@ -389,6 +389,23 @@ impl PluginGroup {
             plugins: Vec::new(),
         }
     }
+
+    /// Assign `dest` as the install destination of every file of every plugin in
+    /// this group, in a single action. Returns how many files were updated.
+    ///
+    /// Backs the "same destination for a whole group" feature: instead of
+    /// editing the destination on each option's file list, the author sets one
+    /// destination for the entire group at once.
+    pub fn set_all_destinations(&mut self, dest: &str) -> usize {
+        let mut count = 0;
+        for plugin in &mut self.plugins {
+            for file in &mut plugin.files {
+                file.destination = dest.to_string();
+                count += 1;
+            }
+        }
+        count
+    }
 }
 
 /// Installation step (CStep from C++)
@@ -408,6 +425,17 @@ impl Step {
             visibility_dependencies: Vec::new(),
             plugin_groups: Vec::new(),
         }
+    }
+
+    /// Assign `dest` as the install destination of every file of every plugin on
+    /// this step/page (across all of its groups), in a single action. Returns how
+    /// many files were updated.
+    pub fn set_all_destinations(&mut self, dest: &str) -> usize {
+        let mut count = 0;
+        for group in &mut self.plugin_groups {
+            count += group.set_all_destinations(dest);
+        }
+        count
     }
 }
 
@@ -737,5 +765,58 @@ mod tests {
     fn test_plugin_type_conversion() {
         assert_eq!(PluginType::from_str("Required"), PluginType::Required);
         assert_eq!(PluginType::from_str("Unknown"), PluginType::Optional);
+    }
+
+    #[test]
+    fn group_set_all_destinations() {
+        let mut g = PluginGroup::new("G", SelectionType::SelectAny);
+        let mut a = Plugin::new("A");
+        a.files.push(InstallFile::new_file("a1.esp"));
+        a.files.push(InstallFile::new_file("a2.esp"));
+        let mut b = Plugin::new("B");
+        b.files.push(InstallFile::new_folder("b_tex"));
+        g.plugins.push(a);
+        g.plugins.push(b);
+
+        let n = g.set_all_destinations("meshes\\mymod");
+        assert_eq!(n, 3);
+        for p in &g.plugins {
+            for f in &p.files {
+                assert_eq!(f.destination, "meshes\\mymod");
+            }
+        }
+    }
+
+    #[test]
+    fn step_set_all_destinations_covers_every_group() {
+        let mut s = Step::new("Page");
+        let mut g1 = PluginGroup::new("G1", SelectionType::SelectAny);
+        let mut p1 = Plugin::new("P1");
+        p1.files.push(InstallFile::new_file("x.esp"));
+        g1.plugins.push(p1);
+        let mut g2 = PluginGroup::new("G2", SelectionType::SelectAll);
+        let mut p2 = Plugin::new("P2");
+        p2.files.push(InstallFile::new_file("y.esp"));
+        p2.files.push(InstallFile::new_file("z.esp"));
+        g2.plugins.push(p2);
+        s.plugin_groups.push(g1);
+        s.plugin_groups.push(g2);
+
+        let n = s.set_all_destinations("textures");
+        assert_eq!(n, 3);
+        assert!(
+            s.plugin_groups
+                .iter()
+                .flat_map(|g| &g.plugins)
+                .flat_map(|p| &p.files)
+                .all(|f| f.destination == "textures")
+        );
+    }
+
+    #[test]
+    fn set_all_destinations_on_empty_group_updates_nothing() {
+        let mut g = PluginGroup::new("Empty", SelectionType::SelectAny);
+        g.plugins.push(Plugin::new("NoFiles"));
+        assert_eq!(g.set_all_destinations("data"), 0);
     }
 }

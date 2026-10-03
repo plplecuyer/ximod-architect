@@ -334,3 +334,14 @@ prop-select-lang = Tscherna ina lingua per vesair ses detagls.
 # Direct link to Nexus Mods (game slug)
 btn-nexus = Nexus ↗
 nexus-open-hint = Avrir la pagina Nexus Mods dal gieu
+
+# Bulk destination — same destination for a whole group / page (1.0.4)
+label-group-dest = Destinaziun per tut la gruppa
+label-page-dest = Destinaziun d'installaziun (tut la pagina)
+btn-apply-group-dest = Applitgar a tut ils plugins da questa gruppa
+btn-apply-page-dest = Applitgar a tut ils plugins da questa pagina
+group-dest-hint = Definescha ina destinaziun d'installaziun per mintga datoteca da mintga plugin da questa gruppa.
+page-dest-hint = Definescha ina destinaziun d'installaziun per mintga datoteca da mintga plugin da questa pagina (tut las gruppas).
+bulk-dest-nofiles = Anc naginas datotecas per actualisar — agiuntai l'emprim datotecas als plugins.
+status-dest-applied = Destinaziun applitgada a { $num } datoteca(s).
+preview-hidden-steps = { $num } pass zuppentads tras las tschernas actualas.

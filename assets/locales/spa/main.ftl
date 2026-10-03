@@ -334,3 +334,14 @@ prop-select-lang = Selecciona un idioma para ver sus detalles.
 # Direct link to Nexus Mods (game slug)
 btn-nexus = Nexus ↗
 nexus-open-hint = Abrir la página de Nexus Mods del juego
+
+# Bulk destination — same destination for a whole group / page (1.0.4)
+label-group-dest = Destino para todo el grupo
+label-page-dest = Destino de instalación (toda la página)
+btn-apply-group-dest = Aplicar a todos los complementos de este grupo
+btn-apply-page-dest = Aplicar a todos los complementos de esta página
+group-dest-hint = Establece un único destino de instalación para cada archivo de cada complemento de este grupo.
+page-dest-hint = Establece un único destino de instalación para cada archivo de cada complemento de esta página (todos los grupos).
+bulk-dest-nofiles = Aún no hay archivos que actualizar — añade primero archivos a los complementos.
+status-dest-applied = Destino aplicado a { $num } archivo(s).
+preview-hidden-steps = { $num } paso(s) ocultos por las selecciones actuales.

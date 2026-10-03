@@ -334,3 +334,14 @@ prop-select-lang = Selectați o limbă pentru a-i vedea detaliile.
 # Direct link to Nexus Mods (game slug)
 btn-nexus = Nexus ↗
 nexus-open-hint = Deschide pagina Nexus Mods a jocului
+
+# Bulk destination — same destination for a whole group / page (1.0.4)
+label-group-dest = Destinație pentru tot grupul
+label-page-dest = Destinație de instalare (toată pagina)
+btn-apply-group-dest = Aplică la toate pluginurile din acest grup
+btn-apply-page-dest = Aplică la toate pluginurile de pe această pagină
+group-dest-hint = Setează o singură destinație de instalare pentru fiecare fișier al fiecărui plugin din acest grup.
+page-dest-hint = Setează o singură destinație de instalare pentru fiecare fișier al fiecărui plugin de pe această pagină (toate grupurile).
+bulk-dest-nofiles = Încă nu există fișiere de actualizat — adăugați mai întâi fișiere la pluginuri.
+status-dest-applied = Destinație aplicată la { $num } fișier(e).
+preview-hidden-steps = { $num } pas(i) ascunși de selecțiile curente.

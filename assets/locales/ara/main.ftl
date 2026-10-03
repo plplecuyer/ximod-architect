@@ -356,3 +356,14 @@ msg-drop-not-fomod = العنصر الذي تم إسقاطه ليس ملف FOMOD
 exit-title = تغييرات لم يتم حفظها
 exit-unsaved = لم يتم حفظ ملف FOMOD. هل تريد حفظه؟
 tab-close-hint = إغلاق ملف FOMOD هذا
+
+# Bulk destination — same destination for a whole group / page (1.0.4)
+label-group-dest = وجهة المجموعة بأكملها
+label-page-dest = وجهة التثبيت (الصفحة بأكملها)
+btn-apply-group-dest = تطبيق على جميع الإضافات في هذه المجموعة
+btn-apply-page-dest = تطبيق على جميع الإضافات في هذه الصفحة
+group-dest-hint = يحدد وجهة تثبيت واحدة لكل ملف من كل إضافة في هذه المجموعة.
+page-dest-hint = يحدد وجهة تثبيت واحدة لكل ملف من كل إضافة في هذه الصفحة (كل المجموعات).
+bulk-dest-nofiles = لا توجد ملفات للتحديث بعد — أضف ملفات إلى الإضافات أولاً.
+status-dest-applied = تم تطبيق الوجهة على { $num } ملف.
+preview-hidden-steps = { $num } خطوة مخفية بسبب التحديدات الحالية.

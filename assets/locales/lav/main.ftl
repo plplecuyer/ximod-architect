@@ -334,3 +334,14 @@ prop-select-lang = Izvēlieties valodu, lai apskatītu tās informāciju.
 # Direct link to Nexus Mods (game slug)
 btn-nexus = Nexus ↗
 nexus-open-hint = Atveriet spēles Nexus Mods lapu
+
+# Bulk destination — same destination for a whole group / page (1.0.4)
+label-group-dest = Visas grupas galamērķis
+label-page-dest = Instalēšanas galamērķis (visa lapa)
+btn-apply-group-dest = Lietot visiem šīs grupas spraudņiem
+btn-apply-page-dest = Lietot visiem šīs lapas spraudņiem
+group-dest-hint = Iestata vienu instalēšanas galamērķi katram šīs grupas katra spraudņa failam.
+page-dest-hint = Iestata vienu instalēšanas galamērķi katram šīs lapas katra spraudņa failam (visas grupas).
+bulk-dest-nofiles = Vēl nav failu, ko atjaunināt — vispirms pievienojiet spraudņiem failus.
+status-dest-applied = Galamērķis lietots { $num } failam.
+preview-hidden-steps = { $num } solis(ļi) paslēpts ar pašreizējām izvēlēm.

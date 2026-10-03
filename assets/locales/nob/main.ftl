@@ -334,3 +334,14 @@ prop-select-lang = Select a language to see its details.
 # Direct link to Nexus Mods (game slug)
 btn-nexus = Nexus ↗
 nexus-open-hint = Open the game's Nexus Mods page
+
+# Bulk destination — same destination for a whole group / page (1.0.4)
+label-group-dest = Mål for hele gruppen
+label-page-dest = Installasjonsmål (hele siden)
+btn-apply-group-dest = Bruk på alle plugins i denne gruppen
+btn-apply-page-dest = Bruk på alle plugins på denne siden
+group-dest-hint = Angir ett installasjonsmål for hver fil i hver plugin i denne gruppen.
+page-dest-hint = Angir ett installasjonsmål for hver fil i hver plugin på denne siden (alle grupper).
+bulk-dest-nofiles = Ingen filer å oppdatere ennå — legg til filer i pluginene først.
+status-dest-applied = Mål brukt på { $num } fil(er).
+preview-hidden-steps = { $num } trinn skjult av gjeldende valg.

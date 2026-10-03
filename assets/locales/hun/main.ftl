@@ -334,3 +334,14 @@ prop-select-lang = Válasszon egy nyelvet a részletek megtekintéséhez.
 # Direct link to Nexus Mods (game slug)
 btn-nexus = Nexus ↗
 nexus-open-hint = A játék Nexus Mods oldalának megnyitása
+
+# Bulk destination — same destination for a whole group / page (1.0.4)
+label-group-dest = Cél az egész csoporthoz
+label-page-dest = Telepítési cél (egész oldal)
+btn-apply-group-dest = Alkalmazás a csoport összes bővítményére
+btn-apply-page-dest = Alkalmazás az oldal összes bővítményére
+group-dest-hint = Egyetlen telepítési célt állít be a csoport minden bővítményének minden fájljához.
+page-dest-hint = Egyetlen telepítési célt állít be az oldal minden bővítményének minden fájljához (minden csoport).
+bulk-dest-nofiles = Még nincs frissítendő fájl — először adjon fájlokat a bővítményekhez.
+status-dest-applied = Cél alkalmazva { $num } fájlra.
+preview-hidden-steps = { $num } lépés elrejtve a jelenlegi választások miatt.

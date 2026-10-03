@@ -334,3 +334,14 @@ prop-select-lang = Επιλέξτε μια γλώσσα για να δείτε �
 # Direct link to Nexus Mods (game slug)
 btn-nexus = Nexus ↗
 nexus-open-hint = Άνοιγμα της σελίδας του παιχνιδιού στο Nexus Mods
+
+# Bulk destination — same destination for a whole group / page (1.0.4)
+label-group-dest = Προορισμός για ολόκληρη την ομάδα
+label-page-dest = Προορισμός εγκατάστασης (ολόκληρη η σελίδα)
+btn-apply-group-dest = Εφαρμογή σε όλα τα πρόσθετα αυτής της ομάδας
+btn-apply-page-dest = Εφαρμογή σε όλα τα πρόσθετα αυτής της σελίδας
+group-dest-hint = Ορίζει έναν προορισμό εγκατάστασης για κάθε αρχείο κάθε προσθέτου αυτής της ομάδας.
+page-dest-hint = Ορίζει έναν προορισμό εγκατάστασης για κάθε αρχείο κάθε προσθέτου αυτής της σελίδας (όλες οι ομάδες).
+bulk-dest-nofiles = Δεν υπάρχουν ακόμη αρχεία προς ενημέρωση — προσθέστε πρώτα αρχεία στα πρόσθετα.
+status-dest-applied = Ο προορισμός εφαρμόστηκε σε { $num } αρχείο(α).
+preview-hidden-steps = { $num } βήμα(τα) κρυμμένα από τις τρέχουσες επιλογές.

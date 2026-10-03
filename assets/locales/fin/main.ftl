@@ -334,3 +334,14 @@ prop-select-lang = Valitse kieli nähdäksesi sen tiedot.
 # Direct link to Nexus Mods (game slug)
 btn-nexus = Nexus ↗
 nexus-open-hint = Avaa pelin Nexus Mods -sivu
+
+# Bulk destination — same destination for a whole group / page (1.0.4)
+label-group-dest = Koko ryhmän kohde
+label-page-dest = Asennuskohde (koko sivu)
+btn-apply-group-dest = Käytä kaikkiin tämän ryhmän lisäosiin
+btn-apply-page-dest = Käytä kaikkiin tämän sivun lisäosiin
+group-dest-hint = Asettaa yhden asennuskohteen tämän ryhmän jokaisen lisäosan jokaiselle tiedostolle.
+page-dest-hint = Asettaa yhden asennuskohteen tämän sivun jokaisen lisäosan jokaiselle tiedostolle (kaikki ryhmät).
+bulk-dest-nofiles = Ei vielä päivitettäviä tiedostoja — lisää ensin tiedostoja lisäosiin.
+status-dest-applied = Kohde otettu käyttöön { $num } tiedostolle.
+preview-hidden-steps = { $num } vaihe(tta) piilotettu nykyisillä valinnoilla.

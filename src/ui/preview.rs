@@ -31,6 +31,20 @@ use crate::ui::main_window::XimodApp;
 /// (step, group, plugin) index of a plugin in the project tree.
 pub type SelKey = (usize, usize, usize);
 
+/// Render a description as the preview should show it. When `replace` is set
+/// (the "Process newlines in descriptions" option), literal `\n` / `\r\n`
+/// sequences typed by the author are turned into real line breaks, so the
+/// preview matches what a mod manager displays.
+fn process_desc(text: &str, replace: bool) -> String {
+    if replace {
+        text.replace("\\r\\n", "\n")
+            .replace("\\n", "\n")
+            .replace("\\r", "\n")
+    } else {
+        text.to_string()
+    }
+}
+
 /// Runtime state of one preview session.
 #[derive(Default)]
 pub struct PreviewState {
@@ -333,6 +347,24 @@ impl XimodApp {
             }
         };
 
+        // Whether to interpret literal "\n" sequences in descriptions as line
+        // breaks, matching the "Process newlines in descriptions" setting so the
+        // preview renders descriptions the way a manager will.
+        let replace_newlines = self.config.replace_newlines;
+
+        // How many steps are currently hidden by unmet visibility conditions.
+        // Shown as a hint so the author understands why later pages don't appear
+        // ("the preview only shows the first screen") instead of it looking like
+        // a bug.
+        let (_hf, hint_visible) =
+            compute(&self.ximod, &self.preview.selections, &self.preview.file_states);
+        let hidden_count = self.ximod.steps.len().saturating_sub(hint_visible.len());
+        let l_hidden = if hidden_count > 0 {
+            self.i18n.t_num("preview-hidden-steps", hidden_count as i64)
+        } else {
+            String::new()
+        };
+
         // Disjoint field borrows for the closure.
         let ximod = &self.ximod;
         let preview = &mut self.preview;
@@ -473,6 +505,13 @@ impl XimodApp {
                         .strong()
                         .size(15.0),
                     );
+                    if !l_hidden.is_empty() {
+                        ui.label(
+                            RichText::new(&l_hidden)
+                                .small()
+                                .color(Color32::from_rgb(150, 120, 60)),
+                        );
+                    }
                     ui.add_space(4.0);
 
                     ui.columns(2, |cols| {
@@ -597,7 +636,10 @@ impl XimodApp {
                                     .id_salt("preview_desc")
                                     .max_height(220.0)
                                     .show(ui, |ui| {
-                                        ui.label(&plugin.description);
+                                        ui.label(process_desc(
+                                            &plugin.description,
+                                            replace_newlines,
+                                        ));
                                     });
                             }
                             None => {
@@ -761,6 +803,17 @@ mod tests {
             .collect();
         assert!(install.iter().any(|d| d == "patch4k.esp")); // conditional applied
         assert!(install.iter().any(|d| d.contains("b.dds")));
+    }
+
+    #[test]
+    fn process_desc_interprets_literal_newlines_when_enabled() {
+        // Off: text is untouched.
+        assert_eq!(process_desc("a\\nb", false), "a\\nb");
+        // On: literal \n / \r\n become real line breaks.
+        assert_eq!(process_desc("a\\nb", true), "a\nb");
+        assert_eq!(process_desc("a\\r\\nb", true), "a\nb");
+        // Real newlines already present are preserved either way.
+        assert_eq!(process_desc("a\nb", true), "a\nb");
     }
 
     #[test]

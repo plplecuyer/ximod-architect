@@ -334,3 +334,14 @@ prop-select-lang = Vali keel, et näha selle üksikasju.
 # Direct link to Nexus Mods (game slug)
 btn-nexus = Nexus ↗
 nexus-open-hint = Ava mängu Nexus Modsi lehekülg
+
+# Bulk destination — same destination for a whole group / page (1.0.4)
+label-group-dest = Kogu grupi sihtkoht
+label-page-dest = Paigalduse sihtkoht (kogu leht)
+btn-apply-group-dest = Rakenda kõigile selle grupi pluginatele
+btn-apply-page-dest = Rakenda kõigile selle lehe pluginatele
+group-dest-hint = Määrab ühe paigalduse sihtkoha selle grupi iga plugina igale failile.
+page-dest-hint = Määrab ühe paigalduse sihtkoha selle lehe iga plugina igale failile (kõik grupid).
+bulk-dest-nofiles = Veel pole faile, mida uuendada — lisa esmalt pluginatele faile.
+status-dest-applied = Sihtkoht rakendatud { $num } failile.
+preview-hidden-steps = { $num } sammu peidetud praeguste valikutega.

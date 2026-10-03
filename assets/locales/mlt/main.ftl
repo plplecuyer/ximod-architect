@@ -334,3 +334,14 @@ prop-select-lang = Agħżel lingwa biex tara d-dettalji tagħha.
 # Direct link to Nexus Mods (game slug)
 btn-nexus = Nexus ↗
 nexus-open-hint = Iftaħ il-paġna ta' Nexus Mods tal-logħba
+
+# Bulk destination — same destination for a whole group / page (1.0.4)
+label-group-dest = Destinazzjoni għall-grupp kollu
+label-page-dest = Destinazzjoni tal-installazzjoni (il-paġna kollha)
+btn-apply-group-dest = Applika għall-plugins kollha f'dan il-grupp
+btn-apply-page-dest = Applika għall-plugins kollha f'din il-paġna
+group-dest-hint = Jissettja destinazzjoni waħda tal-installazzjoni għal kull fajl ta' kull plugin f'dan il-grupp.
+page-dest-hint = Jissettja destinazzjoni waħda tal-installazzjoni għal kull fajl ta' kull plugin f'din il-paġna (il-gruppi kollha).
+bulk-dest-nofiles = Għad m'hemm l-ebda fajl x'taġġorna — l-ewwel żid fajls mal-plugins.
+status-dest-applied = Destinazzjoni applikata għal { $num } fajl.
+preview-hidden-steps = { $num } pass moħbija mill-għażliet attwali.

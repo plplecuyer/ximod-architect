@@ -334,3 +334,14 @@ prop-select-lang = Roghnaigh teanga chun a sonraí a fheiceáil.
 # Direct link to Nexus Mods (game slug)
 btn-nexus = Nexus ↗
 nexus-open-hint = Oscail leathanach Nexus Mods an chluiche
+
+# Bulk destination — same destination for a whole group / page (1.0.4)
+label-group-dest = Sprioc don ghrúpa iomlán
+label-page-dest = Sprioc suiteála (an leathanach iomlán)
+btn-apply-group-dest = Cuir i bhfeidhm ar gach breiseán sa ghrúpa seo
+btn-apply-page-dest = Cuir i bhfeidhm ar gach breiseán ar an leathanach seo
+group-dest-hint = Socraíonn sé sprioc shuiteála amháin do gach comhad de gach breiseán sa ghrúpa seo.
+page-dest-hint = Socraíonn sé sprioc shuiteála amháin do gach comhad de gach breiseán ar an leathanach seo (gach grúpa).
+bulk-dest-nofiles = Níl aon chomhad le nuashonrú fós — cuir comhaid leis na breiseáin ar dtús.
+status-dest-applied = Sprioc curtha i bhfeidhm ar { $num } comhad.
+preview-hidden-steps = { $num } céim i bhfolach ag na roghnuithe reatha.

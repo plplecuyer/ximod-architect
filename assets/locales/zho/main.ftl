@@ -334,3 +334,14 @@ prop-select-lang = 选择一种语言以查看其详细信息。
 # Direct link to Nexus Mods (game slug)
 btn-nexus = Nexus ↗
 nexus-open-hint = 打开该游戏的 Nexus Mods 页面
+
+# Bulk destination — same destination for a whole group / page (1.0.4)
+label-group-dest = 整个组的目标位置
+label-page-dest = 安装目标位置（整页）
+btn-apply-group-dest = 应用于此组中的所有插件
+btn-apply-page-dest = 应用于此页面上的所有插件
+group-dest-hint = 为此组中每个插件的每个文件设置单一安装目标位置。
+page-dest-hint = 为此页面上每个插件的每个文件设置单一安装目标位置（所有组）。
+bulk-dest-nofiles = 暂无可更新的文件 — 请先为插件添加文件。
+status-dest-applied = 已将目标位置应用于 { $num } 个文件。
+preview-hidden-steps = 当前选择隐藏了 { $num } 个步骤。

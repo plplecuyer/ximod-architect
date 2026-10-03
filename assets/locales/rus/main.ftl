@@ -334,3 +334,14 @@ prop-select-lang = Выберите язык, чтобы просмотреть 
 # Direct link to Nexus Mods (game slug)
 btn-nexus = Nexus ↗
 nexus-open-hint = Открыть страницу модификаций игры на Nexus
+
+# Bulk destination — same destination for a whole group / page (1.0.4)
+label-group-dest = Назначение для всей группы
+label-page-dest = Назначение установки (вся страница)
+btn-apply-group-dest = Применить ко всем плагинам этой группы
+btn-apply-page-dest = Применить ко всем плагинам этой страницы
+group-dest-hint = Задаёт одно место установки для каждого файла каждого плагина этой группы.
+page-dest-hint = Задаёт одно место установки для каждого файла каждого плагина этой страницы (все группы).
+bulk-dest-nofiles = Пока нет файлов для обновления — сначала добавьте файлы в плагины.
+status-dest-applied = Назначение применено к { $num } файлу(ам).
+preview-hidden-steps = { $num } шаг(ов) скрыто текущим выбором.
