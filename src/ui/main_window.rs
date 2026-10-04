@@ -122,6 +122,11 @@ pub struct XimodApp {
     pub group_dest_buf: String,
     /// Edit buffer for the "same destination for a whole page/step" field.
     pub page_dest_buf: String,
+    /// Paging offset (in pages of 8) for the horizontal step-tabs strip, used
+    /// when a project has more steps than fit on one row.
+    pub step_tab_page: usize,
+    /// Paging offset (in pages of 8) for the conditional-install tabs strip.
+    pub cond_tab_page: usize,
     pub current_file_index: Option<usize>,
     pub current_flag_index: Option<usize>,
     pub current_dependency_index: Option<usize>,
@@ -390,6 +395,8 @@ impl Default for XimodApp {
             current_group_index: None,
             current_plugin_index: None,
             group_dest_buf: String::new(),
+            step_tab_page: 0,
+            cond_tab_page: 0,
             page_dest_buf: String::new(),
             current_file_index: None,
             current_flag_index: None,
@@ -2227,25 +2234,59 @@ impl XimodApp {
 
         let step_names: Vec<String> = self.ximod.steps.iter().map(|s| s.name.clone()).collect();
 
-        // Step tabs
+        // Step tabs — paginated (8 per page) when there are more than 8 steps, so the
+        // row never overflows past the window edge and the +, ◀, ▶ controls stay
+        // reachable. The « / » buttons page the visible window by 8 steps.
+        const STEP_PAGE: usize = 8;
+        let n_steps = step_names.len();
+        let max_page = if n_steps == 0 { 0 } else { (n_steps - 1) / STEP_PAGE };
+        if self.step_tab_page > max_page {
+            self.step_tab_page = max_page;
+        }
+        let paged = n_steps > STEP_PAGE;
+        let start = self.step_tab_page * STEP_PAGE;
+        let end = (start + STEP_PAGE).min(n_steps);
+
         ui.horizontal(|ui| {
-            for (idx, name) in step_names.iter().enumerate() {
+            if paged
+                && ui
+                    .add_enabled(self.step_tab_page > 0, egui::Button::new("«"))
+                    .clicked()
+            {
+                self.step_tab_page -= 1;
+            }
+
+            for idx in start..end {
                 let selected = self.current_step_index == Some(idx);
-                if ui.selectable_label(selected, name).clicked() {
+                if ui.selectable_label(selected, &step_names[idx]).clicked() {
                     self.current_step_index = Some(idx);
                     self.current_group_index = None;
                     self.current_plugin_index = None;
                 }
             }
 
+            if paged {
+                if ui
+                    .add_enabled(end < n_steps, egui::Button::new("»"))
+                    .clicked()
+                {
+                    self.step_tab_page += 1;
+                }
+                ui.label(format!("{}–{} / {}", start + 1, end, n_steps));
+            }
+
             if ui.button("➕").clicked() {
                 let name = self.i18n.t_num("default-step-name", (self.ximod.steps.len() + 1) as i64);
                 self.ximod.steps.push(Step::new(name));
-                self.current_step_index = Some(self.ximod.steps.len() - 1);
+                let last = self.ximod.steps.len() - 1;
+                self.current_step_index = Some(last);
+                self.current_group_index = None;
+                self.current_plugin_index = None;
+                self.step_tab_page = last / STEP_PAGE; // jump to the page holding the new step
                 self.project_modified = true;
             }
 
-            // Reorder the selected step (horizontal tab row → ◀ ▶).
+            // Reorder the selected step (◀ ▶); keep its page visible after moving.
             if let Some(i) = self.current_step_index {
                 let n = self.ximod.steps.len();
                 if ui
@@ -2255,6 +2296,7 @@ impl XimodApp {
                 {
                     crate::ui::components::move_up(&mut self.ximod.steps, i);
                     self.current_step_index = Some(i - 1);
+                    self.step_tab_page = (i - 1) / STEP_PAGE;
                     self.project_modified = true;
                 }
                 if ui
@@ -2264,6 +2306,7 @@ impl XimodApp {
                 {
                     crate::ui::components::move_down(&mut self.ximod.steps, i);
                     self.current_step_index = Some(i + 1);
+                    self.step_tab_page = (i + 1) / STEP_PAGE;
                     self.project_modified = true;
                 }
             }
@@ -2310,9 +2353,25 @@ impl XimodApp {
 
                 ui.separator();
 
-                ui.columns(2, |columns| {
-                    self.render_groups_panel(&mut columns[0], step_idx);
-                    self.render_plugin_details(&mut columns[1]);
+                // Responsive split: the left pane (groups / plugins) takes about half
+                // the width but is capped so the right pane (plugin details) always
+                // keeps a usable width and never collapses. The right pane then gets
+                // the remaining width, so its description field wraps correctly.
+                let total_w = ui.available_width();
+                let right_min = 340.0;
+                let left_w = (total_w * 0.5)
+                    .min((total_w - right_min).max(240.0))
+                    .max(240.0);
+                ui.horizontal_top(|ui| {
+                    ui.allocate_ui_with_layout(
+                        egui::vec2(left_w, ui.available_height()),
+                        egui::Layout::top_down(egui::Align::Min),
+                        |ui| {
+                            self.render_groups_panel(ui, step_idx);
+                        },
+                    );
+                    ui.separator();
+                    self.render_plugin_details(ui);
                 });
             }
         }
@@ -3416,8 +3475,28 @@ impl XimodApp {
             .map(|idx| self.i18n.t_num("pattern-label", (idx + 1) as i64))
             .collect();
 
+        // Conditional-install tabs — paginated (8 per page) when there are more than
+        // 8, so the row never overflows past the window edge. The « / » buttons page
+        // the visible window by 8.
+        const COND_PAGE: usize = 8;
+        let max_page = if pattern_count == 0 { 0 } else { (pattern_count - 1) / COND_PAGE };
+        if self.cond_tab_page > max_page {
+            self.cond_tab_page = max_page;
+        }
+        let paged = pattern_count > COND_PAGE;
+        let start = self.cond_tab_page * COND_PAGE;
+        let end = (start + COND_PAGE).min(pattern_count);
+
         ui.horizontal(|ui| {
-            for idx in 0..pattern_count {
+            if paged
+                && ui
+                    .add_enabled(self.cond_tab_page > 0, egui::Button::new("«"))
+                    .clicked()
+            {
+                self.cond_tab_page -= 1;
+            }
+
+            for idx in start..end {
                 let selected = self.current_cond_pattern_index == Some(idx);
                 if ui
                     .selectable_label(selected, &pattern_labels[idx])
@@ -3427,9 +3506,21 @@ impl XimodApp {
                 }
             }
 
+            if paged {
+                if ui
+                    .add_enabled(end < pattern_count, egui::Button::new("»"))
+                    .clicked()
+                {
+                    self.cond_tab_page += 1;
+                }
+                ui.label(format!("{}–{} / {}", start + 1, end, pattern_count));
+            }
+
             if ui.button("➕").clicked() {
                 self.ximod.conditional_files.push(ConditionalFileSet::new());
-                self.current_cond_pattern_index = Some(self.ximod.conditional_files.len() - 1);
+                let last = self.ximod.conditional_files.len() - 1;
+                self.current_cond_pattern_index = Some(last);
+                self.cond_tab_page = last / COND_PAGE;
                 self.project_modified = true;
             }
 

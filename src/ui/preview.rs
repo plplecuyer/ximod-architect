@@ -314,7 +314,6 @@ impl XimodApp {
         let l_refresh = self.i18n.t("preview-refresh");
         let l_assume = self.i18n.t("preview-assumptions");
         let l_back = self.i18n.t("preview-back");
-        let l_next = self.i18n.t("preview-next");
         let l_install = self.i18n.t("preview-install");
         let l_close = self.i18n.t("preview-close");
         let l_restart = self.i18n.t("preview-restart");
@@ -327,7 +326,6 @@ impl XimodApp {
         let l_col_dst = self.i18n.t("preview-col-dest");
         let l_col_prio = self.i18n.t("preview-col-priority");
         let l_desc_none = self.i18n.t("preview-select-hint");
-        let l_details = self.i18n.t("preview-details");
         let sel_hint = |t: SelectionType| -> String {
             match t {
                 SelectionType::SelectExactlyOne => self.i18n.t("preview-sel-exactlyone"),
@@ -391,6 +389,100 @@ impl XimodApp {
             egui::ViewportId::from_hash_of("ximod_preview"),
             vb,
             |ctx, _class| {
+                // ---- Bottom: navigation bar, in its own panel so it is ALWAYS
+                // visible and can never be pushed off-screen by the options list
+                // (which previously happened: the preview then looked stuck on the
+                // first page because Back / Next / Install were below the window). ----
+                egui::TopBottomPanel::bottom("preview_nav").show(ctx, |ui| {
+                    ui.add_space(6.0);
+                    let step_ok = preview.finished
+                        || visible.is_empty()
+                        || {
+                            let step = &ximod.steps[preview.cursor];
+                            step.plugin_groups
+                                .iter()
+                                .enumerate()
+                                .all(|(gi, g)| group_valid(g, &preview.selections, preview.cursor, gi))
+                        };
+                    // Vortex-style bar: the left button names the step you go back to,
+                    // the right button names the step Next leads to (or "Install" on the
+                    // last page), and a progress bar fills the space between them.
+                    let name_of = |s: usize| -> String {
+                        match ximod.steps.get(s) {
+                            Some(st) if !st.name.is_empty() => st.name.clone(),
+                            _ => format!("Step {}", s + 1),
+                        }
+                    };
+                    let pos = visible.iter().position(|&s| s == preview.cursor).unwrap_or(0);
+                    ui.horizontal(|ui| {
+                        // ---- Left: back to the previously visited step ----
+                        let back_target = preview.history.last().copied();
+                        let back_label = match back_target {
+                            Some(s) => format!("◀  {}", name_of(s)),
+                            None => l_back.clone(),
+                        };
+                        if ui
+                            .add_enabled(back_target.is_some(), egui::Button::new(back_label))
+                            .clicked()
+                        {
+                            if let Some(prev) = preview.history.pop() {
+                                preview.finished = false;
+                                preview.cursor = prev;
+                            }
+                        }
+
+                        // ---- Right side (filled right-to-left), progress in the middle ----
+                        ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                            if preview.finished {
+                                if ui.button(&l_close).clicked() {
+                                    do_close = true;
+                                }
+                                if ui.button(&l_restart).clicked() {
+                                    do_refresh = true;
+                                }
+                            } else {
+                                let next_target =
+                                    visible.iter().copied().find(|&s| s > preview.cursor);
+                                let next_label = match next_target {
+                                    Some(s) => format!("{}  ▶", name_of(s)),
+                                    None => l_install.clone(),
+                                };
+                                if ui
+                                    .add_enabled(step_ok, egui::Button::new(next_label))
+                                    .clicked()
+                                {
+                                    preview.history.push(preview.cursor);
+                                    match next_target {
+                                        Some(n) => preview.cursor = n,
+                                        None => preview.finished = true,
+                                    }
+                                }
+                                if !step_ok {
+                                    ui.label(
+                                        RichText::new(&l_invalid)
+                                            .small()
+                                            .color(Color32::from_rgb(200, 80, 80)),
+                                    );
+                                }
+                            }
+                            // Progress bar fills the gap between the two buttons.
+                            if !visible.is_empty() {
+                                let shown = if preview.finished { visible.len() } else { pos + 1 };
+                                let frac = shown as f32 / visible.len() as f32;
+                                let avail = ui.available_width();
+                                if avail > 60.0 {
+                                    ui.add(
+                                        egui::ProgressBar::new(frac)
+                                            .desired_width(avail)
+                                            .text(format!("{} / {}", shown, visible.len())),
+                                    );
+                                }
+                            }
+                        });
+                    });
+                    ui.add_space(4.0);
+                });
+
                 egui::CentralPanel::default().show(ctx, |ui| {
                 // ---- Top bar: header, refresh, assumptions toggle ----
                 ui.horizontal(|ui| {
@@ -520,6 +612,7 @@ impl XimodApp {
                             .id_salt("preview_opts")
                             .auto_shrink([false, false])
                             .show(&mut cols[0], |ui| {
+                              ui.with_layout(egui::Layout::top_down(egui::Align::LEFT), |ui| {
                                 for (gi, group) in step.plugin_groups.iter().enumerate() {
                                     ui.group(|ui| {
                                         ui.label(RichText::new(&group.name).strong());
@@ -608,100 +701,60 @@ impl XimodApp {
                                         }
                                     });
                                 }
+                              });
                             });
 
                         // ---- Right: detail of the focused plugin ----
+                        // `ui.columns` gives each column a *justified* layout, which
+                        // stretches wrapped description text edge-to-edge (the ugly
+                        // "R E Q U I R E M E N T S" spacing). A mod manager like Vortex
+                        // left-aligns it, so render the whole detail pane in a plain
+                        // top-down, left-aligned layout.
                         let ui = &mut cols[1];
-                        ui.label(RichText::new(&l_details).strong());
-                        ui.separator();
-                        let focus = preview.focused.filter(|&(fs, fg, fp)| {
-                            fs == si
-                                && fg < step.plugin_groups.len()
-                                && fp < step.plugin_groups[fg].plugins.len()
+                        ui.with_layout(egui::Layout::top_down(egui::Align::LEFT), |ui| {
+                            // No "Details" header and no repeated option name: like Vortex,
+                            // the pane shows just the image of the focused option and its
+                            // description (the option itself is highlighted in the list).
+                            let focus = preview.focused.filter(|&(fs, fg, fp)| {
+                                fs == si
+                                    && fg < step.plugin_groups.len()
+                                    && fp < step.plugin_groups[fg].plugins.len()
+                            });
+                            match focus {
+                                Some((_, fg, fp)) => {
+                                    let plugin = &step.plugin_groups[fg].plugins[fp];
+                                    let abs = plugin
+                                        .image_path
+                                        .as_ref()
+                                        .and_then(|rel| root.as_ref().map(|r| r.join(rel)));
+                                    // Prominent banner image like Vortex: fill the pane
+                                    // width (capped), keeping aspect within the box.
+                                    let img_w = ui.available_width().clamp(200.0, 560.0);
+                                    let img_h = (img_w * 0.42).clamp(120.0, 260.0);
+                                    ImageDisplay::new(img_w, img_h)
+                                        .with_fallback(" ")
+                                        .show(ui, abs.as_deref());
+                                    ui.add_space(6.0);
+                                    egui::ScrollArea::vertical()
+                                        .id_salt("preview_desc")
+                                        .auto_shrink([false, false])
+                                        .show(ui, |ui| {
+                                            ui.label(process_desc(
+                                                &plugin.description,
+                                                replace_newlines,
+                                            ));
+                                        });
+                                }
+                                None => {
+                                    ui.label(
+                                        RichText::new(&l_desc_none).color(Color32::GRAY),
+                                    );
+                                }
+                            }
                         });
-                        match focus {
-                            Some((_, fg, fp)) => {
-                                let plugin = &step.plugin_groups[fg].plugins[fp];
-                                ui.label(RichText::new(&plugin.name).strong());
-                                ui.add_space(4.0);
-                                let abs = plugin
-                                    .image_path
-                                    .as_ref()
-                                    .and_then(|rel| root.as_ref().map(|r| r.join(rel)));
-                                ImageDisplay::new(260.0, 150.0)
-                                    .with_fallback(" ")
-                                    .show(ui, abs.as_deref());
-                                ui.add_space(6.0);
-                                egui::ScrollArea::vertical()
-                                    .id_salt("preview_desc")
-                                    .max_height(220.0)
-                                    .show(ui, |ui| {
-                                        ui.label(process_desc(
-                                            &plugin.description,
-                                            replace_newlines,
-                                        ));
-                                    });
-                            }
-                            None => {
-                                ui.label(
-                                    RichText::new(&l_desc_none).color(Color32::GRAY),
-                                );
-                            }
-                        }
                     });
                 }
 
-                ui.separator();
-
-                // ---- Navigation ----
-                let step_ok = preview.finished
-                    || visible.is_empty()
-                    || {
-                        let step = &ximod.steps[preview.cursor];
-                        step.plugin_groups
-                            .iter()
-                            .enumerate()
-                            .all(|(gi, g)| group_valid(g, &preview.selections, preview.cursor, gi))
-                    };
-
-                ui.horizontal(|ui| {
-                    let can_back = !preview.history.is_empty();
-                    if ui.add_enabled(can_back, egui::Button::new(&l_back)).clicked() {
-                        if let Some(prev) = preview.history.pop() {
-                            preview.finished = false;
-                            preview.cursor = prev;
-                        }
-                    }
-
-                    if preview.finished {
-                        if ui.button(&l_restart).clicked() {
-                            do_refresh = true;
-                        }
-                        if ui.button(&l_close).clicked() {
-                            do_close = true;
-                        }
-                    } else {
-                        // Is there another visible step after the current one?
-                        let has_next = visible.iter().any(|&s| s > preview.cursor);
-                        let label = if has_next { &l_next } else { &l_install };
-                        if ui
-                            .add_enabled(step_ok, egui::Button::new(label))
-                            .clicked()
-                        {
-                            preview.history.push(preview.cursor);
-                            match visible.iter().copied().find(|&s| s > preview.cursor) {
-                                Some(n) => preview.cursor = n,
-                                None => preview.finished = true,
-                            }
-                        }
-                    }
-
-                    if !step_ok {
-                        ui.label(
-                            RichText::new(&l_invalid).color(Color32::from_rgb(200, 80, 80)),
-                        );
-                    }
-                });
                 });
 
                 crate::ui::main_window::record_win_geom(cfg, ctx, "ximod_preview");
@@ -803,6 +856,33 @@ mod tests {
             .collect();
         assert!(install.iter().any(|d| d == "patch4k.esp")); // conditional applied
         assert!(install.iter().any(|d| d.contains("b.dds")));
+    }
+
+    #[test]
+    fn multi_step_navigation_reaches_every_page() {
+        // Four always-visible steps (no <visible> conditions), like the real
+        // "Lodecs Custom Armory" FOMOD. Every page must be reachable with Next.
+        let mut m = Ximod::new("Multi");
+        for i in 0..4 {
+            let mut g = PluginGroup::new(format!("G{i}"), SelectionType::SelectExactlyOne);
+            g.plugins.push(Plugin::new("A"));
+            g.plugins.push(Plugin::new("B"));
+            let mut s = Step::new(format!("Step {i}"));
+            s.plugin_groups.push(g);
+            m.steps.push(s);
+        }
+        let files = BTreeMap::new();
+        let sel = default_selections(&m, &files);
+        let (_f, visible) = compute(&m, &sel, &files);
+        assert_eq!(visible, vec![0, 1, 2, 3]);
+        // Simulate the Next progression used by the navigation bar.
+        let mut cursor = *visible.first().unwrap();
+        let mut seen = vec![cursor];
+        while let Some(n) = visible.iter().copied().find(|&s| s > cursor) {
+            cursor = n;
+            seen.push(cursor);
+        }
+        assert_eq!(seen, vec![0, 1, 2, 3]);
     }
 
     #[test]
