@@ -39,10 +39,15 @@ pub fn current_version() -> &'static str {
 
 /// Spawn a background thread that performs the check and return its receiver.
 /// Poll the receiver with `try_recv()` from the UI loop.
-pub fn spawn_check() -> Receiver<UpdateCheck> {
+///
+/// The UI only polls the receiver while it is repainting; without a nudge the
+/// result would sit in the channel until the next mouse move. The thread
+/// therefore requests a repaint once the result is sent.
+pub fn spawn_check(ctx: eframe::egui::Context) -> Receiver<UpdateCheck> {
     let (tx, rx) = std::sync::mpsc::channel();
     std::thread::spawn(move || {
         let _ = tx.send(check_blocking());
+        ctx.request_repaint();
     });
     rx
 }
@@ -68,10 +73,7 @@ fn check_blocking() -> UpdateCheck {
 fn latest_release_tag() -> Result<String, String> {
     let url = format!("https://api.github.com/repos/{REPO}/releases/latest");
     let resp = ureq::get(&url)
-        .set(
-            "User-Agent",
-            concat!("XIMOD-Architect/", env!("CARGO_PKG_VERSION")),
-        )
+        .set("User-Agent", concat!("XIMOD-Architect/", env!("CARGO_PKG_VERSION")))
         .set("Accept", "application/vnd.github+json")
         .timeout(Duration::from_secs(8))
         .call()
@@ -93,22 +95,28 @@ pub fn is_newer(candidate: &str, current: &str) -> bool {
     parse(candidate) > parse(current)
 }
 
-/// Parse a dotted version into a `(major, minor, patch)` tuple. Missing or
-/// non-numeric components become 0.
-fn parse(v: &str) -> (u64, u64, u64) {
-    let mut parts = v
-        .split(['.', '-', '+'])
-        .map(|p| {
-            p.chars()
-                .take_while(|c| c.is_ascii_digit())
-                .collect::<String>()
-                .parse::<u64>()
-                .unwrap_or(0)
-        });
+/// Parse a dotted version into a `(major, minor, patch, is_release)` tuple.
+/// Missing or non-numeric components become 0. A pre-release suffix
+/// (`2.0.0-dev`, `1.0.2-beta`) sorts *below* the bare release of the same
+/// number, so a development build is told when its final version ships.
+fn parse(v: &str) -> (u64, u64, u64, bool) {
+    let v = v.trim().trim_start_matches('v');
+    let (numbers, suffix) = match v.find(['-', '+']) {
+        Some(i) => (&v[..i], &v[i + 1..]),
+        None => (v, ""),
+    };
+    let mut parts = numbers.split('.').map(|p| {
+        p.chars()
+            .take_while(|c| c.is_ascii_digit())
+            .collect::<String>()
+            .parse::<u64>()
+            .unwrap_or(0)
+    });
     (
         parts.next().unwrap_or(0),
         parts.next().unwrap_or(0),
         parts.next().unwrap_or(0),
+        suffix.is_empty(),
     )
 }
 
@@ -127,5 +135,9 @@ mod tests {
         // 'v' prefix and pre-release suffixes are tolerated.
         assert!(is_newer("1.0.3", "1.0.2"));
         assert!(!is_newer("1.0.2-beta", "1.0.2"));
+        // A development build must learn about its own final release.
+        assert!(is_newer("2.0.0", "2.0.0-dev"));
+        assert!(!is_newer("2.0.0-dev", "2.0.0-dev"));
+        assert!(is_newer("2.0.1-beta", "2.0.0"));
     }
 }

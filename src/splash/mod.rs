@@ -1,5 +1,5 @@
 //! Native transparent splash screen implementation
-//! 
+//!
 //! Platform-specific implementations for Windows, Linux (X11), and macOS.
 //! Creates a truly transparent borderless window that displays the splash image.
 
@@ -18,41 +18,36 @@ pub struct SplashConfig {
 /// Returns when the splash is complete
 pub fn show_splash(config: SplashConfig) -> Result<(), String> {
     // Load the image first to get dimensions
-    let image_data = std::fs::read(&config.image_path)
-        .map_err(|e| format!("Failed to read splash image: {}", e))?;
-    
-    let image = image::load_from_memory(&image_data)
-        .map_err(|e| format!("Failed to decode splash image: {}", e))?;
-    
+    let image_data = std::fs::read(&config.image_path).map_err(|e| format!("Failed to read splash image: {}", e))?;
+
+    let image = image::load_from_memory(&image_data).map_err(|e| format!("Failed to decode splash image: {}", e))?;
+
     let rgba = image.to_rgba8();
     let img_width = rgba.width();
     let img_height = rgba.height();
-    
+
     // Calculate splash size (26% of screen width, max 1024, keep aspect ratio)
     let max_size = (config.screen_width * 0.26).min(1024.0);
     let scale = (max_size / img_width as f32).min(max_size / img_height as f32).min(1.0);
     let splash_width = (img_width as f32 * scale) as u32;
     let splash_height = (img_height as f32 * scale) as u32;
-    
+
     // Center on screen
     let x = ((config.screen_width - splash_width as f32) / 2.0) as i32;
     let y = ((config.screen_height - splash_height as f32) / 2.0) as i32;
-    
-    tracing::info!(
-        "Showing splash: {}x{} at ({}, {})",
-        splash_width, splash_height, x, y
-    );
-    
+
+    tracing::info!("Showing splash: {}x{} at ({}, {})", splash_width, splash_height, x, y);
+
     // Call platform-specific implementation
     #[cfg(target_os = "windows")]
     return windows::show_splash_window(&rgba, splash_width, splash_height, x, y, &config);
-    
+
     #[cfg(target_os = "linux")]
     return linux::show_splash_window(&rgba, splash_width, splash_height, x, y, &config);
-    
+
     #[cfg(target_os = "macos")]
     return macos::show_splash_window(&rgba, splash_width, splash_height, x, y, &config);
-    
+
     #[cfg(not(any(target_os = "windows", target_os = "linux", target_os = "macos")))]
     {
         tracing::warn!("Native splash not supported on this platform, using fallback");
@@ -67,12 +62,12 @@ pub fn show_splash(config: SplashConfig) -> Result<(), String> {
 #[cfg(target_os = "windows")]
 mod windows {
     use super::*;
+    use std::mem;
+    use std::ptr;
     use windows_sys::Win32::Foundation::*;
     use windows_sys::Win32::Graphics::Gdi::*;
-    use windows_sys::Win32::UI::WindowsAndMessaging::*;
     use windows_sys::Win32::System::LibraryLoader::*;
-    use std::ptr;
-    use std::mem;
+    use windows_sys::Win32::UI::WindowsAndMessaging::*;
 
     const WS_EX_LAYERED: u32 = 0x00080000;
     const WS_EX_TOPMOST: u32 = 0x00000008;
@@ -100,7 +95,7 @@ mod windows {
 
             // Register window class
             let class_name: Vec<u16> = "XimodSplash\0".encode_utf16().collect();
-            
+
             let wc = WNDCLASSEXW {
                 cbSize: mem::size_of::<WNDCLASSEXW>() as u32,
                 style: 0,
@@ -126,9 +121,14 @@ mod windows {
                 class_name.as_ptr(),
                 ptr::null(),
                 WS_POPUP,
-                x, y,
-                width as i32, height as i32,
-                ptr::null_mut(), ptr::null_mut(), hinstance, ptr::null(),
+                x,
+                y,
+                width as i32,
+                height as i32,
+                ptr::null_mut(),
+                ptr::null_mut(),
+                hinstance,
+                ptr::null(),
             );
 
             if hwnd.is_null() {
@@ -138,7 +138,7 @@ mod windows {
             // Create compatible DC and bitmap
             let hdc_screen = GetDC(ptr::null_mut());
             let hdc_mem = CreateCompatibleDC(hdc_screen);
-            
+
             // Create DIB section for the image
             let mut bmi: BITMAPINFO = mem::zeroed();
             bmi.bmiHeader.biSize = mem::size_of::<BITMAPINFOHEADER>() as u32;
@@ -149,14 +149,7 @@ mod windows {
             bmi.bmiHeader.biCompression = BI_RGB;
 
             let mut bits: *mut std::ffi::c_void = ptr::null_mut();
-            let hbitmap = CreateDIBSection(
-                hdc_mem,
-                &bmi,
-                DIB_RGB_COLORS,
-                &mut bits,
-                ptr::null_mut(),
-                0,
-            );
+            let hbitmap = CreateDIBSection(hdc_mem, &bmi, DIB_RGB_COLORS, &mut bits, ptr::null_mut(), 0);
 
             if hbitmap.is_null() || bits.is_null() {
                 DestroyWindow(hwnd);
@@ -168,27 +161,22 @@ mod windows {
             let old_bitmap = SelectObject(hdc_mem, hbitmap);
 
             // Scale and copy image data (RGBA to BGRA with premultiplied alpha)
-            let scaled = image::imageops::resize(
-                rgba,
-                width,
-                height,
-                image::imageops::FilterType::Lanczos3,
-            );
-            
+            let scaled = image::imageops::resize(rgba, width, height, image::imageops::FilterType::Lanczos3);
+
             let pixel_data = bits as *mut u8;
             for (i, pixel) in scaled.pixels().enumerate() {
                 let r = pixel[0] as u32;
                 let g = pixel[1] as u32;
                 let b = pixel[2] as u32;
                 let a = pixel[3] as u32;
-                
+
                 // Premultiply alpha for UpdateLayeredWindow
                 let r_pm = ((r * a) / 255) as u8;
                 let g_pm = ((g * a) / 255) as u8;
                 let b_pm = ((b * a) / 255) as u8;
-                
+
                 let offset = i * 4;
-                *pixel_data.add(offset) = b_pm;     // Blue
+                *pixel_data.add(offset) = b_pm; // Blue
                 *pixel_data.add(offset + 1) = g_pm; // Green
                 *pixel_data.add(offset + 2) = r_pm; // Red
                 *pixel_data.add(offset + 3) = a as u8; // Alpha
@@ -217,7 +205,7 @@ mod windows {
                 }
 
                 let elapsed = start_time.elapsed();
-                
+
                 if elapsed >= total_duration {
                     break;
                 }
@@ -261,7 +249,10 @@ mod windows {
     ) {
         let mut pt_pos = POINT { x, y };
         let mut pt_src = POINT { x: 0, y: 0 };
-        let mut size = SIZE { cx: width as i32, cy: height as i32 };
+        let mut size = SIZE {
+            cx: width as i32,
+            cy: height as i32,
+        };
         let blend = BLENDFUNCTION {
             BlendOp: AC_SRC_OVER,
             BlendFlags: 0,
@@ -284,12 +275,7 @@ mod windows {
         }
     }
 
-    unsafe extern "system" fn splash_wnd_proc(
-        hwnd: HWND,
-        msg: u32,
-        wparam: WPARAM,
-        lparam: LPARAM,
-    ) -> LRESULT {
+    unsafe extern "system" fn splash_wnd_proc(hwnd: HWND, msg: u32, wparam: WPARAM, lparam: LPARAM) -> LRESULT {
         unsafe { DefWindowProcW(hwnd, msg, wparam, lparam) }
     }
 }
@@ -300,10 +286,10 @@ mod windows {
 #[cfg(target_os = "linux")]
 mod linux {
     use super::*;
-    use x11::xlib::*;
-    use std::ptr;
     use std::mem;
     use std::os::raw::*;
+    use std::ptr;
+    use x11::xlib::*;
 
     pub fn show_splash_window(
         rgba: &image::RgbaImage,
@@ -328,7 +314,7 @@ mod linux {
             // Try to find a 32-bit visual for transparency
             let mut vinfo: XVisualInfo = mem::zeroed();
             let has_argb = XMatchVisualInfo(display, screen, 32, TrueColor, &mut vinfo) != 0;
-            
+
             let (use_visual, use_depth, colormap) = if has_argb {
                 let cmap = XCreateColormap(display, root, vinfo.visual, AllocNone);
                 (vinfo.visual, 32, cmap)
@@ -350,8 +336,10 @@ mod linux {
             let window = XCreateWindow(
                 display,
                 root,
-                x, y,
-                width, height,
+                x,
+                y,
+                width,
+                height,
                 0,
                 use_depth,
                 InputOutput as c_uint,
@@ -366,12 +354,7 @@ mod linux {
             }
 
             // Scale image
-            let scaled = image::imageops::resize(
-                rgba,
-                width,
-                height,
-                image::imageops::FilterType::Lanczos3,
-            );
+            let scaled = image::imageops::resize(rgba, width, height, image::imageops::FilterType::Lanczos3);
 
             // Create XImage
             let mut pixel_data: Vec<u32> = Vec::with_capacity((width * height) as usize);
@@ -405,7 +388,7 @@ mod linux {
 
             // Prevent XDestroyImage from freeing our data
             // We'll handle it ourselves
-            
+
             // Create GC
             let gc = XCreateGC(display, window, 0, ptr::null_mut());
 
@@ -426,7 +409,7 @@ mod linux {
                 while XPending(display) > 0 {
                     let mut event: XEvent = mem::zeroed();
                     XNextEvent(display, &mut event);
-                    
+
                     if event.type_ == Expose {
                         XPutImage(display, window, gc, ximage, 0, 0, 0, 0, width, height);
                         XFlush(display);
@@ -434,7 +417,7 @@ mod linux {
                 }
 
                 let elapsed = start_time.elapsed();
-                
+
                 if elapsed >= total_duration {
                     break;
                 }

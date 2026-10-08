@@ -39,7 +39,15 @@ pub struct TransEntry {
 
 /// Length in bytes of the UTF-8 character starting with `b`.
 fn utf8_len(b: u8) -> usize {
-    if b < 0x80 { 1 } else if b < 0xE0 { 2 } else if b < 0xF0 { 3 } else { 4 }
+    if b < 0x80 {
+        1
+    } else if b < 0xE0 {
+        2
+    } else if b < 0xF0 {
+        3
+    } else {
+        4
+    }
 }
 
 /// A separator character that may sit between a token and human text.
@@ -220,9 +228,7 @@ fn urlencode(s: &str) -> String {
     let mut out = String::with_capacity(s.len());
     for b in s.as_bytes() {
         match b {
-            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => {
-                out.push(*b as char)
-            }
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => out.push(*b as char),
             _ => out.push_str(&format!("%{:02X}", b)),
         }
     }
@@ -242,14 +248,7 @@ const META_HEADER: &str = "# XIMOD Architect - translation metadata";
 /// # @font = Noto_Sans/static/NotoSans-Regular.ttf
 /// # @endonym = Republique francaise
 /// ```
-const META_KEYS: [&str; 6] = [
-    "country",
-    "language",
-    "font",
-    "endonym",
-    "langname",
-    "author",
-];
+const META_KEYS: [&str; 6] = ["country", "language", "font", "endonym", "langname", "author"];
 
 /// True when a line belongs to the metadata block (header or `# @key = value`).
 ///
@@ -292,11 +291,7 @@ fn parse_metadata(content: &str) -> HashMap<String, String> {
 /// Read the country endonym recorded in a translation's `countryEndonyms.tsv`
 /// for a given (language folder, country). Returns `None` when the side file or
 /// the matching row is absent. Format: `<ISO 3166-1 alpha-3>\t<ISO 639-3>\t<endonym>`.
-fn read_tsv_country_endonym(
-    locales_dir: &std::path::Path,
-    lang: &str,
-    country: &str,
-) -> Option<String> {
+fn read_tsv_country_endonym(locales_dir: &std::path::Path, lang: &str, country: &str) -> Option<String> {
     if lang.is_empty() || country.is_empty() {
         return None;
     }
@@ -430,11 +425,7 @@ impl XimodApp {
         // Reset the font from the target file's header; if it has none,
         // refresh_translation_meta below fills it from Languages.json for the new
         // language (so switching languages never keeps the previous font).
-        self.trans_font = meta
-            .get("font")
-            .cloned()
-            .filter(|s| !s.is_empty())
-            .unwrap_or_default();
+        self.trans_font = meta.get("font").cloned().filter(|s| !s.is_empty()).unwrap_or_default();
         if let Some(v) = meta.get("author") {
             self.trans_author = v.clone();
         }
@@ -450,10 +441,7 @@ impl XimodApp {
             }
             let a = analyze(&sval);
             // Pre-fill from the target file's existing translation, if any.
-            let input = tgt_map
-                .get(&key)
-                .map(|tval| analyze(tval).display)
-                .unwrap_or_default();
+            let input = tgt_map.get(&key).map(|tval| analyze(tval).display).unwrap_or_default();
             entries.push(TransEntry {
                 key,
                 source_value: sval,
@@ -485,10 +473,10 @@ impl XimodApp {
     /// Both fields stay editable so the user can correct them; a save then
     /// propagates the corrections to the JSON reference files.
     pub fn refresh_translation_meta(&mut self) {
-        if self.trans_font.is_empty() {
-            if let Some(f) = self.i18n.font_for(&self.trans_target_lang) {
-                self.trans_font = f.to_string();
-            }
+        if self.trans_font.is_empty()
+            && let Some(f) = self.i18n.font_for(&self.trans_target_lang)
+        {
+            self.trans_font = f.to_string();
         }
 
         // Country endonym: prefer the value the translator recorded in the
@@ -520,11 +508,7 @@ impl XimodApp {
 
         // Language endonym: from the file's header when present, otherwise from
         // Languages.json (older files without a header, or no file yet).
-        let ftl_path = self
-            .i18n
-            .locales_dir()
-            .join(&self.trans_target_lang)
-            .join("main.ftl");
+        let ftl_path = self.i18n.locales_dir().join(&self.trans_target_lang).join("main.ftl");
         let meta = if !self.trans_target_lang.is_empty() && ftl_path.is_file() {
             parse_metadata(&std::fs::read_to_string(&ftl_path).unwrap_or_default())
         } else {
@@ -563,14 +547,11 @@ impl XimodApp {
         let Some(path) = picked else { return };
 
         // Keep only the part relative to assets/fonts.
-        let rel = path
-            .canonicalize()
-            .ok()
-            .and_then(|abs| {
-                root.canonicalize()
-                    .ok()
-                    .and_then(|r| abs.strip_prefix(r).ok().map(|p| p.to_path_buf()))
-            });
+        let rel = path.canonicalize().ok().and_then(|abs| {
+            root.canonicalize()
+                .ok()
+                .and_then(|r| abs.strip_prefix(r).ok().map(|p| p.to_path_buf()))
+        });
         match rel {
             Some(r) => {
                 self.trans_font = r.to_string_lossy().replace('\\', "/");
@@ -594,47 +575,41 @@ impl XimodApp {
         }
 
         // ---- Languages.json: endonym (name) and font of the language ----
-        if let Some(path) = crate::data::find_data_file("Languages.json") {
-            if let Ok(text) = std::fs::read_to_string(&path) {
-                if let Ok(mut doc) = serde_json::from_str::<serde_json::Value>(&text) {
-                    let mut changed = false;
-                    if let Some(arr) = doc.get_mut("languages").and_then(|v| v.as_array_mut()) {
-                        for entry in arr.iter_mut() {
-                            if entry.get("iso639_3").and_then(|v| v.as_str()) != Some(&lang) {
-                                continue;
-                            }
-                            // Only write when the user actually edited the field
-                            // (current value differs from the one loaded), and it
-                            // differs from what the JSON already holds.
-                            if self.trans_lang_endonym != self.trans_lang_endonym_loaded
-                                && !self.trans_lang_endonym.is_empty()
-                                && entry.get("name").and_then(|v| v.as_str())
-                                    != Some(self.trans_lang_endonym.as_str())
-                            {
-                                entry["name"] =
-                                    serde_json::Value::String(self.trans_lang_endonym.clone());
-                                changed = true;
-                            }
-                            if self.trans_font != self.trans_font_loaded
-                                && !self.trans_font.is_empty()
-                                && entry.get("font").and_then(|v| v.as_str())
-                                    != Some(self.trans_font.as_str())
-                            {
-                                entry["font"] =
-                                    serde_json::Value::String(self.trans_font.clone());
-                                changed = true;
-                            }
-                            break;
-                        }
+        if let Some(path) = crate::data::find_data_file("Languages.json")
+            && let Ok(text) = std::fs::read_to_string(&path)
+            && let Ok(mut doc) = serde_json::from_str::<serde_json::Value>(&text)
+        {
+            let mut changed = false;
+            if let Some(arr) = doc.get_mut("languages").and_then(|v| v.as_array_mut()) {
+                for entry in arr.iter_mut() {
+                    if entry.get("iso639_3").and_then(|v| v.as_str()) != Some(&lang) {
+                        continue;
                     }
-                    if changed {
-                        if let Ok(s) = serde_json::to_string_pretty(&doc) {
-                            if std::fs::write(&path, s + "\n").is_ok() {
-                                written.push(path);
-                            }
-                        }
+                    // Only write when the user actually edited the field
+                    // (current value differs from the one loaded), and it
+                    // differs from what the JSON already holds.
+                    if self.trans_lang_endonym != self.trans_lang_endonym_loaded
+                        && !self.trans_lang_endonym.is_empty()
+                        && entry.get("name").and_then(|v| v.as_str()) != Some(self.trans_lang_endonym.as_str())
+                    {
+                        entry["name"] = serde_json::Value::String(self.trans_lang_endonym.clone());
+                        changed = true;
                     }
+                    if self.trans_font != self.trans_font_loaded
+                        && !self.trans_font.is_empty()
+                        && entry.get("font").and_then(|v| v.as_str()) != Some(self.trans_font.as_str())
+                    {
+                        entry["font"] = serde_json::Value::String(self.trans_font.clone());
+                        changed = true;
+                    }
+                    break;
                 }
+            }
+            if changed
+                && let Ok(s) = serde_json::to_string_pretty(&doc)
+                && std::fs::write(&path, s + "\n").is_ok()
+            {
+                written.push(path);
             }
         }
 
@@ -646,60 +621,46 @@ impl XimodApp {
         if (self.trans_endonym_authoritative || self.trans_endonym != self.trans_endonym_loaded)
             && !self.trans_country.is_empty()
             && !self.trans_endonym.is_empty()
+            && let Some(path) = crate::data::find_data_file("Countries.json")
+            && let Ok(text) = std::fs::read_to_string(&path)
+            && let Ok(mut doc) = serde_json::from_str::<serde_json::Value>(&text)
         {
-            if let Some(path) = crate::data::find_data_file("Countries.json") {
-                if let Ok(text) = std::fs::read_to_string(&path) {
-                    if let Ok(mut doc) = serde_json::from_str::<serde_json::Value>(&text) {
-                        let mut changed = false;
-                        if let Some(arr) =
-                            doc.get_mut("countries").and_then(|v| v.as_array_mut())
-                        {
-                            for country in arr.iter_mut() {
-                                if country.get("a3").and_then(|v| v.as_str())
-                                    != Some(self.trans_country.as_str())
+            let mut changed = false;
+            if let Some(arr) = doc.get_mut("countries").and_then(|v| v.as_array_mut()) {
+                for country in arr.iter_mut() {
+                    if country.get("a3").and_then(|v| v.as_str()) != Some(self.trans_country.as_str()) {
+                        continue;
+                    }
+                    let langs = country.get_mut("languages").and_then(|v| v.as_array_mut());
+                    if let Some(langs) = langs {
+                        let existing = langs
+                            .iter_mut()
+                            .find(|l| l.get("iso639_3").and_then(|v| v.as_str()) == Some(lang.as_str()));
+                        match existing {
+                            Some(l) => {
+                                if l.get("countryEndonym").and_then(|v| v.as_str()) != Some(self.trans_endonym.as_str())
                                 {
-                                    continue;
+                                    l["countryEndonym"] = serde_json::Value::String(self.trans_endonym.clone());
+                                    changed = true;
                                 }
-                                let langs = country
-                                    .get_mut("languages")
-                                    .and_then(|v| v.as_array_mut());
-                                if let Some(langs) = langs {
-                                    let existing = langs.iter_mut().find(|l| {
-                                        l.get("iso639_3").and_then(|v| v.as_str())
-                                            == Some(lang.as_str())
-                                    });
-                                    match existing {
-                                        Some(l) => {
-                                            if l.get("countryEndonym").and_then(|v| v.as_str())
-                                                != Some(self.trans_endonym.as_str())
-                                            {
-                                                l["countryEndonym"] = serde_json::Value::String(
-                                                    self.trans_endonym.clone(),
-                                                );
-                                                changed = true;
-                                            }
-                                        }
-                                        None => {
-                                            langs.push(serde_json::json!({
-                                                "iso639_3": lang,
-                                                "countryEndonym": self.trans_endonym,
-                                            }));
-                                            changed = true;
-                                        }
-                                    }
-                                }
-                                break;
                             }
-                        }
-                        if changed {
-                            if let Ok(s) = serde_json::to_string_pretty(&doc) {
-                                if std::fs::write(&path, s + "\n").is_ok() {
-                                    written.push(path);
-                                }
+                            None => {
+                                langs.push(serde_json::json!({
+                                    "iso639_3": lang,
+                                    "countryEndonym": self.trans_endonym,
+                                }));
+                                changed = true;
                             }
                         }
                     }
+                    break;
                 }
+            }
+            if changed
+                && let Ok(s) = serde_json::to_string_pretty(&doc)
+                && std::fs::write(&path, s + "\n").is_ok()
+            {
+                written.push(path);
             }
         }
 
@@ -722,10 +683,7 @@ impl XimodApp {
     /// updated). Only the codes and names actually used are written — the ISO
     /// code sets themselves are never redistributed.
     fn write_country_endonym_record(&self) {
-        if self.trans_country.is_empty()
-            || self.trans_endonym.is_empty()
-            || self.trans_target_lang.is_empty()
-        {
+        if self.trans_country.is_empty() || self.trans_endonym.is_empty() || self.trans_target_lang.is_empty() {
             return;
         }
         let path = self
@@ -735,8 +693,7 @@ impl XimodApp {
             .join("countryEndonyms.tsv");
 
         // Existing rows (country a3 -> endonym), then upsert the current one.
-        let mut rows: std::collections::BTreeMap<String, String> =
-            std::collections::BTreeMap::new();
+        let mut rows: std::collections::BTreeMap<String, String> = std::collections::BTreeMap::new();
         if let Ok(text) = std::fs::read_to_string(&path) {
             for line in text.lines() {
                 if line.trim().is_empty() {
@@ -786,18 +743,14 @@ impl XimodApp {
 
         let file = std::fs::File::create(&zip_path)?;
         let mut zip = zip::ZipWriter::new(file);
-        let opts: zip::write::FileOptions<()> = zip::write::FileOptions::default()
-            .compression_method(zip::CompressionMethod::Deflated);
+        let opts: zip::write::FileOptions<()> =
+            zip::write::FileOptions::default().compression_method(zip::CompressionMethod::Deflated);
 
         // Only the translated file, keeping its folder so the layout is obvious.
         // Its metadata header (country, language, font, endonyms, author) lets
         // the maintainer refresh the reference data without shipping the
         // ISO 639-3 code set.
-        let ftl = self
-            .i18n
-            .locales_dir()
-            .join(&self.trans_target_lang)
-            .join("main.ftl");
+        let ftl = self.i18n.locales_dir().join(&self.trans_target_lang).join("main.ftl");
         if ftl.is_file() {
             zip.start_file(format!("locales/{}/main.ftl", lang), opts)?;
             zip.write_all(&std::fs::read(&ftl)?)?;
@@ -825,10 +778,7 @@ impl XimodApp {
                 if let Some(parent) = zip_path.parent() {
                     crate::fonts::open_path(parent);
                 }
-                let subject = format!(
-                    "XIMOD Architect - translation {}",
-                    self.trans_target_lang
-                );
+                let subject = format!("XIMOD Architect - translation {}", self.trans_target_lang);
                 let body = format!(
                     "Language: {}\nCountry: {}\nAuthor: {}\n\nPlease attach: {}",
                     self.trans_target_lang,
@@ -926,14 +876,14 @@ impl XimodApp {
                 // Export the country endonym next to the .ftl so a maintainer
                 // who only receives the language folder can update Countries.json.
                 self.write_country_endonym_record();
-                self.status_message = self.i18n.t("trans-saved");
+                self.notify_ok(self.i18n.t("trans-saved"));
                 self.trans_message = if updated.is_empty() {
                     String::new()
                 } else {
                     self.i18n.t("trans-data-updated")
                 };
             }
-            Err(_) => self.status_message = self.i18n.t("trans-save-error"),
+            Err(_) => self.notify_err(self.i18n.t("trans-save-error")),
         }
     }
 
@@ -963,14 +913,10 @@ impl XimodApp {
         let lbl_submit_hint = self.i18n.t("trans-submit-hint");
         let lbl_not_iso = self.i18n.t("trans-lang-not-iso");
 
-        let country_langs: Vec<String> = self
-            .country_languages
-            .languages_for(&self.trans_country)
-            .to_vec();
+        let country_langs: Vec<String> = self.country_languages.languages_for(&self.trans_country).to_vec();
         // A translation can only be produced for a language carrying an
         // ISO 639-3 code (i.e. listed in Languages.json).
-        let can_translate = !self.trans_target_lang.is_empty()
-            && self.i18n.has_language(&self.trans_target_lang);
+        let can_translate = !self.trans_target_lang.is_empty() && self.i18n.has_language(&self.trans_target_lang);
 
         let locales: Vec<String> = self.i18n.available_locales().to_vec();
 
@@ -990,199 +936,177 @@ impl XimodApp {
             vb,
             |ctx, _class| {
                 egui::CentralPanel::default().show(ctx, |ui| {
-ui.horizontal_top(|ui| {
-                    // --- Flag: picks the country whose languages can be translated
-                    let flag_size = egui::vec2(120.0, 80.0);
-                    let flag_path = self
-                        .countries
-                        .flag_for(&self.trans_country)
-                        .and_then(|f| crate::data::flags_dir().map(|d| d.join(f)))
-                        .filter(|p| p.is_file());
-                    let flag_resp = match &flag_path {
-                        Some(p) => ui.add_sized(
-                            flag_size,
-                            egui::ImageButton::new(
-                                egui::Image::from_uri(format!("file://{}", p.display()))
-                                    .fit_to_exact_size(flag_size),
+                    ui.horizontal_top(|ui| {
+                        // --- Flag: picks the country whose languages can be translated
+                        let flag_size = egui::vec2(120.0, 80.0);
+                        let flag_path = self
+                            .countries
+                            .flag_for(&self.trans_country)
+                            .and_then(|f| crate::data::flags_dir().map(|d| d.join(f)))
+                            .filter(|p| p.is_file());
+                        let flag_resp = match &flag_path {
+                            Some(p) => ui.add_sized(
+                                flag_size,
+                                egui::ImageButton::new(
+                                    egui::Image::from_uri(format!("file://{}", p.display()))
+                                        .fit_to_exact_size(flag_size),
+                                ),
                             ),
-                        ),
-                        None => ui.add_sized(
-                            flag_size,
-                            egui::Button::new(egui::RichText::new("\u{1F3F3}").size(26.0)),
-                        ),
-                    };
-                    if flag_resp.on_hover_text(&lbl_pick_country).clicked() {
-                        self.flag_target = crate::ui::flag_picker::FlagTarget::Translation;
-                        self.flag_filter.clear();
-                        self.flag_cursor = 0;
-                        self.flag_scroll_offset = 0.0;
-                        self.show_flag_picker = true;
-                    }
+                            None => ui.add_sized(
+                                flag_size,
+                                egui::Button::new(egui::RichText::new("\u{1F3F3}").size(26.0)),
+                            ),
+                        };
+                        if flag_resp.on_hover_text(&lbl_pick_country).clicked() {
+                            self.flag_target = crate::ui::flag_picker::FlagTarget::Translation;
+                            self.flag_filter.clear();
+                            self.flag_cursor = 0;
+                            self.flag_scroll_offset = 0.0;
+                            self.show_flag_picker = true;
+                        }
 
-                    ui.add_space(10.0);
+                        ui.add_space(10.0);
 
-                    // --- Country endonym, rendered with the chosen font
-                    ui.vertical(|ui| {
-                        ui.label(&lbl_endonym);
-                        let font_id = egui::FontId::new(
-                            16.0,
-                            egui::FontFamily::Name(crate::fonts::PREVIEW_FAMILY.into()),
-                        );
-                        ui.add(
-                            egui::TextEdit::multiline(&mut self.trans_endonym)
-                                .desired_width(230.0)
-                                .desired_rows(2)
-                                .font(font_id.clone()),
-                        );
+                        // --- Country endonym, rendered with the chosen font
+                        ui.vertical(|ui| {
+                            ui.label(&lbl_endonym);
+                            let font_id =
+                                egui::FontId::new(16.0, egui::FontFamily::Name(crate::fonts::PREVIEW_FAMILY.into()));
+                            ui.add(
+                                egui::TextEdit::multiline(&mut self.trans_endonym)
+                                    .desired_width(230.0)
+                                    .desired_rows(2)
+                                    .font(font_id.clone()),
+                            );
 
-                        ui.add_space(4.0);
-                        ui.label(&lbl_lang_endonym);
-                        ui.add(
-                            egui::TextEdit::singleline(&mut self.trans_lang_endonym)
-                                .desired_width(230.0)
-                                .font(font_id),
-                        );
+                            ui.add_space(4.0);
+                            ui.label(&lbl_lang_endonym);
+                            ui.add(
+                                egui::TextEdit::singleline(&mut self.trans_lang_endonym)
+                                    .desired_width(230.0)
+                                    .font(font_id),
+                            );
 
-                        ui.add_space(4.0);
-                        ui.label(&lbl_author);
-                        ui.add(
-                            egui::TextEdit::singleline(&mut self.trans_author)
-                                .desired_width(230.0),
-                        );
-                    });
-
-                    ui.add_space(12.0);
-
-                    // --- Languages
-                    ui.vertical(|ui| {
-                        // Source: any language that already has a main.ftl.
-                        ui.horizontal(|ui| {
-                            ui.label(&lbl_source);
-                            egui::ComboBox::from_id_salt("trans_src")
-                                .selected_text(self.i18n.display_name(&self.trans_source_lang))
-                                .height(260.0)
-                                .show_ui(ui, |ui| {
-                                    egui::ScrollArea::both().show(ui, |ui| {
-                                        for loc in &locales {
-                                            if ui
-                                                .selectable_label(
-                                                    self.trans_source_lang == *loc,
-                                                    self.i18n.display_name(loc),
-                                                )
-                                                .clicked()
-                                            {
-                                                self.trans_source_lang = loc.clone();
-                                                reload = true;
-                                            }
-                                        }
-                                    });
-                                });
+                            ui.add_space(4.0);
+                            ui.label(&lbl_author);
+                            ui.add(egui::TextEdit::singleline(&mut self.trans_author).desired_width(230.0));
                         });
 
-                        ui.add_space(4.0);
+                        ui.add_space(12.0);
 
-                        // Target: every language of the selected country.
-                        ui.horizontal(|ui| {
-                            ui.label(&lbl_target);
-                            ui.add_enabled_ui(!country_langs.is_empty(), |ui| {
-                                egui::ComboBox::from_id_salt("trans_tgt")
-                                    .selected_text(
-                                        self.i18n.display_name(&self.trans_target_lang),
-                                    )
+                        // --- Languages
+                        ui.vertical(|ui| {
+                            // Source: any language that already has a main.ftl.
+                            ui.horizontal(|ui| {
+                                ui.label(&lbl_source);
+                                egui::ComboBox::from_id_salt("trans_src")
+                                    .selected_text(self.i18n.display_name(&self.trans_source_lang))
                                     .height(260.0)
                                     .show_ui(ui, |ui| {
                                         egui::ScrollArea::both().show(ui, |ui| {
-                                            for loc in &country_langs {
+                                            for loc in &locales {
                                                 if ui
                                                     .selectable_label(
-                                                        self.trans_target_lang == *loc,
+                                                        self.trans_source_lang == *loc,
                                                         self.i18n.display_name(loc),
                                                     )
                                                     .clicked()
                                                 {
-                                                    self.trans_target_lang = loc.clone();
+                                                    self.trans_source_lang = loc.clone();
                                                     reload = true;
-                                                    meta_refresh = true;
                                                 }
                                             }
                                         });
                                     });
                             });
-                        });
 
-                        ui.add_space(4.0);
+                            ui.add_space(4.0);
 
-                        // Font of the target language.
-                        ui.horizontal(|ui| {
-                            ui.label(&lbl_font);
-                            let shown = if self.trans_font.is_empty() {
-                                lbl_no_font.clone()
-                            } else {
-                                self.trans_font.clone()
-                            };
-                            ui.add(
-                                egui::Label::new(egui::RichText::new(shown).monospace())
-                                    .wrap_mode(egui::TextWrapMode::Truncate),
-                            );
-                        });
-                        ui.horizontal(|ui| {
-                            if ui.button(&lbl_browse).clicked() {
-                                pick_font = true;
-                            }
-                            if ui.button(&lbl_google).clicked() {
-                                crate::fonts::open_url("https://fonts.google.com/");
-                            }
-                            ui.add_space(12.0);
-                            ui.add_enabled_ui(can_translate, |ui| {
-                                if ui.button(&btn_save).clicked() {
-                                    do_save = true;
+                            // Target: every language of the selected country.
+                            ui.horizontal(|ui| {
+                                ui.label(&lbl_target);
+                                ui.add_enabled_ui(!country_langs.is_empty(), |ui| {
+                                    egui::ComboBox::from_id_salt("trans_tgt")
+                                        .selected_text(self.i18n.display_name(&self.trans_target_lang))
+                                        .height(260.0)
+                                        .show_ui(ui, |ui| {
+                                            egui::ScrollArea::both().show(ui, |ui| {
+                                                for loc in &country_langs {
+                                                    if ui
+                                                        .selectable_label(
+                                                            self.trans_target_lang == *loc,
+                                                            self.i18n.display_name(loc),
+                                                        )
+                                                        .clicked()
+                                                    {
+                                                        self.trans_target_lang = loc.clone();
+                                                        reload = true;
+                                                        meta_refresh = true;
+                                                    }
+                                                }
+                                            });
+                                        });
+                                });
+                            });
+
+                            ui.add_space(4.0);
+
+                            // Font of the target language.
+                            ui.horizontal(|ui| {
+                                ui.label(&lbl_font);
+                                let shown = if self.trans_font.is_empty() {
+                                    lbl_no_font.clone()
+                                } else {
+                                    self.trans_font.clone()
+                                };
+                                ui.add(
+                                    egui::Label::new(egui::RichText::new(shown).monospace())
+                                        .wrap_mode(egui::TextWrapMode::Truncate),
+                                );
+                            });
+                            ui.horizontal(|ui| {
+                                if ui.button(&lbl_browse).clicked() {
+                                    pick_font = true;
                                 }
-                                if ui
-                                    .button(&lbl_submit)
-                                    .on_hover_text(&lbl_submit_hint)
-                                    .clicked()
-                                {
-                                    do_submit = true;
+                                if ui.button(&lbl_google).clicked() {
+                                    crate::fonts::open_url("https://fonts.google.com/");
                                 }
+                                ui.add_space(12.0);
+                                ui.add_enabled_ui(can_translate, |ui| {
+                                    if ui.button(&btn_save).clicked() {
+                                        do_save = true;
+                                    }
+                                    if ui.button(&lbl_submit).on_hover_text(&lbl_submit_hint).clicked() {
+                                        do_submit = true;
+                                    }
+                                });
                             });
                         });
                     });
-                });
 
-                if !can_translate && !self.trans_target_lang.is_empty() {
-                    ui.colored_label(
-                        egui::Color32::from_rgb(220, 80, 80),
-                        &lbl_not_iso,
-                    );
-                }
-                if !self.trans_message.is_empty() {
-                    ui.colored_label(
-                        egui::Color32::from_rgb(220, 120, 60),
-                        &self.trans_message,
-                    );
-                }
+                    if !can_translate && !self.trans_target_lang.is_empty() {
+                        ui.colored_label(egui::Color32::from_rgb(220, 80, 80), &lbl_not_iso);
+                    }
+                    if !self.trans_message.is_empty() {
+                        ui.colored_label(egui::Color32::from_rgb(220, 120, 60), &self.trans_message);
+                    }
 
-                ui.separator();
+                    ui.separator();
 
-                // Column layout: the key column has a fixed width; the source
-                // (column 2) and the editable translation (column 3) share the
-                // remaining width *equally* and grow together when the window is
-                // widened — helpful for long strings and CJK scripts that would
-                // otherwise be cramped.
-                let key_w = 150.0_f32;
-                let gap = ui.spacing().item_spacing.x;
-                // Reserve for the scrollbar/margins so the header (above the
-                // scroll area) and the rows (inside it) stay aligned.
-                let col_w = ((ui.available_width() - key_w - gap * 2.0 - 18.0) / 2.0).max(160.0);
-                let row_h = ui.spacing().interact_size.y;
+                    // Column layout: the key column has a fixed width; the source
+                    // (column 2) and the editable translation (column 3) share the
+                    // remaining width *equally* and grow together when the window is
+                    // widened — helpful for long strings and CJK scripts that would
+                    // otherwise be cramped.
+                    let key_w = 150.0_f32;
+                    let gap = ui.spacing().item_spacing.x;
+                    // Reserve for the scrollbar/margins so the header (above the
+                    // scroll area) and the rows (inside it) stay aligned.
+                    let col_w = ((ui.available_width() - key_w - gap * 2.0 - 18.0) / 2.0).max(160.0);
+                    let row_h = ui.spacing().interact_size.y;
 
-                egui::Grid::new("trans_header")
-                    .num_columns(3)
-                    .show(ui, |ui| {
-                        ui.add_sized(
-                            [key_w, row_h],
-                            egui::Label::new(egui::RichText::new(&col_key).strong()),
-                        );
+                    egui::Grid::new("trans_header").num_columns(3).show(ui, |ui| {
+                        ui.add_sized([key_w, row_h], egui::Label::new(egui::RichText::new(&col_key).strong()));
                         ui.add_sized(
                             [col_w, row_h],
                             egui::Label::new(egui::RichText::new(&col_source).strong()),
@@ -1194,84 +1118,86 @@ ui.horizontal_top(|ui| {
                         ui.end_row();
                     });
 
-                // Keyboard navigation for the table. Row heights vary (the source
-                // column wraps), so the page size uses the average row height
-                // measured on the previous frame — recomputed each frame, so it
-                // follows window resizing (a font-based estimate seeds frame 1).
-                let n = self.trans_entries.len();
-                let editing = ctx.wants_keyboard_input();
-                let est = ((ui.available_height() / row_h.max(1.0)).floor() as usize).max(1);
-                let page = if self.trans_visible > 0 {
-                    self.trans_visible
-                } else {
-                    est
-                };
-                let (moved, nav_align, focus_row) =
-                    handle_trans_keys(ctx, &mut self.trans_cursor, n, page, editing);
+                    // Keyboard navigation for the table. Row heights vary (the source
+                    // column wraps), so the page size uses the average row height
+                    // measured on the previous frame — recomputed each frame, so it
+                    // follows window resizing (a font-based estimate seeds frame 1).
+                    let n = self.trans_entries.len();
+                    let editing = ctx.wants_keyboard_input();
+                    let est = ((ui.available_height() / row_h.max(1.0)).floor() as usize).max(1);
+                    let page = if self.trans_visible > 0 {
+                        self.trans_visible
+                    } else {
+                        est
+                    };
+                    let (moved, nav_align, focus_row) =
+                        handle_trans_keys(ctx, &mut self.trans_cursor, n, page, editing);
 
-                let out = egui::ScrollArea::vertical().show(ui, |ui| {
-                    egui::Grid::new("trans_grid")
-                        .num_columns(3)
-                        .striped(true)
-                        .show(ui, |ui| {
-                            for idx in 0..n {
-                                let is_cursor = idx == self.trans_cursor;
-                                let key = self.trans_entries[idx].key.clone();
-                                let display = self.trans_entries[idx].display.clone();
-                                // col 1: key — highlighted on the cursor row.
-                                let key_resp = ui
-                                    .scope(|ui| {
-                                        ui.set_min_width(key_w);
-                                        ui.set_max_width(key_w);
-                                        ui.selectable_label(
-                                            is_cursor,
-                                            egui::RichText::new(&key).monospace(),
-                                        )
-                                        .on_hover_text(&key)
-                                    })
-                                    .inner;
-                                if key_resp.clicked() {
-                                    self.trans_cursor = idx;
-                                }
-                                if moved && is_cursor && focus_row.is_none() {
-                                    key_resp.scroll_to_me(nav_align);
-                                }
-                                // col 2: source label — same width as col 3, wraps
-                                ui.scope(|ui| {
-                                    ui.set_min_width(col_w);
-                                    ui.set_max_width(col_w);
-                                    ui.add(
-                                        egui::Label::new(&display)
-                                            .wrap_mode(egui::TextWrapMode::Wrap),
+                    let out = egui::ScrollArea::vertical().show(ui, |ui| {
+                        egui::Grid::new("trans_grid")
+                            .num_columns(3)
+                            .striped(true)
+                            .show(ui, |ui| {
+                                for idx in 0..n {
+                                    let is_cursor = idx == self.trans_cursor;
+                                    let key = self.trans_entries[idx].key.clone();
+                                    let display = self.trans_entries[idx].display.clone();
+                                    // col 1: key — highlighted on the cursor row.
+                                    let key_resp = ui
+                                        .scope(|ui| {
+                                            ui.set_min_width(key_w);
+                                            ui.set_max_width(key_w);
+                                            ui.selectable_label(is_cursor, egui::RichText::new(&key).monospace())
+                                                .on_hover_text(&key)
+                                        })
+                                        .inner;
+                                    if key_resp.clicked() {
+                                        self.trans_cursor = idx;
+                                    }
+                                    if moved && is_cursor && focus_row.is_none() {
+                                        key_resp.scroll_to_me(nav_align);
+                                    }
+                                    // col 2: source label — same width as col 3, wraps
+                                    ui.scope(|ui| {
+                                        ui.set_min_width(col_w);
+                                        ui.set_max_width(col_w);
+                                        ui.add(egui::Label::new(&display).wrap_mode(egui::TextWrapMode::Wrap));
+                                    });
+                                    // col 3: editable translation — same width as col 2
+                                    // Multi-line so long translations wrap at the column
+                                    // width and the row grows with them; a value stays one
+                                    // FTL line, so Enter is turned into a space below.
+                                    let resp = ui.add(
+                                        egui::TextEdit::multiline(&mut self.trans_entries[idx].input)
+                                            .desired_width(col_w)
+                                            .desired_rows(1),
                                     );
-                                });
-                                // col 3: editable translation — same width as col 2
-                                let resp = ui.add(
-                                    egui::TextEdit::singleline(
-                                        &mut self.trans_entries[idx].input,
-                                    )
-                                    .desired_width(col_w),
-                                );
-                                if focus_row == Some(idx) {
-                                    resp.request_focus();
-                                    resp.scroll_to_me(Some(egui::Align::Center));
+                                    if resp.changed() && self.trans_entries[idx].input.contains(['\n', '\r']) {
+                                        let flat = self.trans_entries[idx]
+                                            .input
+                                            .replace("\r\n", " ")
+                                            .replace(['\n', '\r'], " ");
+                                        self.trans_entries[idx].input = flat;
+                                    }
+                                    if focus_row == Some(idx) {
+                                        resp.request_focus();
+                                        resp.scroll_to_me(Some(egui::Align::Center));
+                                    }
+                                    if resp.has_focus() {
+                                        self.trans_cursor = idx;
+                                    }
+                                    ui.end_row();
                                 }
-                                if resp.has_focus() {
-                                    self.trans_cursor = idx;
-                                }
-                                ui.end_row();
-                            }
-                        });
-                });
-                // Average row height → number of rows that fit, for Page Up/Down.
-                if n > 0 {
-                    let avg = (out.content_size.y / n as f32).max(1.0);
-                    self.trans_visible =
-                        ((out.inner_rect.height() / avg).floor() as usize).max(1);
-                }
+                            });
+                    });
+                    // Average row height → number of rows that fit, for Page Up/Down.
+                    if n > 0 {
+                        let avg = (out.content_size.y / n as f32).max(1.0);
+                        self.trans_visible = ((out.inner_rect.height() / avg).floor() as usize).max(1);
+                    }
                 });
 
-                crate::ui::main_window::record_win_geom(&mut self.config, ctx, "ximod_translation");
+                crate::ui::widgets::free_window::record_win_geom(&mut self.config, ctx, "ximod_translation");
                 if ctx.input(|i| i.viewport().close_requested()) {
                     do_close = true;
                 }

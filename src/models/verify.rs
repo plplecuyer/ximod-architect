@@ -25,22 +25,14 @@ pub enum RefLoc {
     /// A conditional file set (1-based index).
     ConditionalSet { index: usize },
     /// A plugin (option), by 1-based step/group index and plugin name.
-    Plugin {
-        step: usize,
-        group: usize,
-        plugin: String,
-    },
+    Plugin { step: usize, group: usize, plugin: String },
 }
 
 /// A problem found while verifying referenced files.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FileIssue {
     /// A file/folder source does not exist under the root.
-    MissingSource {
-        loc: RefLoc,
-        path: String,
-        folder: bool,
-    },
+    MissingSource { loc: RefLoc, path: String, folder: bool },
     /// An image does not exist under the root.
     MissingImage { loc: RefLoc, path: String },
     /// A reference is an absolute path (not portable inside the archive).
@@ -159,34 +151,42 @@ fn check_ref(
         return None;
     }
     if is_absolute_ref(raw) {
-        issues.push(FileIssue::AbsolutePath { loc, path: raw.to_string() });
+        issues.push(FileIssue::AbsolutePath {
+            loc,
+            path: raw.to_string(),
+        });
         return None;
     }
     let norm = raw.replace('\\', "/");
     let norm = norm.trim_start_matches("./");
     if norm.split('/').any(|c| c == "..") {
-        issues.push(FileIssue::OutsideRoot { loc, path: raw.to_string() });
+        issues.push(FileIssue::OutsideRoot {
+            loc,
+            path: raw.to_string(),
+        });
         return None;
     }
     let abs = root.join(norm);
     let exists = if folder { abs.is_dir() } else { abs.is_file() };
     if !exists {
         if is_image {
-            issues.push(FileIssue::MissingImage { loc, path: raw.to_string() });
+            issues.push(FileIssue::MissingImage {
+                loc,
+                path: raw.to_string(),
+            });
         } else {
-            issues.push(FileIssue::MissingSource { loc, path: raw.to_string(), folder });
+            issues.push(FileIssue::MissingSource {
+                loc,
+                path: raw.to_string(),
+                folder,
+            });
         }
         return None;
     }
     Some(norm.to_lowercase())
 }
 
-fn register(
-    normalized: Option<String>,
-    folder: bool,
-    ref_files: &mut HashSet<String>,
-    ref_dirs: &mut Vec<String>,
-) {
+fn register(normalized: Option<String>, folder: bool, ref_files: &mut HashSet<String>, ref_dirs: &mut Vec<String>) {
     if let Some(n) = normalized {
         if folder {
             if !ref_dirs.contains(&n) {
@@ -201,17 +201,10 @@ fn register(
 /// True for absolute references: POSIX root, UNC/backslash root, or a `C:` drive.
 fn is_absolute_ref(p: &str) -> bool {
     let b = p.as_bytes();
-    p.starts_with('/')
-        || p.starts_with('\\')
-        || (b.len() >= 2 && b[1] == b':' && b[0].is_ascii_alphabetic())
+    p.starts_with('/') || p.starts_with('\\') || (b.len() >= 2 && b[1] == b':' && b[0].is_ascii_alphabetic())
 }
 
-fn collect_orphans(
-    root: &Path,
-    ref_files: &HashSet<String>,
-    ref_dirs: &[String],
-    issues: &mut Vec<FileIssue>,
-) {
+fn collect_orphans(root: &Path, ref_files: &HashSet<String>, ref_dirs: &[String], issues: &mut Vec<FileIssue>) {
     let mut count = 0usize;
     for entry in WalkDir::new(root).into_iter().filter_map(Result::ok) {
         if !entry.file_type().is_file() {
@@ -222,7 +215,8 @@ fn collect_orphans(
         };
         let rel = rel.to_string_lossy().replace('\\', "/");
         let rel_lower = rel.to_lowercase();
-        // The FOMOD installer's own files are never "orphans".
+        // The FOMOD installer's own files (including the rotating backups
+        // under `fomod/backups/`) are never "orphans".
         if rel_lower == "fomod" || rel_lower.starts_with("fomod/") {
             continue;
         }
@@ -291,19 +285,56 @@ mod tests {
         let issues = verify_files(&x, &dir);
 
         // Both textures files are covered by the folder source -> not orphan.
-        assert!(!issues.iter().any(|i| matches!(i, FileIssue::OrphanFile { path } if path.contains("present"))));
-        assert!(!issues.iter().any(|i| matches!(i, FileIssue::OrphanFile { path } if path.contains("orphan"))));
+        assert!(
+            !issues
+                .iter()
+                .any(|i| matches!(i, FileIssue::OrphanFile { path } if path.contains("present")))
+        );
+        assert!(
+            !issues
+                .iter()
+                .any(|i| matches!(i, FileIssue::OrphanFile { path } if path.contains("orphan")))
+        );
         // Actually "orphan.dds" IS under the referenced "textures" folder, so it
         // is covered too. Add a truly orphan file to be sure detection works.
         touch(&dir, "loose_readme.txt");
         let issues = verify_files(&x, &dir);
-        assert!(issues.iter().any(|i| matches!(i, FileIssue::OrphanFile { path } if path == "loose_readme.txt")));
+        assert!(
+            issues
+                .iter()
+                .any(|i| matches!(i, FileIssue::OrphanFile { path } if path == "loose_readme.txt"))
+        );
 
-        assert!(issues.iter().any(|i| matches!(i, FileIssue::MissingSource { path, .. } if path == "missing.esp")));
+        assert!(
+            issues
+                .iter()
+                .any(|i| matches!(i, FileIssue::MissingSource { path, .. } if path == "missing.esp"))
+        );
         assert!(issues.iter().any(|i| matches!(i, FileIssue::AbsolutePath { .. })));
         assert!(issues.iter().any(|i| matches!(i, FileIssue::OutsideRoot { .. })));
         assert!(issues.iter().any(|i| matches!(i, FileIssue::MissingImage { .. })));
 
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn backups_under_fomod_are_never_orphans() {
+        let dir = std::env::temp_dir().join(format!("ximod_verify_bk_{}", std::process::id()));
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(&dir).unwrap();
+        touch(&dir, "fomod/ModuleConfig.xml");
+        touch(&dir, "fomod/backups/20260101-100000/info.xml");
+        touch(&dir, "fomod/backups/20260101-100000/ModuleConfig.xml");
+        touch(&dir, "stray.txt");
+        let issues = verify_files(&Ximod::new("T"), &dir);
+        let orphans: Vec<&str> = issues
+            .iter()
+            .filter_map(|i| match i {
+                FileIssue::OrphanFile { path } => Some(path.as_str()),
+                _ => None,
+            })
+            .collect();
+        assert_eq!(orphans, vec!["stray.txt"]);
         let _ = fs::remove_dir_all(&dir);
     }
 }

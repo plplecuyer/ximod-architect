@@ -36,6 +36,10 @@ impl LogicalOperator {
 }
 
 /// Selection type for plugin groups (5 types from original)
+///
+/// The variant names deliberately mirror the FOMOD schema's `groupType`
+/// values (`SelectExactlyOne`, …) so that `as_str`/`from_str` stay obvious.
+#[allow(clippy::enum_variant_names)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub enum SelectionType {
     SelectExactlyOne,
@@ -177,10 +181,14 @@ impl FileState {
 }
 
 /// Dependency type enum (CDependency from C++)
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum DependencyType {
     Flag,
     File,
+    /// `<gameDependency version="…">`: minimum game version.
+    Game,
+    /// `<fommDependency version="…">`: minimum mod-manager version.
+    Fomm,
 }
 
 impl DependencyType {
@@ -188,21 +196,34 @@ impl DependencyType {
         match self {
             Self::Flag => "flag",
             Self::File => "file",
+            Self::Game => "game",
+            Self::Fomm => "fomm",
         }
     }
 
     pub fn from_str(s: &str) -> Self {
         match s.to_lowercase().as_str() {
             "file" => Self::File,
+            "game" => Self::Game,
+            "fomm" => Self::Fomm,
             _ => Self::Flag,
         }
     }
+
+    pub fn variants() -> &'static [Self] {
+        &[Self::Flag, Self::File, Self::Game, Self::Fomm]
+    }
 }
 
-/// Dependency (CDependency from C++)
+/// Dependency (CDependency from C++): one leaf condition.
+///
+/// `dep_type` is `"flag"` (`name` = flag, `value` = expected value),
+/// `"file"` (`name` = file, `value` = `Active` / `Inactive` / `Missing`),
+/// `"game"` (`value` = minimum game version, `name` empty) or `"fomm"`
+/// (`value` = minimum mod-manager version, `name` empty).
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Dependency {
-    pub dep_type: String,  // "flag" or "file"
+    pub dep_type: String, // "flag", "file", "game" or "fomm"
     pub name: String,
     pub value: String,
 }
@@ -224,13 +245,282 @@ impl Dependency {
         }
     }
 
-    pub fn display_name(&self) -> String {
-        if self.dep_type == "flag" {
-            format!("[Flag] {} = {}", self.name, self.value)
-        } else {
-            format!("[File] {} ({})", self.name, self.value)
+    /// `<gameDependency version="…">`.
+    pub fn new_game(version: impl Into<String>) -> Self {
+        Self {
+            dep_type: "game".to_string(),
+            name: String::new(),
+            value: version.into(),
         }
     }
+
+    /// `<fommDependency version="…">`.
+    pub fn new_fomm(version: impl Into<String>) -> Self {
+        Self {
+            dep_type: "fomm".to_string(),
+            name: String::new(),
+            value: version.into(),
+        }
+    }
+
+    /// The kind of this leaf (unknown strings count as flags, like the
+    /// parser does).
+    pub fn kind(&self) -> DependencyType {
+        DependencyType::from_str(&self.dep_type)
+    }
+
+    pub fn is_flag(&self) -> bool {
+        self.dep_type == "flag"
+    }
+
+    pub fn is_file(&self) -> bool {
+        self.dep_type == "file"
+    }
+
+    /// A version leaf (`game` / `fomm`) has no name: it is "complete" as
+    /// soon as it has a version, where flag / file leaves need a name.
+    pub fn is_version(&self) -> bool {
+        matches!(self.kind(), DependencyType::Game | DependencyType::Fomm)
+    }
+
+    /// Whether the leaf carries enough to be written (a name for flag /
+    /// file leaves, a version for game / manager leaves).
+    pub fn is_complete(&self) -> bool {
+        if self.is_version() {
+            !self.value.is_empty()
+        } else {
+            !self.name.is_empty()
+        }
+    }
+
+    pub fn display_name(&self) -> String {
+        match self.kind() {
+            DependencyType::Flag => format!("[Flag] {} = {}", self.name, self.value),
+            DependencyType::File => format!("[File] {} ({})", self.name, self.value),
+            DependencyType::Game => format!("[Game] >= {}", self.value),
+            DependencyType::Fomm => format!("[Mod manager] >= {}", self.value),
+        }
+    }
+}
+
+/// One item of a [`DependencyGroup`]: a leaf condition or a nested group.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub enum DependencyItem {
+    Leaf(Dependency),
+    Group(DependencyGroup),
+}
+
+impl DependencyItem {
+    pub fn as_leaf(&self) -> Option<&Dependency> {
+        match self {
+            Self::Leaf(d) => Some(d),
+            Self::Group(_) => None,
+        }
+    }
+
+    pub fn as_group(&self) -> Option<&DependencyGroup> {
+        match self {
+            Self::Group(g) => Some(g),
+            Self::Leaf(_) => None,
+        }
+    }
+}
+
+/// A `compositeDependency` of the FOMOD schema: an operator and a list of
+/// items, each a leaf condition or another group, nested to any depth.
+///
+/// Used for a step's `<visible>`, an option's dependency patterns, the
+/// conditional-install sets and the mod-wide `<moduleDependencies>`.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct DependencyGroup {
+    pub operator: LogicalOperator,
+    pub items: Vec<DependencyItem>,
+}
+
+impl DependencyGroup {
+    pub fn new(operator: LogicalOperator) -> Self {
+        Self {
+            operator,
+            items: Vec::new(),
+        }
+    }
+
+    /// A flat group (one level of leaves) under `operator`.
+    pub fn from_leaves(operator: LogicalOperator, leaves: Vec<Dependency>) -> Self {
+        Self {
+            operator,
+            items: leaves.into_iter().map(DependencyItem::Leaf).collect(),
+        }
+    }
+
+    /// No item at all (an empty group always holds, and is omitted on save
+    /// where the schema allows).
+    pub fn is_empty(&self) -> bool {
+        self.items.is_empty()
+    }
+
+    /// Whether any item is a nested group.
+    pub fn has_groups(&self) -> bool {
+        self.items.iter().any(|i| matches!(i, DependencyItem::Group(_)))
+    }
+
+    /// The operator and the leaves when the group has no nested group
+    /// (the shape the model used to be limited to), `None` otherwise.
+    pub fn flat(&self) -> Option<(LogicalOperator, Vec<&Dependency>)> {
+        if self.has_groups() {
+            return None;
+        }
+        Some((
+            self.operator,
+            self.items.iter().filter_map(DependencyItem::as_leaf).collect(),
+        ))
+    }
+
+    /// Every leaf, depth-first, in document order.
+    pub fn leaves(&self) -> Box<dyn Iterator<Item = &Dependency> + '_> {
+        Box::new(self.items.iter().flat_map(|item| match item {
+            DependencyItem::Leaf(d) => Box::new(std::iter::once(d)) as Box<dyn Iterator<Item = &Dependency>>,
+            DependencyItem::Group(g) => g.leaves(),
+        }))
+    }
+
+    /// Every leaf, mutably, depth-first.
+    pub fn leaves_mut(&mut self) -> Box<dyn Iterator<Item = &mut Dependency> + '_> {
+        Box::new(self.items.iter_mut().flat_map(|item| match item {
+            DependencyItem::Leaf(d) => Box::new(std::iter::once(d)) as Box<dyn Iterator<Item = &mut Dependency>>,
+            DependencyItem::Group(g) => g.leaves_mut(),
+        }))
+    }
+
+    /// Number of leaves at every depth.
+    pub fn leaf_count(&self) -> usize {
+        self.leaves().count()
+    }
+
+    /// Call `f` on every leaf, depth-first.
+    pub fn visit(&self, mut f: impl FnMut(&Dependency)) {
+        fn walk(g: &DependencyGroup, f: &mut impl FnMut(&Dependency)) {
+            for item in &g.items {
+                match item {
+                    DependencyItem::Leaf(d) => f(d),
+                    DependencyItem::Group(sub) => walk(sub, f),
+                }
+            }
+        }
+        walk(self, &mut f);
+    }
+
+    /// Keep only the leaves `pred` accepts, at every depth (nested groups
+    /// are kept even when they become empty). Returns how many were removed.
+    pub fn retain_leaves(&mut self, mut pred: impl FnMut(&Dependency) -> bool) -> usize {
+        fn walk(g: &mut DependencyGroup, pred: &mut impl FnMut(&Dependency) -> bool) -> usize {
+            let before = g.items.len();
+            g.items.retain(|item| match item {
+                DependencyItem::Leaf(d) => pred(d),
+                DependencyItem::Group(_) => true,
+            });
+            let mut n = before - g.items.len();
+            for item in &mut g.items {
+                if let DependencyItem::Group(sub) = item {
+                    n += walk(sub, pred);
+                }
+            }
+            n
+        }
+        walk(self, &mut pred)
+    }
+
+    pub fn push_leaf(&mut self, dep: Dependency) {
+        self.items.push(DependencyItem::Leaf(dep));
+    }
+
+    pub fn push_group(&mut self, group: DependencyGroup) {
+        self.items.push(DependencyItem::Group(group));
+    }
+
+    /// Nesting depth: 0 for a group without nested groups, 1 when it holds
+    /// groups that are themselves flat, and so on.
+    pub fn depth(&self) -> usize {
+        self.items
+            .iter()
+            .filter_map(DependencyItem::as_group)
+            .map(|g| g.depth() + 1)
+            .max()
+            .unwrap_or(0)
+    }
+
+    /// The item at `path` (an index per level, from this group down).
+    /// `None` for an empty path or an index out of range.
+    pub fn get_path(&self, path: &[usize]) -> Option<&DependencyItem> {
+        let (&first, rest) = path.split_first()?;
+        let item = self.items.get(first)?;
+        if rest.is_empty() {
+            return Some(item);
+        }
+        item.as_group()?.get_path(rest)
+    }
+
+    /// Mutable [`get_path`](Self::get_path).
+    pub fn get_path_mut(&mut self, path: &[usize]) -> Option<&mut DependencyItem> {
+        let (&first, rest) = path.split_first()?;
+        let item = self.items.get_mut(first)?;
+        if rest.is_empty() {
+            return Some(item);
+        }
+        match item {
+            DependencyItem::Group(g) => g.get_path_mut(rest),
+            DependencyItem::Leaf(_) => None,
+        }
+    }
+
+    /// The group at `path`: this group for an empty path, otherwise the
+    /// nested group the path designates (`None` when it names a leaf).
+    pub fn group_at(&self, path: &[usize]) -> Option<&DependencyGroup> {
+        if path.is_empty() {
+            return Some(self);
+        }
+        self.get_path(path)?.as_group()
+    }
+
+    /// Mutable [`group_at`](Self::group_at).
+    pub fn group_at_mut(&mut self, path: &[usize]) -> Option<&mut DependencyGroup> {
+        if path.is_empty() {
+            return Some(self);
+        }
+        match self.get_path_mut(path)? {
+            DependencyItem::Group(g) => Some(g),
+            DependencyItem::Leaf(_) => None,
+        }
+    }
+
+    /// Remove and return the item at `path`.
+    pub fn remove_path(&mut self, path: &[usize]) -> Option<DependencyItem> {
+        let (&last, parent) = path.split_last()?;
+        let group = self.group_at_mut(parent)?;
+        if last < group.items.len() {
+            Some(group.items.remove(last))
+        } else {
+            None
+        }
+    }
+}
+
+/// Where a condition group lives in the project (0-based indices).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum ConditionSite {
+    /// A step's `<visible>` conditions.
+    StepVisibility { step: usize },
+    /// One dependency pattern of an option.
+    PluginPattern {
+        step: usize,
+        group: usize,
+        plugin: usize,
+        pattern: usize,
+    },
+    /// A conditional-install set.
+    CondSet { index: usize },
+    /// The mod-wide requirements (`<moduleDependencies>`).
+    Module,
 }
 
 /// Condition flag (CCondition from C++)
@@ -256,6 +546,12 @@ pub struct InstallFile {
     pub source: String,
     pub destination: String,
     pub priority: u32,
+    /// `alwaysInstall` attribute: install even when the option is not selected.
+    #[serde(default)]
+    pub always_install: bool,
+    /// `installIfUsable` attribute: install whenever the option is usable.
+    #[serde(default)]
+    pub install_if_usable: bool,
 }
 
 impl InstallFile {
@@ -272,6 +568,8 @@ impl InstallFile {
             source: source.into(),
             destination: String::new(),
             priority: 0,
+            always_install: false,
+            install_if_usable: false,
         }
     }
 
@@ -281,6 +579,8 @@ impl InstallFile {
             source: source.into(),
             destination: String::new(),
             priority: 0,
+            always_install: false,
+            install_if_usable: false,
         }
     }
 }
@@ -289,12 +589,12 @@ impl InstallFile {
 /// Strips leading directories until finding a known game folder
 pub fn get_proper_destination_path(path: &str) -> String {
     let path_lower = path.to_lowercase();
-    
+
     // Check for plugin files (.esp, .esm, .esl, .ba2)
-    if path_lower.ends_with(".esp") 
-        || path_lower.ends_with(".esm") 
+    if path_lower.ends_with(".esp")
+        || path_lower.ends_with(".esm")
         || path_lower.ends_with(".esl")
-        || path_lower.ends_with(".ba2") 
+        || path_lower.ends_with(".ba2")
     {
         // Return just the filename
         if let Some(pos) = path.rfind('\\') {
@@ -308,16 +608,36 @@ pub fn get_proper_destination_path(path: &str) -> String {
 
     // Known Bethesda game folders
     let known_folders = [
-        "strings", "textures", "music", "sound", "interface",
-        "meshes", "programs", "materials", "lodsettings", "vis",
-        "misc", "scripts", "shadersfx", "mcm", "seq", "grass",
-        "terrain", "lod", "geometries", "animations", "actors",
-        "video", "voices", "facegen", "landscape",
+        "strings",
+        "textures",
+        "music",
+        "sound",
+        "interface",
+        "meshes",
+        "programs",
+        "materials",
+        "lodsettings",
+        "vis",
+        "misc",
+        "scripts",
+        "shadersfx",
+        "mcm",
+        "seq",
+        "grass",
+        "terrain",
+        "lod",
+        "geometries",
+        "animations",
+        "actors",
+        "video",
+        "voices",
+        "facegen",
+        "landscape",
     ];
 
     // Split path by backslash or forward slash
-    let parts: Vec<&str> = path.split(|c| c == '\\' || c == '/').collect();
-    
+    let parts: Vec<&str> = path.split(['\\', '/']).collect();
+
     for (i, part) in parts.iter().enumerate() {
         let part_lower = part.to_lowercase();
         if known_folders.contains(&part_lower.as_str()) {
@@ -329,20 +649,55 @@ pub fn get_proper_destination_path(path: &str) -> String {
     path.to_string()
 }
 
-/// Dependency pattern (CDependencyPattern from C++)
+/// Dependency pattern (CDependencyPattern from C++): the option takes
+/// `pattern_type` when `condition` holds.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(from = "DependencyPatternCompat")]
 pub struct DependencyPattern {
-    pub operator: LogicalOperator,
-    pub pattern_type: String,  // Plugin type name for this pattern
-    pub dependencies: Vec<Dependency>,
+    pub pattern_type: String, // Plugin type name for this pattern
+    pub condition: DependencyGroup,
 }
 
 impl DependencyPattern {
     pub fn new() -> Self {
         Self {
-            operator: LogicalOperator::And,
             pattern_type: "Optional".to_string(),
-            dependencies: Vec::new(),
+            condition: DependencyGroup::default(),
+        }
+    }
+}
+
+/// Old JSON shape of a pattern (`operator` + flat `dependencies`), still
+/// accepted when loading templates saved before nested groups existed.
+#[derive(Deserialize)]
+struct DependencyPatternCompat {
+    #[serde(default)]
+    pattern_type: String,
+    #[serde(default)]
+    condition: Option<DependencyGroup>,
+    #[serde(default)]
+    operator: Option<LogicalOperator>,
+    #[serde(default)]
+    dependencies: Option<Vec<Dependency>>,
+}
+
+/// Merge the new `condition` field with the old `operator` / flat list.
+fn compat_group(
+    condition: Option<DependencyGroup>,
+    operator: Option<LogicalOperator>,
+    dependencies: Option<Vec<Dependency>>,
+) -> DependencyGroup {
+    match condition {
+        Some(g) => g,
+        None => DependencyGroup::from_leaves(operator.unwrap_or_default(), dependencies.unwrap_or_default()),
+    }
+}
+
+impl From<DependencyPatternCompat> for DependencyPattern {
+    fn from(c: DependencyPatternCompat) -> Self {
+        Self {
+            pattern_type: c.pattern_type,
+            condition: compat_group(c.condition, c.operator, c.dependencies),
         }
     }
 }
@@ -379,6 +734,11 @@ pub struct PluginGroup {
     pub name: String,
     pub selection_type: SelectionType,
     pub plugins: Vec<Plugin>,
+    /// `<plugins order="…">` as authored when it is not `Explicit`
+    /// (`Ascending` / `Descending`); written back verbatim. XIMOD itself
+    /// keeps the authored order of the options on save.
+    #[serde(default)]
+    pub plugins_order: Option<String>,
 }
 
 impl PluginGroup {
@@ -387,6 +747,7 @@ impl PluginGroup {
             name: name.into(),
             selection_type,
             plugins: Vec::new(),
+            plugins_order: None,
         }
     }
 
@@ -410,20 +771,55 @@ impl PluginGroup {
 
 /// Installation step (CStep from C++)
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(from = "StepCompat")]
 pub struct Step {
     pub name: String,
-    pub visibility_operator: LogicalOperator,
-    pub visibility_dependencies: Vec<Dependency>,
+    /// `<visible>`: the step is shown only when this group holds (an empty
+    /// group means always).
+    pub visibility: DependencyGroup,
     pub plugin_groups: Vec<PluginGroup>,
+    /// `<optionalFileGroups order="…">` as authored when it is not
+    /// `Explicit`; written back verbatim (XIMOD keeps the authored order).
+    #[serde(default)]
+    pub groups_order: Option<String>,
+}
+
+/// Old JSON shape of a step (`visibility_operator` + flat
+/// `visibility_dependencies`), still accepted when loading older templates.
+#[derive(Deserialize)]
+struct StepCompat {
+    #[serde(default)]
+    name: String,
+    #[serde(default)]
+    visibility: Option<DependencyGroup>,
+    #[serde(default)]
+    visibility_operator: Option<LogicalOperator>,
+    #[serde(default)]
+    visibility_dependencies: Option<Vec<Dependency>>,
+    #[serde(default)]
+    plugin_groups: Vec<PluginGroup>,
+    #[serde(default)]
+    groups_order: Option<String>,
+}
+
+impl From<StepCompat> for Step {
+    fn from(c: StepCompat) -> Self {
+        Self {
+            name: c.name,
+            visibility: compat_group(c.visibility, c.visibility_operator, c.visibility_dependencies),
+            plugin_groups: c.plugin_groups,
+            groups_order: c.groups_order,
+        }
+    }
 }
 
 impl Step {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             name: name.into(),
-            visibility_operator: LogicalOperator::And,
-            visibility_dependencies: Vec::new(),
+            visibility: DependencyGroup::default(),
             plugin_groups: Vec::new(),
+            groups_order: None,
         }
     }
 
@@ -439,20 +835,42 @@ impl Step {
     }
 }
 
-/// Conditional file set (CConditionalFile from C++)
+/// Conditional file set (CConditionalFile from C++): `files` are installed
+/// when `condition` holds.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(from = "ConditionalFileSetCompat")]
 pub struct ConditionalFileSet {
-    pub operator: LogicalOperator,
-    pub dependencies: Vec<Dependency>,
+    pub condition: DependencyGroup,
     pub files: Vec<InstallFile>,
 }
 
 impl ConditionalFileSet {
     pub fn new() -> Self {
         Self {
-            operator: LogicalOperator::And,
-            dependencies: Vec::new(),
+            condition: DependencyGroup::default(),
             files: Vec::new(),
+        }
+    }
+}
+
+/// Old JSON shape of a conditional set (`operator` + flat `dependencies`).
+#[derive(Deserialize)]
+struct ConditionalFileSetCompat {
+    #[serde(default)]
+    condition: Option<DependencyGroup>,
+    #[serde(default)]
+    operator: Option<LogicalOperator>,
+    #[serde(default)]
+    dependencies: Option<Vec<Dependency>>,
+    #[serde(default)]
+    files: Vec<InstallFile>,
+}
+
+impl From<ConditionalFileSetCompat> for ConditionalFileSet {
+    fn from(c: ConditionalFileSetCompat) -> Self {
+        Self {
+            condition: compat_group(c.condition, c.operator, c.dependencies),
+            files: c.files,
         }
     }
 }
@@ -568,6 +986,30 @@ pub struct Ximod {
     pub steps: Vec<Step>,
     pub required_files: Vec<InstallFile>,
     pub conditional_files: Vec<ConditionalFileSet>,
+    /// `<moduleDependencies>` (mod-wide requirements). `None` or an empty
+    /// group means the element is omitted on save.
+    #[serde(default)]
+    pub module_dependencies: Option<DependencyGroup>,
+    /// `moduleName/@position` (`Left`, `Right`, `RightOfImage`), kept verbatim.
+    #[serde(default)]
+    pub title_position: Option<String>,
+    /// `moduleName/@colour` (hex `RRGGBB`), kept verbatim.
+    #[serde(default)]
+    pub title_colour: Option<String>,
+    /// `moduleImage/@showImage`.
+    #[serde(default)]
+    pub image_show_image: Option<bool>,
+    /// `moduleImage/@showFade`.
+    #[serde(default)]
+    pub image_show_fade: Option<bool>,
+    /// `moduleImage/@height`.
+    #[serde(default)]
+    pub image_height: Option<i32>,
+    /// `<installSteps order="…">` as authored when it is not `Explicit`;
+    /// written back verbatim. XIMOD keeps the authored order of the steps on
+    /// save (it never re-sorts them).
+    #[serde(default)]
+    pub steps_order: Option<String>,
 }
 
 impl Ximod {
@@ -584,88 +1026,202 @@ impl Ximod {
             steps: Vec::new(),
             required_files: Vec::new(),
             conditional_files: Vec::new(),
+            module_dependencies: None,
+            title_position: None,
+            title_colour: None,
+            image_show_image: None,
+            image_show_fade: None,
+            image_height: None,
+            steps_order: None,
+        }
+    }
+
+    /// The mod-wide requirements, if any were authored (an empty list counts
+    /// as none).
+    pub fn has_module_dependencies(&self) -> bool {
+        self.module_dependencies.as_ref().is_some_and(|m| !m.is_empty())
+    }
+
+    /// Every condition group of the project with its kind, in project
+    /// order: mod requirements, then per step its visibility and its
+    /// options' patterns, then the conditional sets.
+    pub fn for_each_condition<'a>(&'a self, mut f: impl FnMut(ConditionSite, &'a DependencyGroup)) {
+        if let Some(m) = &self.module_dependencies {
+            f(ConditionSite::Module, m);
+        }
+        for (si, step) in self.steps.iter().enumerate() {
+            f(ConditionSite::StepVisibility { step: si }, &step.visibility);
+            for (gi, group) in step.plugin_groups.iter().enumerate() {
+                for (pi, plugin) in group.plugins.iter().enumerate() {
+                    for (pat_i, pat) in plugin.dependency_patterns.iter().enumerate() {
+                        f(
+                            ConditionSite::PluginPattern {
+                                step: si,
+                                group: gi,
+                                plugin: pi,
+                                pattern: pat_i,
+                            },
+                            &pat.condition,
+                        );
+                    }
+                }
+            }
+        }
+        for (ci, set) in self.conditional_files.iter().enumerate() {
+            f(ConditionSite::CondSet { index: ci }, &set.condition);
+        }
+    }
+
+    /// Mutable [`for_each_condition`](Self::for_each_condition).
+    pub fn for_each_condition_mut(&mut self, mut f: impl FnMut(ConditionSite, &mut DependencyGroup)) {
+        if let Some(m) = &mut self.module_dependencies {
+            f(ConditionSite::Module, m);
+        }
+        for (si, step) in self.steps.iter_mut().enumerate() {
+            f(ConditionSite::StepVisibility { step: si }, &mut step.visibility);
+            for (gi, group) in step.plugin_groups.iter_mut().enumerate() {
+                for (pi, plugin) in group.plugins.iter_mut().enumerate() {
+                    for (pat_i, pat) in plugin.dependency_patterns.iter_mut().enumerate() {
+                        f(
+                            ConditionSite::PluginPattern {
+                                step: si,
+                                group: gi,
+                                plugin: pi,
+                                pattern: pat_i,
+                            },
+                            &mut pat.condition,
+                        );
+                    }
+                }
+            }
+        }
+        for (ci, set) in self.conditional_files.iter_mut().enumerate() {
+            f(ConditionSite::CondSet { index: ci }, &mut set.condition);
+        }
+    }
+
+    /// Every leaf condition of the project, at every depth.
+    pub fn all_leaves(&self) -> Vec<&Dependency> {
+        let mut out = Vec::new();
+        self.for_each_condition(|_, g| out.extend(g.leaves()));
+        out
+    }
+
+    /// Visit every user-facing text of the project (names, descriptions,
+    /// author, flag names and values), e.g. to find the scripts it uses.
+    pub fn for_each_text(&self, mut f: impl FnMut(&str)) {
+        f(&self.name);
+        f(&self.author);
+        f(&self.description);
+        for step in &self.steps {
+            f(&step.name);
+            for group in &step.plugin_groups {
+                f(&group.name);
+                for plugin in &group.plugins {
+                    f(&plugin.name);
+                    f(&plugin.description);
+                    for flag in &plugin.condition_flags {
+                        f(&flag.name);
+                        f(&flag.value);
+                    }
+                }
+            }
         }
     }
 
     /// Get all condition flags used in this project
     pub fn get_all_flags(&self) -> Vec<String> {
-        let mut flags = Vec::new();
-        
+        let mut flags: indexmap::IndexSet<&str> = indexmap::IndexSet::new();
         for step in &self.steps {
             for group in &step.plugin_groups {
                 for plugin in &group.plugins {
                     for flag in &plugin.condition_flags {
-                        if !flags.contains(&flag.name) {
-                            flags.push(flag.name.clone());
-                        }
+                        flags.insert(flag.name.as_str());
                     }
                 }
             }
         }
-        
-        flags
+        flags.into_iter().map(str::to_string).collect()
     }
 
     /// Get all flag values used in this project
     pub fn get_all_flag_values(&self) -> Vec<String> {
-        let mut values = Vec::new();
-        
+        let mut values: indexmap::IndexSet<&str> = indexmap::IndexSet::new();
         for step in &self.steps {
             for group in &step.plugin_groups {
                 for plugin in &group.plugins {
                     for flag in &plugin.condition_flags {
-                        if !values.contains(&flag.value) {
-                            values.push(flag.value.clone());
-                        }
+                        values.insert(flag.value.as_str());
                     }
                 }
             }
         }
-        
-        values
+        values.into_iter().map(str::to_string).collect()
     }
 
-    /// Get all dependency names used in this project
+    /// Get all dependency names used in this project (flag and file
+    /// leaves at every depth; step visibility, option patterns and
+    /// conditional sets, in that order).
     pub fn get_all_dependency_names(&self) -> Vec<String> {
-        let mut deps = Vec::new();
-        
-        for step in &self.steps {
-            // Visibility dependencies
-            for dep in &step.visibility_dependencies {
-                if !deps.contains(&dep.name) {
-                    deps.push(dep.name.clone());
+        fn take<'a>(deps: &mut indexmap::IndexSet<&'a str>, g: &'a DependencyGroup) {
+            for dep in g.leaves() {
+                if !dep.is_version() {
+                    deps.insert(dep.name.as_str());
                 }
             }
-            
-            // Plugin dependency patterns
+        }
+        let mut deps: indexmap::IndexSet<&str> = indexmap::IndexSet::new();
+        for step in &self.steps {
+            take(&mut deps, &step.visibility);
             for group in &step.plugin_groups {
                 for plugin in &group.plugins {
                     for pattern in &plugin.dependency_patterns {
-                        for dep in &pattern.dependencies {
-                            if !deps.contains(&dep.name) {
-                                deps.push(dep.name.clone());
-                            }
-                        }
+                        take(&mut deps, &pattern.condition);
                     }
                 }
             }
         }
-        
-        // Conditional file dependencies
         for cond in &self.conditional_files {
-            for dep in &cond.dependencies {
-                if !deps.contains(&dep.name) {
-                    deps.push(dep.name.clone());
+            take(&mut deps, &cond.condition);
+        }
+        deps.into_iter().map(str::to_string).collect()
+    }
+
+    /// Names tested by file dependencies (`<fileDependency file="…">`),
+    /// in project order: step visibility, option patterns, conditional sets
+    /// and mod requirements.
+    pub fn get_all_file_names(&self) -> Vec<String> {
+        fn take<'a>(names: &mut indexmap::IndexSet<&'a str>, g: &'a DependencyGroup) {
+            for dep in g.leaves() {
+                if dep.is_file() {
+                    names.insert(dep.name.as_str());
                 }
             }
         }
-        
-        deps
+        let mut names: indexmap::IndexSet<&str> = indexmap::IndexSet::new();
+        for step in &self.steps {
+            take(&mut names, &step.visibility);
+            for group in &step.plugin_groups {
+                for plugin in &group.plugins {
+                    for pattern in &plugin.dependency_patterns {
+                        take(&mut names, &pattern.condition);
+                    }
+                }
+            }
+        }
+        for cond in &self.conditional_files {
+            take(&mut names, &cond.condition);
+        }
+        if let Some(m) = &self.module_dependencies {
+            take(&mut names, m);
+        }
+        names.into_iter().map(str::to_string).collect()
     }
 
     /// Count total plugins
     pub fn plugin_count(&self) -> usize {
-        self.steps.iter()
+        self.steps
+            .iter()
             .flat_map(|s| &s.plugin_groups)
             .map(|g| g.plugins.len())
             .sum()
@@ -673,37 +1229,37 @@ impl Ximod {
 
     /// Count total files
     pub fn file_count(&self) -> usize {
-        let plugin_files: usize = self.steps.iter()
+        let plugin_files: usize = self
+            .steps
+            .iter()
             .flat_map(|s| &s.plugin_groups)
             .flat_map(|g| &g.plugins)
             .map(|p| p.files.len())
             .sum();
-        
+
         let required = self.required_files.len();
-        let conditional: usize = self.conditional_files.iter()
-            .map(|c| c.files.len())
-            .sum();
-        
+        let conditional: usize = self.conditional_files.iter().map(|c| c.files.len()).sum();
+
         plugin_files + required + conditional
     }
 
     /// Validate the project structure
     pub fn validate(&self) -> Vec<ValidationError> {
         let mut errors = Vec::new();
-        
+
         if self.name.is_empty() {
             errors.push(ValidationError::NoName);
         }
-        
+
         if self.steps.is_empty() && self.required_files.is_empty() {
             errors.push(ValidationError::NoSteps);
         }
-        
+
         for (i, step) in self.steps.iter().enumerate() {
             if step.name.is_empty() {
                 errors.push(ValidationError::EmptyStep { step: i + 1 });
             }
-            
+
             for (j, group) in step.plugin_groups.iter().enumerate() {
                 if group.name.is_empty() {
                     errors.push(ValidationError::EmptyGroup {
@@ -711,7 +1267,7 @@ impl Ximod {
                         group: j + 1,
                     });
                 }
-                
+
                 if group.plugins.is_empty() {
                     errors.push(ValidationError::NoPlugins {
                         step: i + 1,
@@ -720,7 +1276,7 @@ impl Ximod {
                 }
             }
         }
-        
+
         errors
     }
 }
@@ -756,7 +1312,10 @@ mod tests {
     #[test]
     fn test_proper_destination_path() {
         assert_eq!(get_proper_destination_path("textures\\test.dds"), "textures\\test.dds");
-        assert_eq!(get_proper_destination_path("MyMod\\textures\\test.dds"), "textures\\test.dds");
+        assert_eq!(
+            get_proper_destination_path("MyMod\\textures\\test.dds"),
+            "textures\\test.dds"
+        );
         assert_eq!(get_proper_destination_path("MyMod.esp"), "MyMod.esp");
         assert_eq!(get_proper_destination_path("Data\\MyMod.esp"), "MyMod.esp");
     }
@@ -811,6 +1370,125 @@ mod tests {
                 .flat_map(|p| &p.files)
                 .all(|f| f.destination == "textures")
         );
+    }
+
+    /// Lot N: the group helpers (paths, leaves, depth, removal, flat view).
+    #[test]
+    fn dependency_group_helpers() {
+        let mut g = DependencyGroup::new(LogicalOperator::And);
+        assert!(g.is_empty());
+        assert_eq!(g.depth(), 0);
+        assert_eq!(g.flat(), Some((LogicalOperator::And, Vec::new())));
+        g.push_leaf(Dependency::new_flag("a", "1"));
+        let mut or = DependencyGroup::new(LogicalOperator::Or);
+        or.push_leaf(Dependency::new_flag("b", "2"));
+        let mut deep = DependencyGroup::new(LogicalOperator::And);
+        deep.push_leaf(Dependency::new_file("X.esm", "Active"));
+        deep.push_leaf(Dependency::new_game("1.6"));
+        or.push_group(deep);
+        g.push_group(or);
+        g.push_leaf(Dependency::new_fomm("0.13"));
+
+        assert!(!g.is_empty());
+        assert!(g.has_groups());
+        assert_eq!(g.flat(), None);
+        assert_eq!(g.depth(), 2);
+        assert_eq!(g.leaf_count(), 5);
+        let names: Vec<String> = g.leaves().map(|d| d.display_name()).collect();
+        assert_eq!(
+            names,
+            vec![
+                "[Flag] a = 1",
+                "[Flag] b = 2",
+                "[File] X.esm (Active)",
+                "[Game] >= 1.6",
+                "[Mod manager] >= 0.13",
+            ]
+        );
+        let mut visited = 0;
+        g.visit(|_| visited += 1);
+        assert_eq!(visited, 5);
+
+        // Paths.
+        assert_eq!(g.get_path(&[]), None);
+        assert_eq!(
+            g.get_path(&[0]),
+            Some(&DependencyItem::Leaf(Dependency::new_flag("a", "1")))
+        );
+        assert_eq!(
+            g.get_path(&[1, 1, 1]),
+            Some(&DependencyItem::Leaf(Dependency::new_game("1.6")))
+        );
+        assert_eq!(g.get_path(&[1, 1, 9]), None);
+        assert_eq!(g.get_path(&[0, 0]), None, "a leaf has no children");
+        assert_eq!(g.group_at(&[]).map(|x| x.operator), Some(LogicalOperator::And));
+        assert_eq!(g.group_at(&[1]).map(|x| x.operator), Some(LogicalOperator::Or));
+        assert_eq!(g.group_at(&[0]), None);
+        g.group_at_mut(&[1, 1]).unwrap().operator = LogicalOperator::Or;
+        assert_eq!(g.group_at(&[1, 1]).unwrap().operator, LogicalOperator::Or);
+        if let Some(DependencyItem::Leaf(d)) = g.get_path_mut(&[1, 0]) {
+            d.value = "changed".into();
+        }
+        assert_eq!(g.leaves().nth(1).unwrap().value, "changed");
+        for d in g.leaves_mut() {
+            if d.is_file() {
+                d.value = "Missing".into();
+            }
+        }
+        assert_eq!(g.leaves().nth(2).unwrap().value, "Missing");
+
+        // Removal.
+        assert_eq!(g.remove_path(&[]), None);
+        assert_eq!(g.remove_path(&[7]), None);
+        assert_eq!(
+            g.remove_path(&[1, 1, 1]),
+            Some(DependencyItem::Leaf(Dependency::new_game("1.6")))
+        );
+        assert_eq!(g.leaf_count(), 4);
+        assert!(g.remove_path(&[1]).is_some_and(|i| i.as_group().is_some()));
+        assert_eq!(g.depth(), 0);
+        assert_eq!(g.leaf_count(), 2);
+        assert_eq!(g.retain_leaves(|d| !d.is_version()), 1);
+        assert_eq!(g.leaf_count(), 1);
+
+        // Leaf kinds.
+        assert!(Dependency::new_game("1").is_version());
+        assert!(!Dependency::new_game("").is_complete());
+        assert!(!Dependency::new_flag("", "x").is_complete());
+        assert!(Dependency::new_file("a", "").is_complete());
+        assert_eq!(DependencyType::from_str("GAME"), DependencyType::Game);
+        assert_eq!(DependencyType::from_str("nope"), DependencyType::Flag);
+    }
+
+    /// Lot N: the project-wide walkers see leaves at every depth.
+    #[test]
+    fn project_walkers_descend_into_groups() {
+        let mut m = Ximod::new("W");
+        let mut s = Step::new("S");
+        let mut or = DependencyGroup::new(LogicalOperator::Or);
+        or.push_leaf(Dependency::new_file("Deep.esm", "Active"));
+        or.push_leaf(Dependency::new_flag("deep", "1"));
+        s.visibility.push_group(or);
+        s.visibility.push_leaf(Dependency::new_flag("top", "1"));
+        m.steps.push(s);
+        m.module_dependencies = Some(DependencyGroup::from_leaves(
+            LogicalOperator::And,
+            vec![Dependency::new_file("Mod.esm", "Active"), Dependency::new_game("1")],
+        ));
+        assert_eq!(m.get_all_dependency_names(), vec!["Deep.esm", "deep", "top"]);
+        assert_eq!(m.get_all_file_names(), vec!["Deep.esm", "Mod.esm"]);
+        assert_eq!(m.all_leaves().len(), 5);
+        let mut sites = Vec::new();
+        m.for_each_condition(|site, _| sites.push(site));
+        assert_eq!(
+            sites,
+            vec![ConditionSite::Module, ConditionSite::StepVisibility { step: 0 }]
+        );
+        m.for_each_condition_mut(|_, g| g.operator = LogicalOperator::Or);
+        assert_eq!(m.steps[0].visibility.operator, LogicalOperator::Or);
+        assert!(m.has_module_dependencies());
+        m.module_dependencies = Some(DependencyGroup::default());
+        assert!(!m.has_module_dependencies());
     }
 
     #[test]

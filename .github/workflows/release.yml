@@ -51,7 +51,7 @@ jobs:
           cp "${MANIFEST_DIR}/packaging/linux/install.sh" "$STAGE/" 2>/dev/null || true
           cp "${MANIFEST_DIR}/packaging/linux/ximod-architect.desktop" "$STAGE/" 2>/dev/null || true
           tar czf "${STAGE}.tar.gz" "$STAGE"
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v5
         with:
           name: linux
           path: "*.tar.gz"
@@ -85,7 +85,7 @@ jobs:
             '; Its presence keeps settings in this folder instead of %APPDATA%.'
           ) | Set-Content -Path "$Stage/Config.ini" -Encoding ascii
           Compress-Archive -Path "$Stage/*" -DestinationPath "$Stage.zip" -Force
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v5
         with:
           name: windows
           path: "*.zip"
@@ -98,7 +98,7 @@ jobs:
           $Version = $env:GITHUB_REF_NAME -replace '^v',''
           $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
           & "$iscc" "/DMyAppVersion=$Version" "packaging\windows\ximod-architect.iss"
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v5
         with:
           name: windows-installer
           path: ${{ env.MANIFEST_DIR }}/installer/*.exe
@@ -153,7 +153,7 @@ jobs:
           cd dist
           ditto -c -k --keepParent "XIMOD Architect.app" "ximod-architect-${VERSION}-macos-universal.app.zip"
           for f in *.dmg; do [ -f "$f" ] && mv "$f" "ximod-architect-${VERSION}-macos-universal.dmg"; done
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v5
         with:
           name: macos
           path: |
@@ -166,14 +166,16 @@ jobs:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     steps:
-      - uses: actions/checkout@v5            # <-- ajouté : pour lire le fichier de notes
-      - uses: actions/download-artifact@v6
+      - uses: actions/checkout@v5            # pour lire le fichier de notes
+      - uses: actions/download-artifact@v5
         with:
           path: artifacts
       - name: Publier la Release GitHub
         uses: softprops/action-gh-release@v2
         with:
           files: artifacts/**/*
-          body_path: RELEASE_NOTES_${{ github.ref_name }}.md   # <-- ta note, par tag
-#          generate_release_notes: true
+          # Notes de version du tag (ex. RELEASE_NOTES_v2.0.0.md), completees par
+          # la liste des commits generee par GitHub.
+          body_path: ${{ env.MANIFEST_DIR }}/RELEASE_NOTES_${{ github.ref_name }}.md
+          generate_release_notes: true
           fail_on_unmatched_files: true

@@ -31,6 +31,38 @@ const CELL_H: f32 = 70.0;
 /// Row height = flag + caption + spacing.
 const ROW_H: f32 = CELL_H + 26.0;
 
+/// One selectable flag: a country whose flag file exists on disk.
+struct FlagEntry {
+    a3: String,
+    /// Caption under the flag (endonym, else English, else French name).
+    label: String,
+    /// `file://` URI of the flag image.
+    uri: String,
+    /// Lower-cased French name, English name and alpha-3, for filtering.
+    hay: [String; 3],
+}
+
+/// Per-window cache, kept in egui's temporary storage (cheap to clone: two
+/// `Arc`s). It replaces work that used to run on every frame: locating the
+/// flag folder, lower-casing three strings per country and one `stat` per flag.
+#[derive(Clone)]
+struct FlagCache {
+    /// Identity (address, length) of the country table `all` was built from;
+    /// the table is replaced wholesale when the reference data is reloaded.
+    src: (usize, usize),
+    /// Every country with an existing flag file, in table order. Built when
+    /// the picker opens (the cache is dropped when it closes).
+    all: std::sync::Arc<Vec<FlagEntry>>,
+    /// Raw filter text `shown` was computed for.
+    filter: std::sync::Arc<str>,
+    /// Indices into `all` matching `filter`.
+    shown: std::sync::Arc<Vec<u32>>,
+}
+
+fn flag_cache_id() -> egui::Id {
+    egui::Id::new("ximod_flag_picker_cache")
+}
+
 /// Keyboard navigation for the 2-D flag grid. Consumes the keys. Returns:
 ///   * whether the cursor moved,
 ///   * the vertical scroll offset to force this frame to keep the cursor visible
@@ -180,9 +212,52 @@ fn handle_flag_keys(
 }
 
 impl XimodApp {
+    /// Every country that has a flag file on disk, in table order. Touches the
+    /// filesystem (one `stat` per flag): call it when the picker opens, not on
+    /// every frame.
+    fn build_flag_entries(&self) -> Vec<FlagEntry> {
+        let Some(dir) = crate::data::flags_dir() else {
+            return Vec::new();
+        };
+        self.countries
+            .countries
+            .iter()
+            .filter(|c| !c.flag.is_empty())
+            .filter_map(|c| {
+                let path = dir.join(&c.flag);
+                if !path.is_file() {
+                    return None;
+                }
+                // Caption under the flag: the country's name in its first
+                // official (endonym) language; fall back to English, then French.
+                let label = c
+                    .languages
+                    .iter()
+                    .map(|l| l.country_endonym.trim())
+                    .find(|s| !s.is_empty())
+                    .map(|s| s.to_string())
+                    .unwrap_or_else(|| {
+                        if c.name_en.is_empty() {
+                            c.name_fr.clone()
+                        } else {
+                            c.name_en.clone()
+                        }
+                    });
+                Some(FlagEntry {
+                    a3: c.a3.clone(),
+                    label,
+                    uri: crate::ui::components::file_uri(&path),
+                    hay: [c.name_fr.to_lowercase(), c.name_en.to_lowercase(), c.a3.to_lowercase()],
+                })
+            })
+            .collect()
+    }
+
     /// Render the flag picker window.
     pub fn render_flag_picker(&mut self, ctx: &egui::Context) {
         if !self.show_flag_picker {
+            // Drop the cache: the next opening re-reads the flag folder.
+            ctx.data_mut(|d| d.remove::<FlagCache>(flag_cache_id()));
             self.free_window_closed("ximod_flag_picker");
             return;
         }
@@ -192,60 +267,68 @@ impl XimodApp {
         let lbl_none = self.i18n.t("flags-none");
 
         // Countries that actually have a flag file, filtered by the search box.
-        let dir = crate::data::flags_dir();
-        let needle = self.flag_filter.trim().to_lowercase();
-        let entries: Vec<(String, String, std::path::PathBuf)> = match &dir {
-            Some(d) => self
-                .countries
-                .countries
-                .iter()
-                .filter(|c| !c.flag.is_empty())
-                .filter(|c| {
-                    needle.is_empty()
-                        || c.name_fr.to_lowercase().contains(&needle)
-                        || c.name_en.to_lowercase().contains(&needle)
-                        || c.a3.to_lowercase().contains(&needle)
-                })
-                .map(|c| {
-                    // Caption under the flag: the country's name in its first
-                    // official (endonym) language; fall back to English, then French.
-                    let label = c
-                        .languages
-                        .iter()
-                        .map(|l| l.country_endonym.trim())
-                        .find(|s| !s.is_empty())
-                        .map(|s| s.to_string())
-                        .unwrap_or_else(|| {
-                            if c.name_en.is_empty() {
-                                c.name_fr.clone()
-                            } else {
-                                c.name_en.clone()
-                            }
-                        });
-                    (c.a3.clone(), label, d.join(&c.flag))
-                })
-                .filter(|(_, _, p)| p.is_file())
-                .collect(),
-            None => Vec::new(),
+        // The full list is built once per opening (or when the country table
+        // is reloaded); the filtered view only when the filter text changes.
+        let src = (
+            self.countries.countries.as_ptr() as usize,
+            self.countries.countries.len(),
+        );
+        let cached = ctx.data(|d| d.get_temp::<FlagCache>(flag_cache_id()));
+        let cache = match cached {
+            Some(c) if c.src == src && *c.filter == *self.flag_filter => c,
+            stale => {
+                let all = match stale {
+                    Some(c) if c.src == src => c.all,
+                    _ => std::sync::Arc::new(self.build_flag_entries()),
+                };
+                let needle = self.flag_filter.trim().to_lowercase();
+                let shown: Vec<u32> = all
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, e)| needle.is_empty() || e.hay.iter().any(|h| h.contains(&needle)))
+                    .map(|(i, _)| i as u32)
+                    .collect();
+                let c = FlagCache {
+                    src,
+                    all,
+                    filter: self.flag_filter.as_str().into(),
+                    shown: std::sync::Arc::new(shown),
+                };
+                ctx.data_mut(|d| d.insert_temp(flag_cache_id(), c.clone()));
+                c
+            }
         };
+        let all = cache.all;
+        let shown = cache.shown;
+        // Filtered entry by position in the grid.
+        let entry_at = |idx: usize| shown.get(idx).and_then(|&i| all.get(i as usize));
 
         let mut do_close = false;
         let mut chosen: Option<String> = None;
 
         // Independent OS-level window (viewport): freely movable, including onto
         // a second screen and over the (also free) translation editor window.
-        let vb = self.free_viewport_builder(ctx, "ximod_flag_picker", title, [760.0, 520.0], false);
-        ctx.show_viewport_immediate(
-            egui::ViewportId::from_hash_of("ximod_flag_picker"),
-            vb,
-            |ctx, _class| {
-                egui::CentralPanel::default().show(ctx, |ui| {
+        // On the first launch the Settings window is kept "always on top"; the
+        // picker opened from it must then be on top too, and take the focus,
+        // or it would open behind it.
+        let vb = self
+            .free_viewport_builder(ctx, "ximod_flag_picker", title, [760.0, 520.0], false)
+            .with_window_level(if self.settings_on_top {
+                egui::WindowLevel::AlwaysOnTop
+            } else {
+                egui::WindowLevel::Normal
+            });
+        let picker_vp = egui::ViewportId::from_hash_of("ximod_flag_picker");
+        if self.flag_picker_focus_frames > 0 {
+            self.flag_picker_focus_frames -= 1;
+            ctx.send_viewport_cmd_to(picker_vp, egui::ViewportCommand::Focus);
+            ctx.request_repaint();
+        }
+        ctx.show_viewport_immediate(picker_vp, vb, |ctx, _class| {
+            egui::CentralPanel::default().show(ctx, |ui| {
                 ui.horizontal(|ui| {
                     ui.label(&lbl_filter);
-                    ui.add(
-                        egui::TextEdit::singleline(&mut self.flag_filter)
-                            .desired_width(220.0),
-                    );
+                    ui.add(egui::TextEdit::singleline(&mut self.flag_filter).desired_width(220.0));
                     if crate::ui::components::delete_button(ui).clicked() {
                         self.flag_filter.clear();
                     }
@@ -254,7 +337,7 @@ impl XimodApp {
 
                 // Keyboard navigation (2-D grid). Active before the empty check so
                 // Escape still closes when there are no results.
-                let n = entries.len();
+                let n = shown.len();
                 let editing = ctx.wants_keyboard_input();
                 // Row pitch as used by ScrollArea::show_rows (row height + spacing).
                 let pitch = ROW_H + ui.spacing().item_spacing.y;
@@ -277,19 +360,17 @@ impl XimodApp {
                 if key_close {
                     do_close = true;
                 }
-                if key_enter {
-                    if let Some((a3, _, _)) = entries.get(self.flag_cursor) {
-                        chosen = Some(a3.clone());
-                    }
+                if key_enter && let Some(e) = entry_at(self.flag_cursor) {
+                    chosen = Some(e.a3.clone());
                 }
 
-                if entries.is_empty() {
+                if shown.is_empty() {
                     ui.label(&lbl_none);
                     return;
                 }
 
                 let cursor_col = ui.visuals().selection.bg_fill;
-                let rows = (entries.len() + COLUMNS - 1) / COLUMNS;
+                let rows = shown.len().div_ceil(COLUMNS);
                 let mut area = egui::ScrollArea::both().auto_shrink([false, false]);
                 if let Some(off) = target_off {
                     area = area.vertical_scroll_offset(off);
@@ -304,9 +385,10 @@ impl XimodApp {
                             ui.add_space(GRID_LEAD);
                             for col in 0..COLUMNS {
                                 let idx = row * COLUMNS + col;
-                                let Some((a3, label, path)) = entries.get(idx) else {
+                                let Some(entry) = entry_at(idx) else {
                                     break;
                                 };
+                                let (a3, label) = (&entry.a3, &entry.label);
                                 ui.vertical(|ui| {
                                     let current = match self.flag_target {
                                         FlagTarget::Settings => &self.temp_country,
@@ -314,11 +396,8 @@ impl XimodApp {
                                     };
                                     let selected = current == a3;
                                     let is_cursor = idx == self.flag_cursor;
-                                    let img = egui::Image::from_uri(format!(
-                                        "file://{}",
-                                        path.display()
-                                    ))
-                                    .fit_to_exact_size(egui::vec2(CELL_W, CELL_H));
+                                    let img = egui::Image::from_uri(entry.uri.as_str())
+                                        .fit_to_exact_size(egui::vec2(CELL_W, CELL_H));
                                     let resp = ui
                                         .add_sized(
                                             egui::vec2(CELL_W, CELL_H),
@@ -340,10 +419,8 @@ impl XimodApp {
                                     // Caption, truncated to the cell width.
                                     ui.allocate_ui(egui::vec2(CELL_W, 18.0), |ui| {
                                         ui.add(
-                                            egui::Label::new(
-                                                egui::RichText::new(label).small(),
-                                            )
-                                            .wrap_mode(egui::TextWrapMode::Truncate),
+                                            egui::Label::new(egui::RichText::new(label).small())
+                                                .wrap_mode(egui::TextWrapMode::Truncate),
                                         );
                                     });
                                 });
@@ -353,14 +430,13 @@ impl XimodApp {
                 });
                 self.flag_scroll_offset = out.state.offset.y;
                 self.flag_viewport_h = out.inner_rect.height();
-                });
+            });
 
-                crate::ui::main_window::record_win_geom(&mut self.config, ctx, "ximod_flag_picker");
-                if ctx.input(|i| i.viewport().close_requested()) {
-                    do_close = true;
-                }
-            },
-        );
+            crate::ui::widgets::free_window::record_win_geom(&mut self.config, ctx, "ximod_flag_picker");
+            if ctx.input(|i| i.viewport().close_requested()) {
+                do_close = true;
+            }
+        });
 
         if let Some(a3) = chosen {
             match self.flag_target {
@@ -379,21 +455,21 @@ impl XimodApp {
                         // No official language listed: fall back to the first
                         // spoken language so the drop-down never shows a stale value.
                         let langs = self.country_languages.languages_for(&self.temp_country);
-                        if !langs.iter().any(|l| *l == self.temp_locale) {
-                            if let Some(first) = langs.first() {
-                                self.temp_locale = first.clone();
-                            }
+                        if !langs.contains(&self.temp_locale)
+                            && let Some(first) = langs.first()
+                        {
+                            self.temp_locale = first.clone();
                         }
                     }
                 }
                 FlagTarget::Translation => {
                     self.trans_country = a3;
                     let langs = self.country_languages.languages_for(&self.trans_country);
-                    if !langs.iter().any(|l| *l == self.trans_target_lang) {
-                        if let Some(first) = langs.first() {
-                            self.trans_target_lang = first.clone();
-                            self.load_translation_entries();
-                        }
+                    if !langs.contains(&self.trans_target_lang)
+                        && let Some(first) = langs.first()
+                    {
+                        self.trans_target_lang = first.clone();
+                        self.load_translation_entries();
                     }
                     self.refresh_translation_meta();
                 }
@@ -404,6 +480,14 @@ impl XimodApp {
         if do_close {
             self.show_flag_picker = false;
             self.free_window_closed("ximod_flag_picker");
+        }
+        if !self.show_flag_picker {
+            self.flag_picker_focus_frames = 0;
+            // Hand the focus back to the Settings window on the first launch,
+            // so it does not end up behind the main window in turn.
+            if self.settings_on_top && self.show_settings {
+                self.settings_focus_frames = 5;
+            }
         }
     }
 }

@@ -4,14 +4,14 @@
 //! and taskbar on all platforms.
 
 use eframe::egui;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// Get the path to the application icon based on the platform
 pub fn get_icon_path() -> Option<PathBuf> {
     let exe_dir = std::env::current_exe()
         .ok()
         .and_then(|p| p.parent().map(|p| p.to_path_buf()))?;
-    
+
     #[cfg(target_os = "windows")]
     {
         // On Windows, look for .ico file (also works with .png)
@@ -25,7 +25,7 @@ pub fn get_icon_path() -> Option<PathBuf> {
             return Some(png_path);
         }
     }
-    
+
     #[cfg(target_os = "linux")]
     {
         // On Linux, prefer PNG for runtime icon (SVG is for desktop integration)
@@ -45,7 +45,7 @@ pub fn get_icon_path() -> Option<PathBuf> {
             }
         }
     }
-    
+
     #[cfg(target_os = "macos")]
     {
         // On macOS, the icon is in the app bundle, but we can also load PNG for runtime
@@ -61,30 +61,27 @@ pub fn get_icon_path() -> Option<PathBuf> {
             }
         }
     }
-    
+
     None
 }
 
 /// Load the application icon as IconData for eframe
 pub fn load_icon() -> Option<egui::IconData> {
     // First try to load from file next to executable
-    if let Some(path) = get_icon_path() {
-        if let Ok(data) = std::fs::read(&path) {
-            return load_icon_from_bytes(&data, &path);
-        }
+    if let Some(path) = get_icon_path()
+        && let Ok(data) = std::fs::read(&path)
+    {
+        return load_icon_from_bytes(&data, &path);
     }
-    
+
     // Fallback: try to load embedded icon (if we embed one in the future)
     None
 }
 
 /// Load icon from bytes (supports PNG and ICO)
-fn load_icon_from_bytes(data: &[u8], path: &PathBuf) -> Option<egui::IconData> {
-    let extension = path.extension()
-        .and_then(|e| e.to_str())
-        .unwrap_or("")
-        .to_lowercase();
-    
+fn load_icon_from_bytes(data: &[u8], path: &Path) -> Option<egui::IconData> {
+    let extension = path.extension().and_then(|e| e.to_str()).unwrap_or("").to_lowercase();
+
     match extension.as_str() {
         "png" => load_png_icon(data),
         "ico" => load_ico_icon(data),
@@ -100,7 +97,7 @@ fn load_png_icon(data: &[u8]) -> Option<egui::IconData> {
     let image = image::load_from_memory(data).ok()?;
     let rgba = image.to_rgba8();
     let (width, height) = rgba.dimensions();
-    
+
     Some(egui::IconData {
         rgba: rgba.into_raw(),
         width,
@@ -114,7 +111,7 @@ fn load_ico_icon(data: &[u8]) -> Option<egui::IconData> {
     let image = image::DynamicImage::from_decoder(icon_dir).ok()?;
     let rgba = image.to_rgba8();
     let (width, height) = rgba.dimensions();
-    
+
     Some(egui::IconData {
         rgba: rgba.into_raw(),
         width,

@@ -6,6 +6,14 @@
     "fallout3": {
       "name": "Fallout 3",
       "nexusSlug": "fallout3",
+      "masters": [
+        "Fallout3.esm",
+        "Anchorage.esm",
+        "ThePitt.esm",
+        "BrokenSteel.esm",
+        "PointLookout.esm",
+        "Zeta.esm"
+      ],
       "categories": [
         "Ammo",
         "Animation",
@@ -47,6 +55,15 @@
     "fallout4": {
       "name": "Fallout 4",
       "nexusSlug": "fallout4",
+      "masters": [
+        "Fallout4.esm",
+        "DLCRobot.esm",
+        "DLCworkshop01.esm",
+        "DLCCoast.esm",
+        "DLCworkshop02.esm",
+        "DLCworkshop03.esm",
+        "DLCNukaWorld.esm"
+      ],
       "categories": [
         "Ammo",
         "Animation",
@@ -113,6 +130,15 @@
     "fallout4VR": {
       "name": "Fallout 4 VR",
       "nexusSlug": "fallout4vr",
+      "masters": [
+        "Fallout4.esm",
+        "DLCRobot.esm",
+        "DLCworkshop01.esm",
+        "DLCCoast.esm",
+        "DLCworkshop02.esm",
+        "DLCworkshop03.esm",
+        "DLCNukaWorld.esm"
+      ],
       "categories": [
         "Ammo",
         "Animation",
@@ -179,6 +205,18 @@
     "falloutNewVegas": {
       "name": "Fallout: New Vegas",
       "nexusSlug": "newvegas",
+      "masters": [
+        "FalloutNV.esm",
+        "DeadMoney.esm",
+        "HonestHearts.esm",
+        "OldWorldBlues.esm",
+        "LonesomeRoad.esm",
+        "GunRunnersArsenal.esm",
+        "CaravanPack.esm",
+        "ClassicPack.esm",
+        "MercenaryPack.esm",
+        "TribalPack.esm"
+      ],
       "categories": [
         "Ammo",
         "Animation",
@@ -224,6 +262,11 @@
     "morrowind": {
       "name": "Morrowind",
       "nexusSlug": "morrowind",
+      "masters": [
+        "Morrowind.esm",
+        "Tribunal.esm",
+        "Bloodmoon.esm"
+      ],
       "categories": [
         "Animations",
         "Armour",
@@ -265,6 +308,18 @@
     "starfield": {
       "name": "Starfield",
       "nexusSlug": "starfield",
+      "masters": [
+        "Starfield.esm",
+        "Constellation.esm",
+        "OldMars.esm",
+        "BlueprintShips-Starfield.esm",
+        "SFBGS003.esm",
+        "SFBGS004.esm",
+        "SFBGS006.esm",
+        "SFBGS007.esm",
+        "SFBGS008.esm"
+      ],
+      "eslLimit": 4096,
       "categories": [
         "Animations",
         "Appearance",
@@ -298,6 +353,9 @@
     "oblivion": {
       "name": "The Elder Scrolls IV: Oblivion",
       "nexusSlug": "oblivion",
+      "masters": [
+        "Oblivion.esm"
+      ],
       "categories": [
         "Animals, Creatures, Mounts & Horses",
         "Animation",
@@ -356,6 +414,9 @@
     "oblivionremastered": {
       "name": "The Elder Scrolls IV: Oblivion Remastered",
       "nexusSlug": "oblivionremastered",
+      "masters": [
+        "Oblivion.esm"
+      ],
       "categories": [
         ".esp",
         "Animations",
@@ -387,6 +448,13 @@
     "skyrim": {
       "name": "The Elder Scrolls V: Skyrim (Legendary/Oldrim)",
       "nexusSlug": "skyrim",
+      "masters": [
+        "Skyrim.esm",
+        "Update.esm",
+        "Dawnguard.esm",
+        "HearthFires.esm",
+        "Dragonborn.esm"
+      ],
       "categories": [
         "Alchemy",
         "Animation",
@@ -454,6 +522,18 @@
     "skyrimSpecialEdition": {
       "name": "The Elder Scrolls V: Skyrim Special Edition",
       "nexusSlug": "skyrimspecialedition",
+      "masters": [
+        "Skyrim.esm",
+        "Update.esm",
+        "Dawnguard.esm",
+        "HearthFires.esm",
+        "Dragonborn.esm",
+        "ccBGSSSE001-Fish.esm",
+        "ccBGSSSE025-AdvDSGS.esm",
+        "ccBGSSSE037-Curios.esl",
+        "ccQDRSSE001-SurvivalMode.esl",
+        "_ResourcePack.esl"
+      ],
       "categories": [
         "Alchemy",
         "Animation",
@@ -508,6 +588,13 @@
     "skyrimVR": {
       "name": "The Elder Scrolls V: Skyrim VR",
       "nexusSlug": "skyrimvr",
+      "masters": [
+        "Skyrim.esm",
+        "Update.esm",
+        "Dawnguard.esm",
+        "HearthFires.esm",
+        "Dragonborn.esm"
+      ],
       "categories": [
         "Alchemy",
         "Animation",

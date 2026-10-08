@@ -62,21 +62,19 @@ const LANGUAGE_MAP: &[(&str, &str, &str)] = &[
 #[allow(dead_code)]
 pub fn iso639_1_to_3(code: &str) -> String {
     let code_lower = code.to_lowercase();
-    
+
     // Check if it's already an ISO 639-3 code
-    if code_lower.len() == 3 {
-        if LANGUAGE_MAP.iter().any(|(_, iso3, _)| *iso3 == code_lower) {
-            return code_lower;
-        }
+    if code_lower.len() == 3 && LANGUAGE_MAP.iter().any(|(_, iso3, _)| *iso3 == code_lower) {
+        return code_lower;
     }
-    
+
     // Map from ISO 639-1 to ISO 639-3
     for (iso1, iso3, _) in LANGUAGE_MAP {
         if *iso1 == code_lower {
             return iso3.to_string();
         }
     }
-    
+
     // Default to English if unknown
     "eng".to_string()
 }
@@ -84,21 +82,19 @@ pub fn iso639_1_to_3(code: &str) -> String {
 /// Convert ISO 639-3 code to ISO 639-1 code
 pub fn iso639_3_to_1(code: &str) -> String {
     let code_lower = code.to_lowercase();
-    
+
     // Check if it's already an ISO 639-1 code
-    if code_lower.len() == 2 {
-        if LANGUAGE_MAP.iter().any(|(iso1, _, _)| *iso1 == code_lower) {
-            return code_lower;
-        }
+    if code_lower.len() == 2 && LANGUAGE_MAP.iter().any(|(iso1, _, _)| *iso1 == code_lower) {
+        return code_lower;
     }
-    
+
     // Map from ISO 639-3 to ISO 639-1
     for (iso1, iso3, _) in LANGUAGE_MAP {
         if *iso3 == code_lower {
             return iso1.to_string();
         }
     }
-    
+
     // Default to English if unknown
     "en".to_string()
 }
@@ -106,13 +102,13 @@ pub fn iso639_3_to_1(code: &str) -> String {
 /// Get display name for a locale code (accepts both ISO 639-1 and ISO 639-3)
 pub fn locale_display_name(locale: &str) -> &'static str {
     let locale_lower = locale.to_lowercase();
-    
+
     for (iso1, iso3, name) in LANGUAGE_MAP {
         if *iso1 == locale_lower || *iso3 == locale_lower {
             return name;
         }
     }
-    
+
     "Unknown"
 }
 
@@ -139,7 +135,7 @@ pub fn normalize_locale(code: &str) -> String {
 pub struct I18n {
     bundle: Option<FluentBundle<FluentResource>>,
     fallback_bundle: Option<FluentBundle<FluentResource>>,
-    current_locale: String,       // ISO 639-3 code
+    current_locale: String, // ISO 639-3 code
     locales_dir: PathBuf,
     available_locales: Vec<String>, // ISO 639-3 codes
     /// Canonical language table loaded from assets/data/Languages.json.
@@ -165,7 +161,7 @@ impl I18n {
             languages,
         }
     }
-    
+
     /// Get the locales directory path (next to executable)
     /// Locate the locales directory. Primary location is `assets/locales/`;
     /// the old `locales/` layout is kept as a fallback. Works both next to the
@@ -173,16 +169,16 @@ impl I18n {
     fn get_locales_dir() -> PathBuf {
         let mut candidates: Vec<PathBuf> = Vec::new();
 
-        if let Ok(exe) = std::env::current_exe() {
-            if let Some(dir) = exe.parent() {
-                candidates.push(dir.join("assets").join("locales"));
-                candidates.push(dir.join("locales"));
-                // macOS .app bundle: Contents/Resources/…
-                if let Some(up) = dir.parent() {
-                    let res = up.join("Resources");
-                    candidates.push(res.join("assets").join("locales"));
-                    candidates.push(res.join("locales"));
-                }
+        if let Ok(exe) = std::env::current_exe()
+            && let Some(dir) = exe.parent()
+        {
+            candidates.push(dir.join("assets").join("locales"));
+            candidates.push(dir.join("locales"));
+            // macOS .app bundle: Contents/Resources/…
+            if let Some(up) = dir.parent() {
+                let res = up.join("Resources");
+                candidates.push(res.join("assets").join("locales"));
+                candidates.push(res.join("locales"));
             }
         }
         // Development layout (running via `cargo run`).
@@ -196,33 +192,33 @@ impl I18n {
             .cloned()
             .unwrap_or_else(|| PathBuf::from("assets/locales"))
     }
-    
+
     /// Scan for available locales by checking for directories with main.ftl
     fn scan_available_locales(locales_dir: &PathBuf) -> Vec<String> {
         let mut locales = Vec::new();
-        
+
         if let Ok(entries) = std::fs::read_dir(locales_dir) {
             for entry in entries.flatten() {
                 let path = entry.path();
                 if path.is_dir() {
                     let main_ftl = path.join("main.ftl");
-                    if main_ftl.exists() {
-                        if let Some(dir_name) = path.file_name().and_then(|n| n.to_str()) {
-                            // Folder names are ISO 639-3; normalize handles a
-                            // stray 2-letter folder too, and preserves any
-                            // 3-letter code (incl. those absent from the table).
-                            locales.push(normalize_locale(dir_name));
-                        }
+                    if main_ftl.exists()
+                        && let Some(dir_name) = path.file_name().and_then(|n| n.to_str())
+                    {
+                        // Folder names are ISO 639-3; normalize handles a
+                        // stray 2-letter folder too, and preserves any
+                        // 3-letter code (incl. those absent from the table).
+                        locales.push(normalize_locale(dir_name));
                     }
                 }
             }
         }
-        
+
         // Sort alphabetically
         locales.sort();
         locales
     }
-    
+
     /// Refresh the list of available locales
     #[allow(dead_code)]
     pub fn refresh_available_locales(&mut self) {
@@ -232,12 +228,12 @@ impl I18n {
     /// Set the current locale (accepts both ISO 639-1 and ISO 639-3 codes)
     pub fn set_locale(&mut self, locale: &str) {
         let iso3_code = normalize_locale(locale);
-        
+
         tracing::info!("Setting locale: {} -> {}", locale, iso3_code);
-        
+
         // Clear current bundles
         self.bundle = None;
-        
+
         // Load the requested locale
         match self.load_locale_bundle(&iso3_code) {
             Some(bundle) => {
@@ -249,7 +245,7 @@ impl I18n {
                 tracing::warn!("Failed to load locale: {}, trying fallback", iso3_code);
             }
         }
-        
+
         // Load English as fallback if not already the current locale
         if iso3_code != "eng" {
             if self.fallback_bundle.is_none() {
@@ -258,24 +254,25 @@ impl I18n {
         } else {
             self.fallback_bundle = None;
         }
-        
+
         // If no bundle loaded, try English
-        if self.bundle.is_none() && iso3_code != "eng" {
-            if let Some(bundle) = self.load_locale_bundle("eng") {
-                self.bundle = Some(bundle);
-                self.current_locale = "eng".to_string();
-                tracing::info!("Fell back to English");
-            }
+        if self.bundle.is_none()
+            && iso3_code != "eng"
+            && let Some(bundle) = self.load_locale_bundle("eng")
+        {
+            self.bundle = Some(bundle);
+            self.current_locale = "eng".to_string();
+            tracing::info!("Fell back to English");
         }
     }
-    
+
     /// Load a locale bundle from disk
     fn load_locale_bundle(&self, iso3_code: &str) -> Option<FluentBundle<FluentResource>> {
         let locale_dir = self.locales_dir.join(iso3_code);
         let main_ftl = locale_dir.join("main.ftl");
-        
+
         tracing::debug!("Loading locale file: {:?}", main_ftl);
-        
+
         // Read main.ftl
         let content = match std::fs::read_to_string(&main_ftl) {
             Ok(c) => c,
@@ -284,7 +281,7 @@ impl I18n {
                 return None;
             }
         };
-        
+
         // Fluent language identifier: prefer the ISO 639-1 from Languages.json,
         // fall back to the built-in table, then to "en".
         let iso1_code = self
@@ -292,9 +289,8 @@ impl I18n {
             .iso3_to_iso1(iso3_code)
             .map(|s| s.to_string())
             .unwrap_or_else(|| iso639_3_to_1(iso3_code));
-        let lang_id: LanguageIdentifier = iso1_code.parse()
-            .unwrap_or_else(|_| "en".parse().unwrap());
-        
+        let lang_id: LanguageIdentifier = iso1_code.parse().unwrap_or_else(|_| "en".parse().unwrap());
+
         // Create the resource
         let resource = match FluentResource::try_new(content) {
             Ok(res) => res,
@@ -305,34 +301,38 @@ impl I18n {
                 res // Use partial resource
             }
         };
-        
+
         // Create the bundle
         let mut bundle = FluentBundle::new(vec![lang_id]);
+        // Fluent wraps every placeable in Unicode isolation marks (U+2068 /
+        // U+2069) by default. They are invisible in egui but they ended up in
+        // the default names ("Step { $num }") and therefore in ModuleConfig.xml,
+        // where other tools display them as garbage. egui does no bidi
+        // reordering anyway, so the marks buy nothing even for RTL locales.
+        bundle.set_use_isolating(false);
         if let Err(errors) = bundle.add_resource(resource) {
             for err in errors {
                 tracing::warn!("Fluent bundle error in {}: {:?}", iso3_code, err);
             }
         }
-        
+
         // Load additional .ftl files from the same directory
         if let Ok(entries) = std::fs::read_dir(&locale_dir) {
             for entry in entries.flatten() {
                 let path = entry.path();
-                if path.is_file() {
-                    if let Some(ext) = path.extension() {
-                        if ext == "ftl" && path.file_name() != Some(std::ffi::OsStr::new("main.ftl")) {
-                            if let Ok(additional_content) = std::fs::read_to_string(&path) {
-                                if let Ok(additional_resource) = FluentResource::try_new(additional_content) {
-                                    let _ = bundle.add_resource(additional_resource);
-                                    tracing::debug!("Loaded additional file: {:?}", path);
-                                }
-                            }
-                        }
-                    }
+                if path.is_file()
+                    && let Some(ext) = path.extension()
+                    && ext == "ftl"
+                    && path.file_name() != Some(std::ffi::OsStr::new("main.ftl"))
+                    && let Ok(additional_content) = std::fs::read_to_string(&path)
+                    && let Ok(additional_resource) = FluentResource::try_new(additional_content)
+                {
+                    let _ = bundle.add_resource(additional_resource);
+                    tracing::debug!("Loaded additional file: {:?}", path);
                 }
             }
         }
-        
+
         Some(bundle)
     }
 
@@ -365,7 +365,7 @@ impl I18n {
         }
         code.to_string()
     }
-    
+
     /// Get current locale as ISO 639-1 code (for Config.ini compatibility)
     #[allow(dead_code)]
     pub fn current_locale_iso1(&self) -> String {
@@ -376,13 +376,11 @@ impl I18n {
     pub fn available_locales(&self) -> &[String] {
         &self.available_locales
     }
-    
+
     /// Get available locales as ISO 639-1 codes
     #[allow(dead_code)]
     pub fn available_locales_iso1(&self) -> Vec<String> {
-        self.available_locales.iter()
-            .map(|iso3| iso639_3_to_1(iso3))
-            .collect()
+        self.available_locales.iter().map(|iso3| iso639_3_to_1(iso3)).collect()
     }
 
     /// The canonical language table (Languages.json), for the Properties window.
@@ -403,25 +401,23 @@ impl I18n {
     /// Translate a key with arguments
     pub fn t_with_args(&self, key: &str, args: Option<&FluentArgs>) -> String {
         // Try current locale bundle first
-        if let Some(bundle) = &self.bundle {
-            if let Some(msg) = bundle.get_message(key) {
-                if let Some(pattern) = msg.value() {
-                    let mut errors = vec![];
-                    let result = bundle.format_pattern(pattern, args, &mut errors);
-                    return result.to_string();
-                }
-            }
+        if let Some(bundle) = &self.bundle
+            && let Some(msg) = bundle.get_message(key)
+            && let Some(pattern) = msg.value()
+        {
+            let mut errors = vec![];
+            let result = bundle.format_pattern(pattern, args, &mut errors);
+            return result.to_string();
         }
 
         // Fall back to English bundle
-        if let Some(fallback) = &self.fallback_bundle {
-            if let Some(msg) = fallback.get_message(key) {
-                if let Some(pattern) = msg.value() {
-                    let mut errors = vec![];
-                    let result = fallback.format_pattern(pattern, args, &mut errors);
-                    return result.to_string();
-                }
-            }
+        if let Some(fallback) = &self.fallback_bundle
+            && let Some(msg) = fallback.get_message(key)
+            && let Some(pattern) = msg.value()
+        {
+            let mut errors = vec![];
+            let result = fallback.format_pattern(pattern, args, &mut errors);
+            return result.to_string();
         }
 
         // Return key if not found
@@ -463,19 +459,90 @@ impl Default for I18n {
 mod tests {
     use super::*;
 
+    /// Every locale must define every key of the English reference bundle:
+    /// the project rule is "no key is left to the English fallback".
+    #[test]
+    fn test_all_locales_define_every_key() {
+        fn keys(path: &std::path::Path) -> std::collections::BTreeSet<String> {
+            std::fs::read_to_string(path)
+                .unwrap_or_default()
+                .lines()
+                .filter_map(|l| {
+                    let (k, _) = l.split_once(" = ")?;
+                    let k = k.trim();
+                    (!k.is_empty() && !k.starts_with('#') && !k.starts_with('.')).then(|| k.to_string())
+                })
+                .collect()
+        }
+        let i18n = I18n::new();
+        let root = i18n.locales_dir().to_path_buf();
+        let reference = keys(&root.join("eng").join("main.ftl"));
+        assert!(
+            reference.len() > 300,
+            "reference bundle looks truncated: {}",
+            reference.len()
+        );
+        let mut failures = Vec::new();
+        for entry in std::fs::read_dir(&root).unwrap().flatten() {
+            let dir = entry.path();
+            if !dir.is_dir() {
+                continue;
+            }
+            let present = keys(&dir.join("main.ftl"));
+            let missing: Vec<&String> = reference.difference(&present).collect();
+            if !missing.is_empty() {
+                failures.push(format!("{}: {:?}", dir.display(), missing));
+            }
+        }
+        assert!(
+            failures.is_empty(),
+            "locales with missing keys:\n{}",
+            failures.join("\n")
+        );
+    }
+
+    /// The condition-editor templates use plain `{name}` placeholders filled
+    /// by the UI, written as Fluent string literals so they survive
+    /// formatting instead of being read as message references.
+    #[test]
+    fn test_condition_editor_templates_keep_brace_placeholders() {
+        let mut i18n = I18n::new();
+        for locale in ["eng", "fra", "deu", "jpn"] {
+            i18n.set_locale(locale);
+            let s = i18n.t("condeditor-setter-loc");
+            assert!(
+                s.contains("{step}") && s.contains("{group}") && s.contains("{name}"),
+                "{locale}: {s:?}"
+            );
+            let s = i18n.t("condeditor-needs");
+            assert!(s.contains("{ctx}") && s.contains("{value}"), "{locale}: {s:?}");
+        }
+    }
+
+    /// Regression test: Fluent isolation marks (U+2068/U+2069) used to wrap
+    /// every placeable and leaked into default step/group/plugin names.
+    #[test]
+    fn test_t_arg_has_no_isolation_marks() {
+        let mut i18n = I18n::new();
+        i18n.set_locale("eng");
+        let s = i18n.t_arg("default-step-name", "num", "1");
+        assert_eq!(s, "Step 1");
+        assert!(!s.chars().any(|c| ('\u{2066}'..='\u{2069}').contains(&c)));
+    }
+
     #[test]
     fn test_iso_conversion() {
         assert_eq!(iso639_1_to_3("en"), "eng");
         assert_eq!(iso639_1_to_3("fr"), "fra");
         assert_eq!(iso639_1_to_3("de"), "deu");
         assert_eq!(iso639_1_to_3("eng"), "eng"); // Already ISO 639-3
-        
+
         assert_eq!(iso639_3_to_1("eng"), "en");
         assert_eq!(iso639_3_to_1("fra"), "fr");
         assert_eq!(iso639_3_to_1("deu"), "de");
         assert_eq!(iso639_3_to_1("en"), "en"); // Already ISO 639-1
     }
-    
+
     #[test]
     fn test_locale_display_name() {
         assert_eq!(locale_display_name("en"), "English");

@@ -1,0 +1,46 @@
+name: CI
+
+# Integration continue : a chaque push (toutes branches) et sur chaque pull
+# request, verifie le formatage (rustfmt), les lints (clippy, warnings traites
+# comme des erreurs) et la suite de tests. Un seul job Linux : il reprend la
+# meme preparation systeme que release.yml.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request: {}
+
+permissions:
+  contents: read
+
+env:
+  # Si le crate n'est PAS a la racine du depot, indiquez ici son sous-dossier
+  # (ex: "app"). Par defaut, la racine.
+  MANIFEST_DIR: "."
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # ---------------------------------------------------------------- Linux -----
+  check:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Dependances systeme
+        run: |
+          chmod +x "${MANIFEST_DIR}/packaging/linux/build-deps.sh"
+          "${MANIFEST_DIR}/packaging/linux/build-deps.sh" -y
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ${{ env.MANIFEST_DIR }}
+      - name: Formatage (rustfmt)
+        working-directory: ${{ env.MANIFEST_DIR }}
+        run: cargo fmt --all --check
+      - name: Lints (clippy, warnings = erreurs)
+        working-directory: ${{ env.MANIFEST_DIR }}
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Tests
+        working-directory: ${{ env.MANIFEST_DIR }}
+        run: cargo test

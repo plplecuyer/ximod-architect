@@ -26,17 +26,17 @@ use std::path::PathBuf;
 pub fn find_data_file(filename: &str) -> Option<PathBuf> {
     let mut candidates: Vec<PathBuf> = Vec::new();
 
-    if let Ok(exe) = std::env::current_exe() {
-        if let Some(dir) = exe.parent() {
-            candidates.push(dir.join("assets").join("data").join(filename));
-            candidates.push(dir.join("data").join(filename));
-            candidates.push(dir.join(filename));
-            // macOS .app bundle: Contents/Resources/…
-            if let Some(up) = dir.parent() {
-                let res = up.join("Resources");
-                candidates.push(res.join("assets").join("data").join(filename));
-                candidates.push(res.join("data").join(filename));
-            }
+    if let Ok(exe) = std::env::current_exe()
+        && let Some(dir) = exe.parent()
+    {
+        candidates.push(dir.join("assets").join("data").join(filename));
+        candidates.push(dir.join("data").join(filename));
+        candidates.push(dir.join(filename));
+        // macOS .app bundle: Contents/Resources/…
+        if let Some(up) = dir.parent() {
+            let res = up.join("Resources");
+            candidates.push(res.join("assets").join("data").join(filename));
+            candidates.push(res.join("data").join(filename));
         }
     }
     // Development layout (running via `cargo run`).
@@ -53,12 +53,12 @@ pub fn flags_dir() -> Option<PathBuf> {
     let rel = PathBuf::from("assets").join("images").join("svg");
     let mut candidates: Vec<PathBuf> = Vec::new();
 
-    if let Ok(exe) = std::env::current_exe() {
-        if let Some(dir) = exe.parent() {
-            candidates.push(dir.join(&rel));
-            if let Some(up) = dir.parent() {
-                candidates.push(up.join("Resources").join(&rel));
-            }
+    if let Ok(exe) = std::env::current_exe()
+        && let Some(dir) = exe.parent()
+    {
+        candidates.push(dir.join(&rel));
+        if let Some(up) = dir.parent() {
+            candidates.push(up.join("Resources").join(&rel));
         }
     }
     candidates.push(rel);
@@ -136,6 +136,12 @@ pub struct LanguagesData {
     /// iso639-1 → index (built after load, not part of the JSON).
     #[serde(skip)]
     index_by_iso1: HashMap<String, usize>,
+    /// Every distinct, non-empty font name in the table, sorted (built after
+    /// load). The UI needs "all language fonts" whenever a window shows
+    /// endonyms in every script; scanning the 6 777 entries for that on every
+    /// frame was a measurable cost.
+    #[serde(skip)]
+    distinct_fonts: Vec<String>,
 }
 
 impl LanguagesData {
@@ -155,6 +161,20 @@ impl LanguagesData {
                 self.index_by_iso1.insert(lang.iso1.clone(), i);
             }
         }
+        let mut fonts: Vec<String> = self
+            .languages
+            .iter()
+            .filter(|l| !l.font.is_empty())
+            .map(|l| l.font.clone())
+            .collect();
+        fonts.sort();
+        fonts.dedup();
+        self.distinct_fonts = fonts;
+    }
+
+    /// Every distinct font name used by the language table, sorted.
+    pub fn distinct_fonts(&self) -> &[String] {
+        &self.distinct_fonts
     }
 
     fn get_iso3(&self, iso3: &str) -> Option<&LanguageEntry> {
@@ -173,31 +193,23 @@ impl LanguagesData {
 
     /// Font covering the script of an ISO 639-3 code, if declared.
     pub fn font_for(&self, iso3: &str) -> Option<&str> {
-        self.get_iso3(iso3)
-            .map(|l| l.font.as_str())
-            .filter(|s| !s.is_empty())
+        self.get_iso3(iso3).map(|l| l.font.as_str()).filter(|s| !s.is_empty())
     }
 
     /// ISO 639-3 → ISO 639-1 (None if the language has no 2-letter code).
     pub fn iso3_to_iso1(&self, iso3: &str) -> Option<&str> {
-        self.get_iso3(iso3)
-            .map(|l| l.iso1.as_str())
-            .filter(|s| !s.is_empty())
+        self.get_iso3(iso3).map(|l| l.iso1.as_str()).filter(|s| !s.is_empty())
     }
 
     /// ISO 639-1 → ISO 639-3.
     pub fn iso1_to_iso3(&self, iso1: &str) -> Option<&str> {
-        self.index_by_iso1
-            .get(iso1)
-            .map(|&i| self.languages[i].iso3.as_str())
+        self.index_by_iso1.get(iso1).map(|&i| self.languages[i].iso3.as_str())
     }
 
     /// Countries (ISO 3166-1 alpha-3) where a language is spoken.
     /// Reverse lookup, useful when offering a language to translate.
     pub fn countries_for(&self, iso3: &str) -> &[String] {
-        self.get_iso3(iso3)
-            .map(|l| l.countries.as_slice())
-            .unwrap_or(&[])
+        self.get_iso3(iso3).map(|l| l.countries.as_slice()).unwrap_or(&[])
     }
 
     pub fn is_empty(&self) -> bool {
@@ -304,7 +316,7 @@ impl CountriesData {
             .iter()
             .map(|c| (c.a3.clone(), c.name_fr.clone()))
             .collect();
-        list.sort_by(|a, b| a.1.to_lowercase().cmp(&b.1.to_lowercase()));
+        list.sort_by_key(|a| a.1.to_lowercase());
         list
     }
 
@@ -320,9 +332,7 @@ impl CountriesData {
 
     /// Flag file name for a country (e.g. "ZAF.svg").
     pub fn flag_for(&self, a3: &str) -> Option<&str> {
-        self.by_a3(a3)
-            .map(|c| c.flag.as_str())
-            .filter(|s| !s.is_empty())
+        self.by_a3(a3).map(|c| c.flag.as_str()).filter(|s| !s.is_empty())
     }
 
     /// The country's endonym in a given language, e.g. ("CHE", "ita") →

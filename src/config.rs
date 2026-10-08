@@ -41,14 +41,14 @@ impl Theme {
         // Try to detect system theme
         #[cfg(target_os = "windows")]
         {
-            use std::process::Command;
             #[cfg(windows)]
             use std::os::windows::process::CommandExt;
-            
+            use std::process::Command;
+
             // CREATE_NO_WINDOW flag to prevent console window flash
             #[cfg(windows)]
             const CREATE_NO_WINDOW: u32 = 0x08000000;
-            
+
             // Check Windows dark mode setting via registry
             let mut cmd = Command::new("reg");
             cmd.args([
@@ -57,10 +57,10 @@ impl Theme {
                 "/v",
                 "AppsUseLightTheme",
             ]);
-            
+
             #[cfg(windows)]
             cmd.creation_flags(CREATE_NO_WINDOW);
-            
+
             if let Ok(output) = cmd.output() {
                 let stdout = String::from_utf8_lossy(&output.stdout);
                 if stdout.contains("0x0") {
@@ -175,6 +175,18 @@ pub struct AppConfig {
     /// banner does not reappear for it. Stored as `SkipUpdateVersion`.
     pub skip_update_version: String,
 
+    /// Number of rotating backups of the FOMOD XML kept under
+    /// `<root>/fomod/backups/` (`0` disables them). Stored as `BackupCount`.
+    pub backup_count: usize,
+
+    /// Minutes between two recovery copies of the modified documents
+    /// (`0` disables the autosave). Stored as `AutosaveMinutes`.
+    pub autosave_minutes: u32,
+
+    /// Whether adding a plugin file to an option reads its header and adds its
+    /// missing masters as file dependencies. Stored as `AutoMasters`.
+    pub auto_masters: bool,
+
     /// Saved on-screen positions (outer top-left, in points) of the free tool
     /// windows, keyed by viewport id (e.g. "ximod_translation"). A window with
     /// no saved position opens centered on the main window; once the user moves
@@ -206,6 +218,9 @@ impl Default for AppConfig {
             check_updates: true,
             last_update_check: String::new(),
             skip_update_version: String::new(),
+            backup_count: 10,
+            autosave_minutes: 5,
+            auto_masters: true,
             window_positions: std::collections::HashMap::new(),
             window_sizes: std::collections::HashMap::new(),
         }
@@ -224,12 +239,11 @@ impl AppConfig {
     /// `/Applications`) can still save its settings without administrator rights.
     pub fn config_dir() -> Option<PathBuf> {
         // Portable mode: an existing Config.ini next to the executable wins.
-        if let Ok(exe) = std::env::current_exe() {
-            if let Some(dir) = exe.parent() {
-                if dir.join("Config.ini").is_file() {
-                    return Some(dir.to_path_buf());
-                }
-            }
+        if let Ok(exe) = std::env::current_exe()
+            && let Some(dir) = exe.parent()
+            && dir.join("Config.ini").is_file()
+        {
+            return Some(dir.to_path_buf());
         }
         // Installed mode (default): per-user configuration directory.
         if let Some(base) = dirs::config_dir() {
@@ -249,8 +263,7 @@ impl AppConfig {
     /// Load configuration from INI file
     /// Creates the file with default values if it doesn't exist
     pub fn load() -> anyhow::Result<Self> {
-        let path =
-            Self::config_path().ok_or_else(|| anyhow::anyhow!("Could not determine config path"))?;
+        let path = Self::config_path().ok_or_else(|| anyhow::anyhow!("Could not determine config path"))?;
 
         if path.exists() {
             let content = std::fs::read_to_string(&path)?;
@@ -265,6 +278,15 @@ impl AppConfig {
             }
             Ok(config)
         }
+    }
+
+    /// The saved configuration when a `Config.ini` exists, `None` otherwise.
+    /// Unlike [`load`](Self::load) this never creates the file: meant for the
+    /// command-line mode, which must not leave a configuration behind.
+    pub fn load_existing() -> Option<Self> {
+        let path = Self::config_path()?;
+        let content = std::fs::read_to_string(path).ok()?;
+        Some(Self::parse_ini(&content))
     }
 
     /// Parse INI format content
@@ -332,6 +354,15 @@ impl AppConfig {
         if let Some(v) = values.get("SkipUpdateVersion") {
             config.skip_update_version = v.clone();
         }
+        if let Some(v) = values.get("BackupCount") {
+            config.backup_count = v.parse().unwrap_or(10);
+        }
+        if let Some(v) = values.get("AutosaveMinutes") {
+            config.autosave_minutes = v.parse().unwrap_or(5);
+        }
+        if let Some(v) = values.get("AutoMasters") {
+            config.auto_masters = v == "1" || v.to_lowercase() == "true";
+        }
         if let Some(v) = values.get("WindowWidth") {
             config.window_width = v.parse().unwrap_or(1280.0);
         }
@@ -356,10 +387,10 @@ impl AppConfig {
                 if let Some(p) = parse_pair() {
                     config.window_positions.insert(id.to_string(), p);
                 }
-            } else if let Some(id) = k.strip_prefix("WinSize_") {
-                if let Some(p) = parse_pair() {
-                    config.window_sizes.insert(id.to_string(), p);
-                }
+            } else if let Some(id) = k.strip_prefix("WinSize_")
+                && let Some(p) = parse_pair()
+            {
+                config.window_sizes.insert(id.to_string(), p);
             }
         }
 
@@ -367,10 +398,10 @@ impl AppConfig {
         config.recent_files.clear();
         for i in 0..config.max_recent_files {
             let key = format!("RecentFile{}", i);
-            if let Some(v) = values.get(&key) {
-                if !v.is_empty() {
-                    config.recent_files.push(PathBuf::from(v));
-                }
+            if let Some(v) = values.get(&key)
+                && !v.is_empty()
+            {
+                config.recent_files.push(PathBuf::from(v));
             }
         }
 
@@ -379,8 +410,7 @@ impl AppConfig {
 
     /// Save configuration to INI file
     pub fn save(&self) -> anyhow::Result<()> {
-        let dir =
-            Self::config_dir().ok_or_else(|| anyhow::anyhow!("Could not determine config directory"))?;
+        let dir = Self::config_dir().ok_or_else(|| anyhow::anyhow!("Could not determine config directory"))?;
         std::fs::create_dir_all(&dir)?;
 
         let path = dir.join("Config.ini");
@@ -401,10 +431,7 @@ impl AppConfig {
         lines.push("[General]".to_string());
         lines.push(format!("Locale={}", self.locale));
         lines.push(format!("Country={}", self.country));
-        lines.push(format!(
-            "FirstStart={}",
-            if self.first_start_done { 1 } else { 0 }
-        ));
+        lines.push(format!("FirstStart={}", if self.first_start_done { 1 } else { 0 }));
         lines.push(format!("Theme={}", self.theme.as_str()));
         lines.push(format!("FontSize={}", self.font_size));
         lines.push(format!(
@@ -413,12 +440,12 @@ impl AppConfig {
         ));
         lines.push(format!("MaxRecentFiles={}", self.max_recent_files));
         lines.push(format!("SplashScreenSeconds={}", self.splash_screen_seconds));
-        lines.push(format!(
-            "CheckUpdates={}",
-            if self.check_updates { "1" } else { "0" }
-        ));
+        lines.push(format!("CheckUpdates={}", if self.check_updates { "1" } else { "0" }));
         lines.push(format!("LastUpdateCheck={}", self.last_update_check));
         lines.push(format!("SkipUpdateVersion={}", self.skip_update_version));
+        lines.push(format!("BackupCount={}", self.backup_count));
+        lines.push(format!("AutosaveMinutes={}", self.autosave_minutes));
+        lines.push(format!("AutoMasters={}", if self.auto_masters { "1" } else { "0" }));
         lines.push(String::new());
 
         lines.push("[Window]".to_string());
@@ -427,14 +454,8 @@ impl AppConfig {
         lines.push(String::new());
 
         lines.push("[Scripts]".to_string());
-        lines.push(format!(
-            "PreSaveScript={}",
-            self.pre_save_script.replace('\n', "\\n")
-        ));
-        lines.push(format!(
-            "PostSaveScript={}",
-            self.post_save_script.replace('\n', "\\n")
-        ));
+        lines.push(format!("PreSaveScript={}", self.pre_save_script.replace('\n', "\\n")));
+        lines.push(format!("PostSaveScript={}", self.post_save_script.replace('\n', "\\n")));
         lines.push(String::new());
 
         lines.push("[RecentFiles]".to_string());
@@ -551,9 +572,7 @@ pub fn run_script(script_content: &str, macros: &ScriptMacros) -> anyhow::Result
         perms.set_mode(0o755);
         std::fs::set_permissions(&temp_script, perms)?;
 
-        std::process::Command::new("sh")
-            .arg(&temp_script)
-            .status()?;
+        std::process::Command::new("sh").arg(&temp_script).status()?;
     }
 
     // Clean up
@@ -600,9 +619,11 @@ RecentFile1=C:\path\to\mod2
 
     #[test]
     fn test_ini_roundtrip() {
-        let mut config = AppConfig::default();
-        config.locale = "fr".to_string();
-        config.theme = Theme::Light;
+        let mut config = AppConfig {
+            locale: "fr".to_string(),
+            theme: Theme::Light,
+            ..AppConfig::default()
+        };
         config.recent_files.push(PathBuf::from("/test/path"));
 
         let ini = config.to_ini();
@@ -611,5 +632,31 @@ RecentFile1=C:\path\to\mod2
         assert_eq!(parsed.locale, "fr");
         assert_eq!(parsed.theme, Theme::Light);
         assert_eq!(parsed.recent_files.len(), 1);
+    }
+
+    #[test]
+    fn backup_autosave_and_masters_settings_roundtrip() {
+        let defaults = AppConfig::default();
+        assert_eq!(defaults.backup_count, 10);
+        assert_eq!(defaults.autosave_minutes, 5);
+        assert!(defaults.auto_masters);
+        let config = AppConfig {
+            backup_count: 3,
+            autosave_minutes: 0,
+            auto_masters: false,
+            ..AppConfig::default()
+        };
+        let ini = config.to_ini();
+        assert!(ini.contains("BackupCount=3"));
+        assert!(ini.contains("AutosaveMinutes=0"));
+        assert!(ini.contains("AutoMasters=0"));
+        let parsed = AppConfig::parse_ini(&ini);
+        assert_eq!(parsed.backup_count, 3);
+        assert_eq!(parsed.autosave_minutes, 0);
+        assert!(!parsed.auto_masters);
+        // Missing keys keep the defaults (older Config.ini files).
+        let old = AppConfig::parse_ini("[General]\nLocale=fra\n");
+        assert_eq!(old.backup_count, 10);
+        assert!(old.auto_masters);
     }
 }

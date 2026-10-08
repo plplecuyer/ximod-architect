@@ -8,7 +8,7 @@
 //! Crucially, the concatenation of every appended run reproduces the input text
 //! byte-for-byte, so egui's cursor and selection stay correct.
 
-use eframe::egui::{text::LayoutJob, Color32, FontId, TextFormat};
+use eframe::egui::{Color32, FontId, TextFormat, text::LayoutJob};
 
 #[derive(Clone, Copy)]
 enum Tok {
@@ -92,10 +92,11 @@ fn emit(
         ..Default::default()
     };
     // Underline the run that contains the reported error position.
-    if let Some(b) = error_byte {
-        if start <= b && b < end {
-            fmt.underline = eframe::egui::Stroke::new(2.0_f32, ERROR_COLOR);
-        }
+    if let Some(b) = error_byte
+        && start <= b
+        && b < end
+    {
+        fmt.underline = eframe::egui::Stroke::new(2.0_f32, ERROR_COLOR);
     }
     job.append(&text[start..end], 0.0, fmt);
 }
@@ -229,13 +230,7 @@ fn highlight_tag(
             let s = j;
             while j < n {
                 let d = b[j];
-                if is_ascii_ws(d)
-                    || d == b'='
-                    || d == b'/'
-                    || d == b'>'
-                    || d == b'"'
-                    || d == b'\''
-                {
+                if is_ascii_ws(d) || d == b'=' || d == b'/' || d == b'>' || d == b'"' || d == b'\'' {
                     break;
                 }
                 j += 1;

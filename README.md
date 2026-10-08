@@ -6,23 +6,30 @@ This is a Rust port of Wenderer's original FOMOD Creation Tool, offering improve
 
 ## Features
 
-- **FOMOD Package Creation**: Create complete FOMOD installer packages
-- **Multi-Step Wizards**: Design complex installation wizards with multiple steps
+- **FOMOD Package Creation**: Create complete FOMOD installer packages, with nested condition groups, `moduleDependencies`, `alwaysInstall` / `installIfUsable` and explicit ordering preserved
+- **Multi-Step Wizards**: Design complex installation wizards with multiple steps, in a project tree with an inspector, undo/redo, drag-and-drop reordering and full keyboard navigation
 - **Plugin Groups**: Organize plugins with various selection types (SelectOne, SelectAny, etc.)
 - **Conditional Installation**: Set up file installation based on user choices
-- **Dependency Patterns**: Configure plugin types based on dependencies
-- **Flag System**: Use condition flags to control installation flow
+- **Dependency Patterns**: Configure plugin types based on dependencies; masters read from `.esp/.esm/.esl` headers become conditions automatically
+- **Flag System**: Use condition flags to control installation flow, with an editable condition editor (rename a flag everywhere, orphan detection, visual condition builder)
+- **Installer Preview**: Simulate the installer as a mod manager shows it — mod information page, every step, hidden pages, final file tree with sizes and overwrites, saved scenarios
+- **Quality Checks**: Validation panel, referenced-file verification, destination-conflict detection (including inside BSA/BA2 archives), import-fidelity warnings, ESL eligibility and plugin report
+- **Translating existing FOMODs**: Lossless translation of third-party installers (XML patcher, sidecar files, Nexus-ready packages, duplicates translated once, CSV exchange)
+- **Export**: ZIP or 7z packages, rotating backups with atomic writes, Nexus description generator (BBCode / Markdown), FOMOD comparison
 - **Pre/Post Save Scripts**: Execute custom scripts before or after saving
-- **Multi-Language Support**: Interface available in 32 languages, including non-Latin scripts (Japanese, Simplified Chinese, Korean, Russian), with dynamic loading of the bundled Noto fonts
-- **Built-in Tools**: XML editor with live validation, read-only country/language explorer, and an in-app translation editor
+- **Multi-Language Support**: Interface available in 33 languages, including non-Latin scripts (Arabic, Japanese, Chinese, Korean, Russian, Greek…), with dynamic loading of the bundled Noto fonts
+- **Built-in Tools**: XML editor with live validation, country/language explorer, in-app translation editor, project strings table, archive content viewer
+- **Command line**: `validate`, `build`, `package`, `batch`, `inspect`, `archive`, `translate`, `simulate`, `ba2` for CI and bulk work
 - **Cross-Platform**: Works on Windows, Linux, and macOS
 - **Native Splash Screen**: Transparent splash screen with fade effect
+
+See [`CHANGELOG.md`](CHANGELOG.md) for the full list of changes in 2.0.0.
 
 ## Building
 
 ### Prerequisites
 
-- Rust 1.70+ (install from https://rustup.rs)
+- Rust 1.98.1 or later (install from https://rustup.rs)
 - On Linux, the system development libraries. The quickest way is the helper script,
   which detects your distribution (Debian/Ubuntu, Fedora, Arch):
 
@@ -135,14 +142,23 @@ This creates `XIMOD Architect.app` (and a `.dmg`) in the `dist/` directory. Run
 ```
 ximod-architect/
 ├── src/
-│   ├── main.rs           # Application entry point
+│   ├── main.rs           # Application entry point and CLI dispatcher
 │   ├── config.rs         # Configuration management
 │   ├── icon.rs           # Icon loading
 │   ├── splash/           # Native splash screen
-│   ├── models/           # Data structures (FOMOD model)
-│   ├── ui/               # User interface
-│   ├── xml/              # XML serialization
-│   └── i18n/             # Internationalization
+│   ├── models/           # FOMOD model, conflicts, simulator, translation, plugin headers, BSA/BA2
+│   ├── ui/               # User interface (tree, inspector, preview, dialogs, condition editor…)
+│   ├── xml/              # XML serialization, validation, lossless patching, fidelity checks
+│   ├── i18n/             # Internationalization (Fluent)
+│   ├── archive.rs        # ZIP / 7z export, BA2 writer
+│   ├── archive_open.rs   # Opening mod archives
+│   ├── backups.rs        # Rotating backups and recovery
+│   ├── cli_batch.rs      # `batch` command
+│   ├── cli_translate.rs  # `translate` command
+│   ├── fonts.rs          # Script detection → bundled Noto fonts
+│   ├── media.rs          # Image checks and optimization
+│   ├── update.rs         # Update check (GitHub Releases)
+│   └── wizard.rs         # New project from a folder
 ├── assets/
 │   ├── data/             # Games/categories, countries, languages (JSON)
 │   ├── fonts/            # Bundled Noto fonts (one per writing system)
@@ -160,7 +176,7 @@ ximod-architect/
 
 ## Internationalization
 
-XIMOD Architect ships with **32 interface translations**. They are loaded dynamically
+XIMOD Architect ships with **33 interface translations**. They are loaded dynamically
 from the `assets/locales/` directory at runtime. Each language has its own folder named
 with the ISO 639-3 code (e.g. `assets/locales/eng/`, `fra/`, `deu/`, `jpn/`, `zho/`,
 `kor/`, `rus/`, `tur/`, …). English (`eng`) and French (`fra`) are the reference translations;
@@ -171,6 +187,13 @@ To add a new language:
 2. Copy `main.ftl` from an existing language
 3. Translate all strings (the built-in translation editor does this for you and protects macros/variables)
 4. The language will appear automatically in Settings
+
+## Documentation
+
+The user manual is available in English (`Manuals/XIMOD_Architect_Manual_GBR.pdf`) and
+French (`Manuals/XIMOD_Architect_Manuel_FRA.pdf`); Help → User manual opens it from the
+application. `CONCEPTION_V2.md` and `ANALYSE_V2.md` (French) document the design and the
+audit that drove version 2.
 
 ## FOMOD Format
 

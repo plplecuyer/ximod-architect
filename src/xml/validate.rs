@@ -11,8 +11,8 @@
 //! Issues are returned as structured `SchemaIssue` values (with line/column) and
 //! localised by the UI layer, keeping this module free of any i18n dependency.
 
-use quick_xml::events::Event;
 use quick_xml::Reader;
+use quick_xml::events::Event;
 
 // Enumerations, mirroring the schema (and the model's own enums).
 const ORDERS: &[&str] = &["Ascending", "Descending", "Explicit"];
@@ -23,13 +23,7 @@ const GROUP_TYPES: &[&str] = &[
     "SelectAll",
     "SelectAny",
 ];
-const PLUGIN_TYPES: &[&str] = &[
-    "Required",
-    "Optional",
-    "Recommended",
-    "NotUsable",
-    "CouldBeUsable",
-];
+const PLUGIN_TYPES: &[&str] = &["Required", "Optional", "Recommended", "NotUsable", "CouldBeUsable"];
 const STATES: &[&str] = &["Missing", "Inactive", "Active"];
 const OPERATORS: &[&str] = &["And", "Or"];
 const DEP_CHILDREN: &[&str] = &[
@@ -43,19 +37,40 @@ const DEP_CHILDREN: &[&str] = &[
 /// A schema violation, independent of any language.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SchemaIssueKind {
-    WrongRoot { found: String, expected: String },
-    UnknownElement { element: String, parent: String },
-    MissingChild { parent: String, child: String },
-    NeedsOne { parent: String, child: String },
-    TooMany { parent: String, child: String },
-    MissingAttr { element: String, attr: String },
+    WrongRoot {
+        found: String,
+        expected: String,
+    },
+    UnknownElement {
+        element: String,
+        parent: String,
+    },
+    MissingChild {
+        parent: String,
+        child: String,
+    },
+    NeedsOne {
+        parent: String,
+        child: String,
+    },
+    TooMany {
+        parent: String,
+        child: String,
+    },
+    MissingAttr {
+        element: String,
+        attr: String,
+    },
     BadEnum {
         element: String,
         attr: String,
         value: String,
         allowed: String,
     },
-    ChooseOne { parent: String, options: String },
+    ChooseOne {
+        parent: String,
+        options: String,
+    },
 }
 
 #[derive(Debug, Clone)]
@@ -87,8 +102,16 @@ impl std::fmt::Display for SchemaIssueKind {
             SchemaIssueKind::MissingAttr { element, attr } => {
                 write!(f, "attribute \"{attr}\" is required on \"{element}\"")
             }
-            SchemaIssueKind::BadEnum { element, attr, value, allowed } => {
-                write!(f, "invalid value \"{value}\" for {element}/@{attr} (expected: {allowed})")
+            SchemaIssueKind::BadEnum {
+                element,
+                attr,
+                value,
+                allowed,
+            } => {
+                write!(
+                    f,
+                    "invalid value \"{value}\" for {element}/@{attr} (expected: {allowed})"
+                )
             }
             SchemaIssueKind::ChooseOne { parent, options } => {
                 write!(f, "\"{parent}\" must contain exactly one of: {options}")
@@ -100,21 +123,19 @@ impl std::fmt::Display for SchemaIssueKind {
 // --------------------------------------------------------------------------- //
 // Lightweight DOM
 // --------------------------------------------------------------------------- //
-struct Node {
-    name: String,
-    attrs: Vec<(String, String)>,
-    text: String,
-    children: Vec<Node>,
-    line: usize,
-    column: usize,
+/// One element of the parsed document (shared with `fidelity`).
+pub(crate) struct Node {
+    pub(crate) name: String,
+    pub(crate) attrs: Vec<(String, String)>,
+    pub(crate) text: String,
+    pub(crate) children: Vec<Node>,
+    pub(crate) line: usize,
+    pub(crate) column: usize,
 }
 
 impl Node {
-    fn attr(&self, key: &str) -> Option<&str> {
-        self.attrs
-            .iter()
-            .find(|(k, _)| k == key)
-            .map(|(_, v)| v.as_str())
+    pub(crate) fn attr(&self, key: &str) -> Option<&str> {
+        self.attrs.iter().find(|(k, _)| k == key).map(|(_, v)| v.as_str())
     }
     fn count(&self, name: &str) -> usize {
         self.children.iter().filter(|c| c.name == name).count()
@@ -149,10 +170,7 @@ fn make_node(e: &quick_xml::events::BytesStart, content: &str, pos: usize) -> No
     let mut attrs = Vec::new();
     for a in e.attributes().flatten() {
         let k = String::from_utf8_lossy(a.key.as_ref()).into_owned();
-        let v = a
-            .unescape_value()
-            .map(|c| c.into_owned())
-            .unwrap_or_default();
+        let v = a.unescape_value().map(|c| c.into_owned()).unwrap_or_default();
         attrs.push((k, v));
     }
     let (line, column) = byte_to_line_col(content, pos.min(content.len()));
@@ -168,14 +186,14 @@ fn make_node(e: &quick_xml::events::BytesStart, content: &str, pos: usize) -> No
 
 /// Parse the document into a single root node, or `None` if it is not
 /// well-formed (well-formedness is reported separately by `check_well_formed`).
-fn parse_tree(content: &str) -> Option<Node> {
+pub(crate) fn parse_tree(content: &str) -> Option<Node> {
     let mut reader = Reader::from_reader(content.as_bytes());
     reader.config_mut().trim_text(true);
     let mut stack: Vec<Node> = Vec::new();
     let mut root: Option<Node> = None;
     let mut buf = Vec::new();
 
-    fn attach(stack: &mut Vec<Node>, root: &mut Option<Node>, node: Node) {
+    fn attach(stack: &mut [Node], root: &mut Option<Node>, node: Node) {
         match stack.last_mut() {
             Some(parent) => parent.children.push(node),
             None => *root = Some(node),
@@ -196,10 +214,10 @@ fn parse_tree(content: &str) -> Option<Node> {
                 }
             }
             Ok(Event::Text(t)) => {
-                if let Some(top) = stack.last_mut() {
-                    if let Ok(txt) = t.unescape() {
-                        top.text.push_str(txt.trim());
-                    }
+                if let Some(top) = stack.last_mut()
+                    && let Ok(txt) = t.unescape()
+                {
+                    top.text.push_str(txt.trim());
                 }
             }
             Ok(Event::Eof) => break,
@@ -358,16 +376,16 @@ pub fn validate_module_config(content: &str) -> Vec<SchemaIssue> {
 /// managers ignore unknown elements and XIMOD adds its own `Game` extension.
 pub fn validate_info(content: &str) -> Vec<SchemaIssue> {
     let mut ctx = Ctx { issues: Vec::new() };
-    if let Some(root) = parse_tree(content) {
-        if root.name != "fomod" {
-            ctx.push(
-                &root,
-                SchemaIssueKind::WrongRoot {
-                    found: root.name.clone(),
-                    expected: "fomod".to_string(),
-                },
-            );
-        }
+    if let Some(root) = parse_tree(content)
+        && root.name != "fomod"
+    {
+        ctx.push(
+            &root,
+            SchemaIssueKind::WrongRoot {
+                found: root.name.clone(),
+                expected: "fomod".to_string(),
+            },
+        );
     }
     ctx.issues
 }
@@ -385,7 +403,13 @@ fn validate_config(ctx: &mut Ctx, node: &Node) {
         ],
     );
     ctx.exactly_one(node, "moduleName");
-    for e in ["moduleImage", "moduleDependencies", "requiredInstallFiles", "installSteps", "conditionalFileInstalls"] {
+    for e in [
+        "moduleImage",
+        "moduleDependencies",
+        "requiredInstallFiles",
+        "installSteps",
+        "conditionalFileInstalls",
+    ] {
         ctx.at_most_one(node, e);
     }
     if let Some(mi) = node.find("moduleImage") {
@@ -409,18 +433,18 @@ fn validate_filelist(ctx: &mut Ctx, node: &Node) {
     ctx.only(node, &["file", "folder"]);
     for f in node.children.iter().filter(|c| c.name == "file" || c.name == "folder") {
         ctx.require_attr(f, "source");
-        if let Some(p) = f.attr("priority") {
-            if p.parse::<i64>().is_err() {
-                ctx.push(
-                    f,
-                    SchemaIssueKind::BadEnum {
-                        element: f.name.clone(),
-                        attr: "priority".to_string(),
-                        value: p.to_string(),
-                        allowed: "integer".to_string(),
-                    },
-                );
-            }
+        if let Some(p) = f.attr("priority")
+            && p.parse::<i64>().is_err()
+        {
+            ctx.push(
+                f,
+                SchemaIssueKind::BadEnum {
+                    element: f.name.clone(),
+                    attr: "priority".to_string(),
+                    value: p.to_string(),
+                    allowed: "integer".to_string(),
+                },
+            );
         }
     }
 }
@@ -438,6 +462,7 @@ fn validate_dependencies(ctx: &mut Ctx, node: &Node) {
                 ctx.require_attr(c, "flag");
                 ctx.require_attr(c, "value");
             }
+            "gameDependency" | "fommDependency" => ctx.require_attr(c, "version"),
             "dependencies" => validate_dependencies(ctx, c),
             _ => {}
         }
@@ -665,18 +690,17 @@ mod tests {
         p2.description = "d2".into();
         let mut pat = DependencyPattern::new();
         pat.pattern_type = "Recommended".into();
-        pat.dependencies.push(Dependency::new_flag("res", "2K"));
+        pat.condition.push_leaf(Dependency::new_flag("res", "2K"));
         p2.dependency_patterns.push(pat);
         g.plugins.push(p2);
 
         let mut s = Step::new("S");
-        s.visibility_dependencies
-            .push(Dependency::new_file("Skyrim.esm", "Active"));
+        s.visibility.push_leaf(Dependency::new_file("Skyrim.esm", "Active"));
         s.plugin_groups.push(g);
         m.steps.push(s);
 
         let mut cfs = ConditionalFileSet::new();
-        cfs.dependencies.push(Dependency::new_flag("res", "4K"));
+        cfs.condition.push_leaf(Dependency::new_flag("res", "4K"));
         cfs.files.push(InstallFile::new_file("p.esp"));
         m.conditional_files.push(cfs);
 
@@ -693,7 +717,11 @@ mod tests {
     fn detects_bad_group_type() {
         let bad = VALID.replace("SelectExactlyOne", "SelectExactlyTwo");
         let ks = kinds(&bad);
-        assert!(ks.iter().any(|k| matches!(k, SchemaIssueKind::BadEnum { attr, .. } if attr == "type")), "{ks:?}");
+        assert!(
+            ks.iter()
+                .any(|k| matches!(k, SchemaIssueKind::BadEnum { attr, .. } if attr == "type")),
+            "{ks:?}"
+        );
     }
 
     #[test]
@@ -703,21 +731,39 @@ mod tests {
             "",
         );
         let ks = kinds(&bad);
-        assert!(ks.iter().any(|k| matches!(k, SchemaIssueKind::MissingChild { child, .. } if child == "typeDescriptor")), "{ks:?}");
+        assert!(
+            ks.iter()
+                .any(|k| matches!(k, SchemaIssueKind::MissingChild { child, .. } if child == "typeDescriptor")),
+            "{ks:?}"
+        );
     }
 
     #[test]
     fn detects_unknown_element_and_missing_required() {
         let bad = VALID.replace("<moduleName>Demo</moduleName>", "<oops/>");
         let ks = kinds(&bad);
-        assert!(ks.iter().any(|k| matches!(k, SchemaIssueKind::UnknownElement { element, .. } if element == "oops")), "{ks:?}");
-        assert!(ks.iter().any(|k| matches!(k, SchemaIssueKind::MissingChild { child, .. } if child == "moduleName")), "{ks:?}");
+        assert!(
+            ks.iter()
+                .any(|k| matches!(k, SchemaIssueKind::UnknownElement { element, .. } if element == "oops")),
+            "{ks:?}"
+        );
+        assert!(
+            ks.iter()
+                .any(|k| matches!(k, SchemaIssueKind::MissingChild { child, .. } if child == "moduleName")),
+            "{ks:?}"
+        );
     }
 
     #[test]
     fn detects_missing_required_attribute() {
-        let bad = VALID.replace("<flagDependency flag=\"res\" value=\"4K\"/>", "<flagDependency value=\"4K\"/>");
+        let bad = VALID.replace(
+            "<flagDependency flag=\"res\" value=\"4K\"/>",
+            "<flagDependency value=\"4K\"/>",
+        );
         let ks = kinds(&bad);
-        assert!(ks.iter().any(|k| matches!(k, SchemaIssueKind::MissingAttr { .. })), "{ks:?}");
+        assert!(
+            ks.iter().any(|k| matches!(k, SchemaIssueKind::MissingAttr { .. })),
+            "{ks:?}"
+        );
     }
 }
