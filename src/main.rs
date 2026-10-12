@@ -15,6 +15,7 @@
 
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod color;
 mod config;
 mod data;
 mod export;
@@ -24,6 +25,7 @@ mod i18n;
 mod icon;
 mod models;
 mod splash;
+mod tree_colors;
 mod ui;
 mod update;
 mod xml;

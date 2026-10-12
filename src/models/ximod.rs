@@ -851,6 +851,21 @@ impl ConditionalFileSet {
             files: Vec::new(),
         }
     }
+
+    /// Assign `dest` as the install destination of every file of this set in a
+    /// single action (the "destination for the whole set" control of the
+    /// Conditional Installs tab). Returns how many files were updated.
+    pub fn set_all_destinations(&mut self, dest: &str) -> usize {
+        set_destinations(&mut self.files, dest)
+    }
+}
+
+/// Assign `dest` to every file of `files`; returns how many were updated.
+pub fn set_destinations(files: &mut [InstallFile], dest: &str) -> usize {
+    for file in files.iter_mut() {
+        file.destination = dest.to_string();
+    }
+    files.len()
 }
 
 /// Old JSON shape of a conditional set (`operator` + flat `dependencies`).
@@ -1130,6 +1145,13 @@ impl Ximod {
     }
 
     /// Get all condition flags used in this project
+    /// Assign `dest` as the install destination of every required file in a
+    /// single action (the "destination for all required files" control of the
+    /// Required Installs tab). Returns how many files were updated.
+    pub fn set_all_required_destinations(&mut self, dest: &str) -> usize {
+        set_destinations(&mut self.required_files, dest)
+    }
+
     pub fn get_all_flags(&self) -> Vec<String> {
         let mut flags: indexmap::IndexSet<&str> = indexmap::IndexSet::new();
         for step in &self.steps {
@@ -1496,5 +1518,30 @@ mod tests {
         let mut g = PluginGroup::new("Empty", SelectionType::SelectAny);
         g.plugins.push(Plugin::new("NoFiles"));
         assert_eq!(g.set_all_destinations("data"), 0);
+    }
+
+    /// The same bulk destination exists for a conditional set and for the
+    /// required files, and touches nothing else.
+    #[test]
+    fn bulk_destination_on_conditional_set_and_required_files() {
+        let mut set = ConditionalFileSet::new();
+        set.files.push(InstallFile::new_folder("patch/meshes"));
+        set.files.push(InstallFile::new_file("patch.esp"));
+        assert_eq!(set.set_all_destinations("SKSE\\Plugins"), 2);
+        assert!(set.files.iter().all(|f| f.destination == "SKSE\\Plugins"));
+        assert_eq!(ConditionalFileSet::new().set_all_destinations("x"), 0);
+
+        let mut x = Ximod::new("M");
+        x.required_files.push(InstallFile::new_file("core.esp"));
+        x.required_files.push(InstallFile::new_folder("core"));
+        x.conditional_files.push(set);
+        assert_eq!(x.set_all_required_destinations(""), 2);
+        assert!(x.required_files.iter().all(|f| f.destination.is_empty()));
+        assert!(
+            x.conditional_files[0]
+                .files
+                .iter()
+                .all(|f| f.destination == "SKSE\\Plugins")
+        );
     }
 }

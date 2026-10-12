@@ -12,6 +12,7 @@ pub mod flags;
 pub mod nexus_desc;
 pub mod plugin_checks;
 pub mod plugin_header;
+pub mod presets;
 pub mod simulate;
 pub mod strings;
 pub mod templates;

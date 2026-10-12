@@ -60,6 +60,11 @@ pub struct XimodApp {
     // Data
     pub ximod: Ximod,
     pub root_directory: Option<PathBuf>,
+    /// Folder the project-relative file dialogs open in: the parent of the
+    /// last file or folder the user picked, so that sibling folders (feature
+    /// A, B, C…) are right there on the next pick. Session only; falls back to
+    /// the root when unset, outside the root or gone (see `pick_start_dir`).
+    pub last_pick_dir: Option<PathBuf>,
     /// Dynamically-loaded games & their category lists (from Categories.json).
     pub games: crate::games::GamesData,
 
@@ -76,6 +81,10 @@ pub struct XimodApp {
     pub group_dest_buf: String,
     /// Edit buffer for the "same destination for a whole page/step" field.
     pub page_dest_buf: String,
+    /// Text buffers of the bulk-destination controls of the Required and
+    /// Conditional Installs tabs.
+    pub req_dest_buf: String,
+    pub cond_dest_buf: String,
     /// Paging offset (in pages of 8) for the conditional-install tabs strip.
     pub cond_tab_page: usize,
     pub current_file_index: Option<usize>,
@@ -216,6 +225,18 @@ pub struct XimodApp {
     // Country/language database explorer
     pub show_properties: bool,
     pub properties: crate::ui::properties::PropertiesState,
+
+    // Games / categories editor (writes Categories.json)
+    pub show_games_editor: bool,
+
+    // Preset wizard (Project menu)
+    pub show_preset_wizard: bool,
+    pub preset_wizard: crate::ui::preset_wizard::PresetWizardState,
+
+    // Tree colours window + the colour picker it opens (Tools menu)
+    pub show_tree_colors: bool,
+    pub color_picker: crate::ui::color_picker::ColorPicker,
+    pub games_editor: crate::ui::games_editor::GamesEditorState,
 
     // XML editor state
     pub show_xml_editor: bool,
@@ -436,6 +457,7 @@ impl XimodApp {
         Self {
             ximod: Ximod::default(),
             root_directory: None,
+            last_pick_dir: None,
             games,
             temp_locale,
             temp_theme: config.theme,
@@ -459,6 +481,8 @@ impl XimodApp {
             group_dest_buf: String::new(),
             cond_tab_page: 0,
             page_dest_buf: String::new(),
+            req_dest_buf: String::new(),
+            cond_dest_buf: String::new(),
             current_file_index: None,
             current_flag_index: None,
             current_dependency_index: None,
@@ -530,6 +554,12 @@ impl XimodApp {
             show_problems: false,
             problems_expanded: true,
             show_properties: false,
+            show_games_editor: false,
+            show_preset_wizard: false,
+            preset_wizard: Default::default(),
+            show_tree_colors: false,
+            color_picker: crate::ui::color_picker::ColorPicker::default(),
+            games_editor: crate::ui::games_editor::GamesEditorState::default(),
             properties: crate::ui::properties::PropertiesState::default(),
             show_xml_editor: false,
             xml_editor_target: crate::ui::xml_editor::XmlTarget::InfoXml,
@@ -913,7 +943,8 @@ impl XimodApp {
             self.notify_err(msg);
             return Vec::new();
         };
-        let dialog = rfd::FileDialog::new().set_directory(&root);
+        let start = pick_start_dir(&root, self.last_pick_dir.as_deref());
+        let dialog = rfd::FileDialog::new().set_directory(&start);
         let paths: Vec<PathBuf> = match what {
             PickWhat::Files => dialog.pick_files().unwrap_or_default(),
             PickWhat::Folder => dialog.pick_folder().into_iter().collect(),
@@ -923,6 +954,9 @@ impl XimodApp {
                 .into_iter()
                 .collect(),
         };
+        if let Some(dir) = remembered_pick_dir(&paths) {
+            self.last_pick_dir = Some(dir);
+        }
         let mut rels = Vec::new();
         let mut outside = 0usize;
         for path in paths {
@@ -937,6 +971,22 @@ impl XimodApp {
         }
         rels
     }
+}
+
+/// Where a project-relative file dialog should open: the remembered folder when
+/// it is still inside the root and still exists, else the root itself.
+pub(crate) fn pick_start_dir(root: &std::path::Path, last: Option<&std::path::Path>) -> PathBuf {
+    match last {
+        Some(dir) if dir.starts_with(root) && dir.is_dir() => dir.to_path_buf(),
+        _ => root.to_path_buf(),
+    }
+}
+
+/// The folder to remember after a pick: the parent of the first chosen path
+/// (the folder containing the chosen files, or the parent of the chosen
+/// folder — so its siblings show up next time).
+pub(crate) fn remembered_pick_dir(paths: &[PathBuf]) -> Option<PathBuf> {
+    paths.first()?.parent().map(|p| p.to_path_buf())
 }
 
 impl eframe::App for XimodApp {
@@ -1153,6 +1203,10 @@ impl eframe::App for XimodApp {
         self.render_condition_editor(ctx);
         self.render_project_strings(ctx);
         self.render_properties(ctx);
+        self.render_games_editor(ctx);
+        self.render_preset_wizard(ctx);
+        self.render_tree_colors(ctx);
+        self.render_color_picker(ctx);
         self.render_flag_picker(ctx);
         self.render_fomod_translation(ctx);
         self.render_exit_prompt(ctx);
@@ -1197,5 +1251,36 @@ impl eframe::App for XimodApp {
                 tracing::info!("Configuration saved on exit");
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod pick_dir_tests {
+    use super::*;
+
+    /// The dialog reopens in the parent of the last pick while it is inside
+    /// the root and exists; otherwise it falls back to the root.
+    #[test]
+    fn picker_reopens_in_parent_of_last_pick() {
+        let root = std::env::temp_dir().join(format!("ximod_pick_{}", std::process::id()));
+        let feature = root.join("Feature");
+        let a = feature.join("A");
+        std::fs::create_dir_all(&a).unwrap();
+
+        // Nothing remembered yet: the root.
+        assert_eq!(pick_start_dir(&root, None), root);
+        // Picking the folder Feature/A remembers Feature, so B and C are siblings.
+        let remembered = remembered_pick_dir(std::slice::from_ref(&a)).unwrap();
+        assert_eq!(remembered, feature);
+        assert_eq!(pick_start_dir(&root, Some(&remembered)), feature);
+        // Files picked inside A remember A itself.
+        assert_eq!(remembered_pick_dir(&[a.join("x.esp"), a.join("y.esp")]).unwrap(), a);
+        // Outside the root, or vanished: back to the root.
+        assert_eq!(pick_start_dir(&root, Some(std::path::Path::new("/elsewhere"))), root);
+        assert_eq!(pick_start_dir(&root, Some(&root.join("gone"))), root);
+        // No pick at all: nothing to remember.
+        assert_eq!(remembered_pick_dir(&[]), None);
+
+        let _ = std::fs::remove_dir_all(&root);
     }
 }

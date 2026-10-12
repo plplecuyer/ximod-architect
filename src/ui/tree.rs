@@ -9,6 +9,7 @@
 
 use super::main_window::{ConfirmAction, Tab, XimodApp};
 use crate::models::{Plugin, PluginGroup, SelectionType, Step};
+use crate::tree_colors::TreeKind;
 use crate::ui::components::{section_header, section_header_hint};
 use crate::ui::theme::{Palette, icon};
 use eframe::egui::{self, RichText};
@@ -552,6 +553,18 @@ impl XimodApp {
         let h_collapse_from = t("tree-collapse-from-hint");
 
         let palette = Palette::from_ui(ui);
+        // One colour per kind of row (Tools → Tree colours…). The selected row
+        // keeps the default text colour so it stays legible on the selection
+        // background whatever the user chose.
+        let tree_colors = *self.config.tree_colors(ui.visuals().dark_mode);
+        let tint = move |kind: TreeKind, selected: bool, text: String| -> RichText {
+            let rt = RichText::new(text);
+            if selected {
+                rt
+            } else {
+                rt.color(tree_colors.color32(kind))
+            }
+        };
         // Collapsing-header ids of the steps and groups drawn this frame, so a
         // fold command from a context menu can open/close any of them.
         let mut step_ids: Vec<egui::Id> = Vec::with_capacity(self.ximod.steps.len());
@@ -579,7 +592,10 @@ impl XimodApp {
         egui::ScrollArea::vertical().auto_shrink([false, false]).show(ui, |ui| {
             ui.add_space(4.0);
             // ---- Mod info
-            let r = ui.selectable_label(tab == Tab::Info, format!("{} {}", icon::INFO, l_info));
+            let r = ui.selectable_label(
+                tab == Tab::Info,
+                tint(TreeKind::Info, tab == Tab::Info, format!("{} {}", icon::INFO, l_info)),
+            );
             if r.clicked() {
                 action = Some(TreeAction::Select(Tab::Info));
             }
@@ -594,7 +610,7 @@ impl XimodApp {
             ui.horizontal(|ui| {
                 let header = format!("{} {} ({})", icon::STEP, l_steps, self.ximod.steps.len());
                 let selected = tab == Tab::Steps && sel.0.is_none();
-                let r = ui.selectable_label(selected, header);
+                let r = ui.selectable_label(selected, tint(TreeKind::Step, selected, header));
                 if r.clicked() {
                     action = Some(TreeAction::Select(Tab::Steps));
                 }
@@ -630,8 +646,12 @@ impl XimodApp {
                 let header = state
                     .show_header(ui, |ui| {
                         let label = format!("{} {}", icon::STEP, name);
-                        let resp =
-                            drag_source_label(ui, DragItem::Step(si), step_selected, RichText::new(label).strong());
+                        let resp = drag_source_label(
+                            ui,
+                            DragItem::Step(si),
+                            step_selected,
+                            tint(TreeKind::Step, step_selected, label).strong(),
+                        );
                         mark(ui, NavKey::Step(si), resp.rect);
                         nav.push(NavRow {
                             key: NavKey::Step(si),
@@ -732,7 +752,7 @@ impl XimodApp {
                                         ui,
                                         DragItem::Group(si, gi),
                                         group_selected,
-                                        format!("{} {}", icon::GROUP, gname),
+                                        tint(TreeKind::Group, group_selected, format!("{} {}", icon::GROUP, gname)),
                                     );
                                     mark(ui, NavKey::Group(si, gi), resp.rect);
                                     nav.push(NavRow {
@@ -821,7 +841,7 @@ impl XimodApp {
                                             ui,
                                             DragItem::Plugin(si, gi, pi),
                                             plugin_selected,
-                                            format!("{} {}", glyph, pname),
+                                            tint(TreeKind::Option, plugin_selected, format!("{} {}", glyph, pname)),
                                         );
                                         mark(ui, NavKey::Plugin(si, gi, pi), resp.rect);
                                         nav.push(NavRow {
@@ -889,11 +909,15 @@ impl XimodApp {
             // ---- Required files
             let r = ui.selectable_label(
                 tab == Tab::RequiredInstalls,
-                format!(
-                    "{} {} ({})",
-                    icon::REQUIRED,
-                    l_required,
-                    self.ximod.required_files.len()
+                tint(
+                    TreeKind::Required,
+                    tab == Tab::RequiredInstalls,
+                    format!(
+                        "{} {} ({})",
+                        icon::REQUIRED,
+                        l_required,
+                        self.ximod.required_files.len()
+                    ),
                 ),
             );
             if r.clicked() {
@@ -915,7 +939,7 @@ impl XimodApp {
                     l_conditional,
                     self.ximod.conditional_files.len()
                 );
-                let r = ui.selectable_label(selected, header);
+                let r = ui.selectable_label(selected, tint(TreeKind::Conditional, selected, header));
                 if r.clicked() {
                     action = Some(TreeAction::Select(Tab::ConditionalInstalls));
                 }
@@ -936,7 +960,10 @@ impl XimodApp {
                 for ci in 0..self.ximod.conditional_files.len() {
                     let selected = tab == Tab::ConditionalInstalls && cond_sel == Some(ci);
                     let label = self.i18n.t_num("cond-set-label", (ci + 1) as i64);
-                    let resp = ui.selectable_label(selected, format!("{} {}", icon::FLAG, label));
+                    let resp = ui.selectable_label(
+                        selected,
+                        tint(TreeKind::Conditional, selected, format!("{} {}", icon::FLAG, label)),
+                    );
                     if resp.clicked() {
                         action = Some(TreeAction::SelectCond(ci));
                     }

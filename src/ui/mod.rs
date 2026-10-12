@@ -1,5 +1,6 @@
 //! UI module
 
+pub mod color_picker;
 pub mod components;
 pub mod dialogs;
 pub mod docs;
@@ -29,5 +30,7 @@ pub mod xml_highlight;
 pub mod condition_editor;
 pub mod dragdrop;
 pub mod foldnav;
+pub mod games_editor;
+pub mod preset_wizard;
 
 pub use main_window::XimodApp;

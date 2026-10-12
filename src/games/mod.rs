@@ -5,37 +5,36 @@
 //! can be added without recompiling. The file is never embedded in the binary.
 
 use indexmap::IndexMap;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
 /// A single game entry as described in `Categories.json`.
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct GameEntry {
     /// Official game name (e.g. "The Elder Scrolls V: Skyrim Special Edition").
     pub name: String,
     /// Slug used in the Nexus Mods URL (e.g. "skyrimspecialedition").
-    #[serde(rename = "nexusSlug", default)]
+    #[serde(rename = "nexusSlug", default, skip_serializing_if = "String::is_empty")]
     pub nexus_slug: String,
     /// Category names available for this game on Nexus.
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub categories: Vec<String>,
     /// Plugins every installation of the game provides (the main master and
     /// the official DLC / Creation Club files): a plugin depending on them
     /// needs no file dependency for them.
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub masters: Vec<String>,
     /// Record limit of a light plugin for this game (`2048` or `4096`); the
     /// conservative 2048 applies when absent.
-    #[serde(rename = "eslLimit", default)]
+    #[serde(rename = "eslLimit", default, skip_serializing_if = "Option::is_none")]
     pub esl_limit: Option<u32>,
 }
 
 /// The whole games dataset. `games` preserves the JSON file order thanks to
 /// `IndexMap`, so the dropdown lists games in the intended order.
-#[derive(Debug, Clone, Default, Deserialize)]
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct GamesData {
-    #[serde(default)]
-    #[allow(dead_code)]
+    #[serde(default, skip_serializing_if = "String::is_empty")]
     pub version: String,
     #[serde(default)]
     pub games: IndexMap<String, GameEntry>,
@@ -74,6 +73,13 @@ impl GamesData {
     fn data_path() -> Option<PathBuf> {
         let mut candidates: Vec<PathBuf> = Vec::new();
 
+        // User override written by the built-in games editor. It wins over the
+        // shipped file so edits persist even when the application is installed
+        // in a read-only location.
+        if let Some(user) = Self::user_data_path() {
+            candidates.push(user);
+        }
+
         // Next to the executable (production layout).
         if let Ok(exe) = std::env::current_exe()
             && let Some(dir) = exe.parent()
@@ -95,6 +101,40 @@ impl GamesData {
         candidates.push(PathBuf::from("Categories.json"));
 
         candidates.into_iter().find(|p| p.is_file())
+    }
+
+    /// Per-user, always-writable location for the games dataset
+    /// (`<config dir>/data/Categories.json`), used when the shipped file sits
+    /// in a read-only install and as the preferred source once the user has
+    /// edited the games through the built-in editor.
+    pub fn user_data_path() -> Option<PathBuf> {
+        crate::config::AppConfig::config_dir().map(|d| d.join("data").join("Categories.json"))
+    }
+
+    /// Write the dataset to disk as pretty JSON and return the path written.
+    /// It first tries the file the application currently loads from (so the
+    /// author's development copy or a writable install is updated in place);
+    /// if that write fails (e.g. a read-only install), it falls back to the
+    /// per-user override location, which `load` reads first.
+    pub fn save(&self) -> anyhow::Result<PathBuf> {
+        let json = serde_json::to_string_pretty(self)? + "\n";
+
+        // Primary target: the file we load from, else the dev-layout path.
+        let primary = Self::data_path().unwrap_or_else(|| PathBuf::from("assets/data/Categories.json"));
+        if let Some(parent) = primary.parent() {
+            let _ = std::fs::create_dir_all(parent);
+        }
+        if std::fs::write(&primary, &json).is_ok() {
+            return Ok(primary);
+        }
+
+        // Fallback: the per-user override.
+        let user = Self::user_data_path().ok_or_else(|| anyhow::anyhow!("no writable location for Categories.json"))?;
+        if let Some(parent) = user.parent() {
+            std::fs::create_dir_all(parent)?;
+        }
+        std::fs::write(&user, &json)?;
+        Ok(user)
     }
 
     /// `(game_id, official_name)` pairs, in file order, for the game dropdown.
@@ -170,6 +210,39 @@ mod tests {
         assert_eq!(data.esl_limit_for("starfield"), 4096);
         assert_eq!(data.esl_limit_for("skyrimSpecialEdition"), 2048);
         assert_eq!(data.esl_limit_for("unknown"), 2048);
+    }
+
+    /// The dataset round-trips through serde, and empty optional fields are
+    /// omitted from the written JSON (so the games editor produces a tidy file).
+    #[test]
+    fn serializes_and_round_trips() {
+        let json = r#"{"version":"1","games":{
+            "skyrim":{"name":"Skyrim","nexusSlug":"skyrim","categories":["Armour","Audio"],"masters":["Skyrim.esm"],"eslLimit":2048}
+        }}"#;
+        let d: GamesData = serde_json::from_str(json).unwrap();
+        let out = serde_json::to_string(&d).unwrap();
+        let d2: GamesData = serde_json::from_str(&out).unwrap();
+        assert_eq!(d2.name_for("skyrim"), Some("Skyrim"));
+        assert_eq!(d2.categories_for("skyrim"), ["Armour", "Audio"]);
+        assert_eq!(d2.esl_limit_for("skyrim"), 2048);
+
+        let mut empty = GamesData::default();
+        empty.games.insert(
+            "x".into(),
+            GameEntry {
+                name: "X".into(),
+                nexus_slug: String::new(),
+                categories: Vec::new(),
+                masters: Vec::new(),
+                esl_limit: None,
+            },
+        );
+        let s = serde_json::to_string(&empty).unwrap();
+        assert!(s.contains("\"name\":\"X\""));
+        assert!(!s.contains("nexusSlug"));
+        assert!(!s.contains("categories"));
+        assert!(!s.contains("masters"));
+        assert!(!s.contains("eslLimit"));
     }
 
     /// The shipped dataset carries the base masters of the main games.

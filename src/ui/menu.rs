@@ -178,6 +178,7 @@ impl XimodApp {
         let menu_project_strings = t("menu-project-strings");
         let menu_new_from_folder = t("menu-new-from-folder");
         let menu_templates = t("menu-templates");
+        let menu_preset_wizard = t("menu-preset-wizard");
         let menu_compare = t("menu-compare");
         let menu_condition_editor = t("menu-condition-editor");
         let menu_translate_fomod = t("menu-translate-fomod");
@@ -198,6 +199,8 @@ impl XimodApp {
         let menu_preview = t("menu-preview");
         let menu_validate = t("menu-validate");
         let menu_properties = t("menu-properties");
+        let menu_games_editor = t("menu-games-editor");
+        let menu_tree_colors = t("menu-tree-colors");
         let menu_help = t("menu-help");
         let menu_manual = t("menu-manual");
         let menu_about = t("menu-about");
@@ -353,6 +356,9 @@ impl XimodApp {
                     if item(ui, &menu_templates, None, true) {
                         self.open_templates();
                     }
+                    if item(ui, &menu_preset_wizard, None, true) {
+                        self.open_preset_wizard();
+                    }
                     ui.separator();
                     // XML editor: view/edit info.xml and ModuleConfig.xml.
                     ui.menu_button(&menu_xml_editor, |ui| {
@@ -369,6 +375,9 @@ impl XimodApp {
                 ui.menu_button(&menu_tools, |ui| {
                     if item(ui, &menu_settings, Some(&sct_settings), true) {
                         self.open_settings();
+                    }
+                    if item(ui, &menu_tree_colors, None, true) {
+                        self.open_tree_colors();
                     }
                     ui.separator();
                     if item(ui, &menu_pre_save, None, true) {
@@ -400,6 +409,9 @@ impl XimodApp {
                     }
                     if item(ui, &menu_properties, None, true) {
                         self.open_properties();
+                    }
+                    if item(ui, &menu_games_editor, None, true) {
+                        self.open_games_editor();
                     }
                 });
 

@@ -7,9 +7,10 @@ This is a Rust port of Wenderer's original FOMOD Creation Tool, offering improve
 ## Features
 
 - **FOMOD Package Creation**: Create complete FOMOD installer packages, with nested condition groups, `moduleDependencies`, `alwaysInstall` / `installIfUsable` and explicit ordering preserved
-- **Multi-Step Wizards**: Design complex installation wizards with multiple steps, in a project tree with an inspector, undo/redo, drag-and-drop reordering and full keyboard navigation
+- **Multi-Step Wizards**: Design complex installation wizards with multiple steps, in a project tree with an inspector, undo/redo, drag-and-drop reordering and full keyboard navigation; tree colours per kind of node, customisable per theme
 - **Plugin Groups**: Organize plugins with various selection types (SelectOne, SelectAny, etc.)
-- **Conditional Installation**: Set up file installation based on user choices
+- **Conditional Installation**: Set up file installation based on user choices, with one-click destinations for a whole group, page, conditional set or the required files
+- **Preset Wizard**: Generate a "preset + customise" installer in one step — presets that pre-select features, feature pages shown on demand with the preset's choices as defaults, and conditional installs so nothing is ever installed twice
 - **Dependency Patterns**: Configure plugin types based on dependencies; masters read from `.esp/.esm/.esl` headers become conditions automatically
 - **Flag System**: Use condition flags to control installation flow, with an editable condition editor (rename a flag everywhere, orphan detection, visual condition builder)
 - **Installer Preview**: Simulate the installer as a mod manager shows it — mod information page, every step, hidden pages, final file tree with sizes and overwrites, saved scenarios
@@ -18,12 +19,12 @@ This is a Rust port of Wenderer's original FOMOD Creation Tool, offering improve
 - **Export**: ZIP or 7z packages, rotating backups with atomic writes, Nexus description generator (BBCode / Markdown), FOMOD comparison
 - **Pre/Post Save Scripts**: Execute custom scripts before or after saving
 - **Multi-Language Support**: Interface available in 33 languages, including non-Latin scripts (Arabic, Japanese, Chinese, Korean, Russian, Greek…), with dynamic loading of the bundled Noto fonts
-- **Built-in Tools**: XML editor with live validation, country/language explorer, in-app translation editor, project strings table, archive content viewer
+- **Built-in Tools**: XML editor with live validation, country/language explorer, in-app translation editor, project strings table, archive content viewer, games / Nexus categories editor
 - **Command line**: `validate`, `build`, `package`, `batch`, `inspect`, `archive`, `translate`, `simulate`, `ba2` for CI and bulk work
 - **Cross-Platform**: Works on Windows, Linux, and macOS
 - **Native Splash Screen**: Transparent splash screen with fade effect
 
-See [`CHANGELOG.md`](CHANGELOG.md) for the full list of changes in 2.0.0.
+See [`CHANGELOG.md`](CHANGELOG.md) for the full list of changes in 2.1.0.
 
 ## Building
 
@@ -134,7 +135,7 @@ This creates `XIMOD Architect.app` (and a `.dmg`) in the `dist/` directory. Run
 4. **Add Groups**: Within each step, add plugin groups with different selection types
 5. **Add Plugins**: Add plugins to groups with descriptions, images, and files
 6. **Configure Files**: Add files/folders to install for each plugin
-7. **Set Conditions**: Configure visibility conditions and dependency patterns
+7. **Set Conditions**: Configure visibility conditions and dependency patterns — or let Project → Preset wizard… build a preset-based installer for you
 8. **Save**: File → Save to generate info.xml and ModuleConfig.xml in the fomod folder
 
 ## Project Structure
@@ -143,16 +144,18 @@ This creates `XIMOD Architect.app` (and a `.dmg`) in the `dist/` directory. Run
 ximod-architect/
 ├── src/
 │   ├── main.rs           # Application entry point and CLI dispatcher
+│   ├── color.rs          # Colour conversions and AutoCAD colour index (colour picker)
 │   ├── config.rs         # Configuration management
 │   ├── icon.rs           # Icon loading
 │   ├── splash/           # Native splash screen
-│   ├── models/           # FOMOD model, conflicts, simulator, translation, plugin headers, BSA/BA2
+│   ├── tree_colors.rs    # Project-tree colours per node kind
+│   ├── models/           # FOMOD model, conflicts, simulator, translation, plugin headers, BSA/BA2, presets
 │   ├── ui/               # User interface (tree, inspector, preview, dialogs, condition editor…)
 │   ├── xml/              # XML serialization, validation, lossless patching, fidelity checks
 │   ├── i18n/             # Internationalization (Fluent)
 │   ├── archive.rs        # ZIP / 7z export, BA2 writer
 │   ├── archive_open.rs   # Opening mod archives
-│   ├── backups.rs        # Rotating backups and recovery
+│   ├── backups.rs        # Rotating backups (fomod/backups, excluded from exports)
 │   ├── cli_batch.rs      # `batch` command
 │   ├── cli_translate.rs  # `translate` command
 │   ├── fonts.rs          # Script detection → bundled Noto fonts
@@ -235,6 +238,17 @@ automatically:
   directory: `%APPDATA%\XIMOD Architect` on Windows, `~/.config/XIMOD Architect` on
   Linux, `~/Library/Application Support/XIMOD Architect` on macOS. This lets the app be
   installed under `C:\Program Files` (all users) without needing write access there.
+
+The same file also keeps the project-tree colours (`[TreeColors]`, one set per theme).
+Edits made with Tools → Games / categories… are written to the shipped
+`assets/data/Categories.json` when it is writable, otherwise to a per-user copy in the
+configuration directory that the application then reads first.
+
+**Backups** — each save first copies the previous `info.xml` and `ModuleConfig.xml` to
+`fomod/backups/<date-time>/` and keeps the most recent N (Settings → *Backups to keep*,
+`0` disables them). That folder is never included in the archives made by File → Export
+distribution archive…; if you zip the mod by hand, leave it out or use File → Restore a
+backup… → *Delete all backups* first.
 
 ## License
 

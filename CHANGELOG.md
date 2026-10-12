@@ -4,6 +4,48 @@ All notable changes to XIMOD Architect are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [2.1.0] — 2026-10-12
+
+Three additions driven by user feedback on the 2.0 interface, plus the games
+editor that followed the 2.0.0 release.
+
+### Added
+
+- Preset wizard (Project → Preset wizard…): generates the "preset + customise"
+  pattern of the manual (§ 7.5) on the current project. The first tab works
+  from existing feature pages (tick the pages, name the generated elements,
+  define any number of presets in a choice matrix); the second creates feature
+  pages from a short description. The wizard inserts the installation-mode step
+  (preset group + customise group), makes the pages conditional, flags their
+  options with dynamic *Recommended* types, adds "None" options to exclusive
+  groups and moves the options' files to conditional installs — one undoable
+  edit, nothing installed twice.
+- Tree colours (Tools → Tree colours…): one colour per kind of row of the
+  project tree (mod information, steps, groups, options, required files,
+  conditional installs), one set per theme, stored in `Config.ini`. Colours
+  are chosen in the "Select a colour" window ported from XIMOD Translator
+  (AutoCAD colour index and true colours).
+- The project-relative file dialogs (Add file / Add folder / image browse)
+  reopen in the parent of the last chosen file or folder, so sibling folders
+  are one click away; back to the project root when the folder is gone.
+- Bulk destination on the Required Installs and Conditional Installs tabs:
+  one field and one button set the install destination of every required
+  file, or of every file of the selected conditional set, at once — the
+  counterpart of the group / page controls of the Install Steps tab.
+- Games / categories editor (Tools → Games / categories…): add, correct or
+  remove a game and its Nexus categories without editing `Categories.json` by
+  hand; saved to the shipped file or to a per-user copy on read-only installs.
+- User manual (English and French): § 7.5 "Preset with customisable defaults",
+  § 7.6 "Introduction and closing pages", design rule in § 6.6, drag-and-drop
+  cross-reference in § 4.2, § 8.26 to § 8.29 for the features above.
+
+### Changed
+
+- `Cargo.lock`: toml_datetime 1.1.2, toml_edit 0.25.17, toml_parser 1.1.5,
+  zerocopy / zerocopy-derive 0.8.62.
+- 33 interface languages: every new key translated in every locale (818
+  messages per locale); test suite at 323 tests.
+
 ## [2.0.0] — 2026-10-07
 
 Version 2 is a complete overhaul: the interface was rebuilt around a project tree

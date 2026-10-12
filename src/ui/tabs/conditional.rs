@@ -147,6 +147,8 @@ impl XimodApp {
             ui.add_space(8.0);
             subsection_header(ui, &hdr_files);
 
+            self.render_cond_destination(ui, pattern_idx);
+            ui.add_space(6.0);
             self.render_files_table(
                 ui,
                 FilesTarget::Conditional { pattern: pattern_idx },
@@ -155,6 +157,49 @@ impl XimodApp {
                     grid_id: "cond_files_grid",
                     max_height: 150.0,
                 },
+            );
+        }
+    }
+}
+
+impl XimodApp {
+    /// Panel: assign one install destination to every file of the selected
+    /// conditional set at once (the counterpart of the group / page controls
+    /// of the Install Steps tab — handy after the preset wizard moved the
+    /// options' files here).
+    pub(crate) fn render_cond_destination(&mut self, ui: &mut egui::Ui, pattern_idx: usize) {
+        let hint = self.i18n.t("cond-dest-hint");
+        let btn_apply = self.i18n.t("btn-apply-cond-dest");
+        let label_dest = self.i18n.t("label-destination");
+        let nofiles = self.i18n.t("bulk-dest-nofiles");
+        let file_count = self
+            .ximod
+            .conditional_files
+            .get(pattern_idx)
+            .map(|s| s.files.len())
+            .unwrap_or(0);
+
+        ui.label(egui::RichText::new(&hint).small().color(ui.visuals().weak_text_color()));
+        ui.horizontal(|ui| {
+            ui.label(&label_dest);
+            ui.text_edit_singleline(&mut self.cond_dest_buf);
+            if ui.add_enabled(file_count > 0, egui::Button::new(&btn_apply)).clicked() {
+                let dest = self.cond_dest_buf.trim().to_string();
+                let n = self
+                    .ximod
+                    .conditional_files
+                    .get_mut(pattern_idx)
+                    .map(|s| s.set_all_destinations(&dest))
+                    .unwrap_or(0);
+                self.mark_modified();
+                self.notify_ok(self.i18n.t_num("status-dest-applied", n as i64));
+            }
+        });
+        if file_count == 0 {
+            ui.label(
+                egui::RichText::new(&nofiles)
+                    .small()
+                    .color(ui.visuals().weak_text_color()),
             );
         }
     }

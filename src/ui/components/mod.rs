@@ -380,8 +380,9 @@ pub fn status_bar(ui: &mut Ui, status: &str, modified: bool, modified_text: &str
 }
 
 /// Small icon button used for every "clear / delete" action (filter clearing,
-/// recent-file removal, …). The PNG is embedded in the binary, so it renders
-/// identically on every platform and never depends on font glyph coverage.
+/// recent-file removal, …). It is drawn with the bundled icon font
+/// (egui-phosphor), so it renders identically on every platform and never
+/// depends on the system fonts.
 /// Returns the `Response` so callers can add a tooltip and test `.clicked()`.
 pub fn delete_button(ui: &mut Ui) -> Response {
     let color = crate::ui::theme::Palette::from_ui(ui).danger;

@@ -10,4 +10,5 @@ pub mod plugins;
 pub mod script;
 pub mod settings;
 pub mod templates;
+pub mod tree_colors;
 pub mod update;

@@ -197,6 +197,14 @@ pub struct AppConfig {
     /// keyed by viewport id. A window with no saved size opens at its default
     /// size; once resized, the new size is remembered here.
     pub window_sizes: std::collections::HashMap<String, (f32, f32)>,
+
+    /// Colours of the project tree rows for the dark theme (Tools → Tree
+    /// colours…). Stored as `TreeDark_<kind>=r,g,b`.
+    pub tree_colors_dark: crate::tree_colors::TreeColors,
+
+    /// Colours of the project tree rows for the light theme. Stored as
+    /// `TreeLight_<kind>=r,g,b`.
+    pub tree_colors_light: crate::tree_colors::TreeColors,
 }
 
 impl Default for AppConfig {
@@ -223,6 +231,8 @@ impl Default for AppConfig {
             auto_masters: true,
             window_positions: std::collections::HashMap::new(),
             window_sizes: std::collections::HashMap::new(),
+            tree_colors_dark: crate::tree_colors::TreeColors::DARK,
+            tree_colors_light: crate::tree_colors::TreeColors::LIGHT,
         }
     }
 }
@@ -391,6 +401,16 @@ impl AppConfig {
                 && let Some(p) = parse_pair()
             {
                 config.window_sizes.insert(id.to_string(), p);
+            } else if let Some(kind) = k.strip_prefix("TreeDark_")
+                && let Some(kind) = crate::tree_colors::TreeKind::from_key(kind)
+                && let Some(rgb) = crate::tree_colors::parse_rgb(v)
+            {
+                config.tree_colors_dark.set(kind, rgb);
+            } else if let Some(kind) = k.strip_prefix("TreeLight_")
+                && let Some(kind) = crate::tree_colors::TreeKind::from_key(kind)
+                && let Some(rgb) = crate::tree_colors::parse_rgb(v)
+            {
+                config.tree_colors_light.set(kind, rgb);
             }
         }
 
@@ -477,8 +497,43 @@ impl AppConfig {
             let (w, h) = self.window_sizes[id];
             lines.push(format!("WinSize_{}={},{}", id, w, h));
         }
+        lines.push(String::new());
+
+        lines.push("[TreeColors]".to_string());
+        for kind in crate::tree_colors::TreeKind::ALL {
+            lines.push(format!(
+                "TreeDark_{}={}",
+                kind.key(),
+                crate::tree_colors::format_rgb(self.tree_colors_dark.get(kind))
+            ));
+        }
+        for kind in crate::tree_colors::TreeKind::ALL {
+            lines.push(format!(
+                "TreeLight_{}={}",
+                kind.key(),
+                crate::tree_colors::format_rgb(self.tree_colors_light.get(kind))
+            ));
+        }
 
         lines.join("\n")
+    }
+
+    /// The tree colours of a theme (`dark` as reported by egui's visuals).
+    pub fn tree_colors(&self, dark: bool) -> &crate::tree_colors::TreeColors {
+        if dark {
+            &self.tree_colors_dark
+        } else {
+            &self.tree_colors_light
+        }
+    }
+
+    /// Mutable access to the tree colours of a theme.
+    pub fn tree_colors_mut(&mut self, dark: bool) -> &mut crate::tree_colors::TreeColors {
+        if dark {
+            &mut self.tree_colors_dark
+        } else {
+            &mut self.tree_colors_light
+        }
     }
 
     /// Add a file to recent files list
@@ -658,5 +713,36 @@ RecentFile1=C:\path\to\mod2
         let old = AppConfig::parse_ini("[General]\nLocale=fra\n");
         assert_eq!(old.backup_count, 10);
         assert!(old.auto_masters);
+    }
+
+    /// The two tree-colour sets survive the INI round trip, an edited colour
+    /// only touches its kind and theme, and a malformed value is ignored.
+    #[test]
+    fn tree_colors_roundtrip() {
+        use crate::tree_colors::{TreeColors, TreeKind};
+        let mut config = AppConfig::default();
+        assert_eq!(config.tree_colors_dark, TreeColors::DARK);
+        assert_eq!(config.tree_colors_light, TreeColors::LIGHT);
+        config.tree_colors_mut(true).set(TreeKind::Group, (1, 2, 3));
+        config.tree_colors_mut(false).set(TreeKind::Option, (4, 5, 6));
+        let ini = config.to_ini();
+        assert!(ini.contains("[TreeColors]"));
+        assert!(ini.contains("TreeDark_Group=1,2,3"));
+        assert!(ini.contains("TreeLight_Option=4,5,6"));
+        let parsed = AppConfig::parse_ini(&ini);
+        assert_eq!(parsed.tree_colors(true).get(TreeKind::Group), (1, 2, 3));
+        assert_eq!(parsed.tree_colors(false).get(TreeKind::Option), (4, 5, 6));
+        assert_eq!(
+            parsed.tree_colors(true).get(TreeKind::Option),
+            TreeColors::DARK.get(TreeKind::Option)
+        );
+        assert_eq!(
+            parsed.tree_colors(false).get(TreeKind::Group),
+            TreeColors::LIGHT.get(TreeKind::Group)
+        );
+        // Junk and unknown kinds are ignored; older files keep the defaults.
+        let old = AppConfig::parse_ini("[TreeColors]\nTreeDark_Step=red\nTreeLight_Bogus=1,2,3\n");
+        assert_eq!(old.tree_colors_dark, TreeColors::DARK);
+        assert_eq!(old.tree_colors_light, TreeColors::LIGHT);
     }
 }
