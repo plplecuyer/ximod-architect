@@ -42,9 +42,15 @@ editor that followed the 2.0.0 release.
 ### Changed
 
 - `Cargo.lock`: toml_datetime 1.1.2, toml_edit 0.25.17, toml_parser 1.1.5,
-  zerocopy / zerocopy-derive 0.8.62.
+  zerocopy / zerocopy-derive 0.8.62, cc 1.8.0, litrs 1.0.1, serde_json 1.0.154,
+  smallvec 1.16.3, syn 3.0.8, unicode-ident 1.0.27, uuid 1.28.0, zopfli 0.8.4.
 - 33 interface languages: every new key translated in every locale (818
   messages per locale); test suite at 323 tests.
+- Release workflow: GitHub Actions moved to the Node 24 runtime
+  (`upload-artifact@v7`, `download-artifact@v7`, `action-gh-release@v3`);
+  release job pinned to `ubuntu-24.04` (ubuntu-latest moves to Ubuntu 26).
+- UTF-16 decoding (`xml/mod.rs`, `xml/patch.rs`): `chunks_exact(2)` replaced
+  by `as_chunks::<2>()` (new Clippy 1.99 lint `chunks_exact_to_as_chunks`).
 
 ## [2.0.0] — 2026-10-07
 

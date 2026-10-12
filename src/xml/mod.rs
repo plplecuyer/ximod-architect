@@ -609,8 +609,10 @@ fn read_xml_to_string(path: &Path) -> Result<String> {
     // UTF-16 LE BOM: FF FE
     if bytes.len() >= 2 && bytes[0] == 0xFF && bytes[1] == 0xFE {
         let units: Vec<u16> = bytes[2..]
-            .chunks_exact(2)
-            .map(|c| u16::from_le_bytes([c[0], c[1]]))
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .map(|&pair| u16::from_le_bytes(pair))
             .collect();
         return String::from_utf16(&units).context("Invalid UTF-16 LE content");
     }
@@ -618,8 +620,10 @@ fn read_xml_to_string(path: &Path) -> Result<String> {
     // UTF-16 BE BOM: FE FF
     if bytes.len() >= 2 && bytes[0] == 0xFE && bytes[1] == 0xFF {
         let units: Vec<u16> = bytes[2..]
-            .chunks_exact(2)
-            .map(|c| u16::from_be_bytes([c[0], c[1]]))
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .map(|&pair| u16::from_be_bytes(pair))
             .collect();
         return String::from_utf16(&units).context("Invalid UTF-16 BE content");
     }
