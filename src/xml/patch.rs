@@ -294,11 +294,12 @@ pub struct FomodFiles {
 /// ship `Fomod/`, `Info.xml`, `moduleconfig.xml`, … which only work as-is on
 /// case-insensitive file systems). An exact match wins.
 pub(crate) fn find_entry_ignore_case(dir: &Path, name: &str, want_dir: bool) -> Option<PathBuf> {
-    let exact = dir.join(name);
+    // Always list the directory rather than probing `dir.join(name)`: on a
+    // case-insensitive file system (Windows, default macOS) the probe succeeds
+    // for `Fomod/Info.xml` too, but returns the *requested* spelling, so the
+    // file would be archived twice under two names. Listing yields the name
+    // actually on disk; an exact-case match still wins over the others.
     let matches_kind = |p: &Path| if want_dir { p.is_dir() } else { p.is_file() };
-    if matches_kind(&exact) {
-        return Some(exact);
-    }
     let mut found: Vec<PathBuf> = std::fs::read_dir(dir)
         .ok()?
         .flatten()
@@ -307,6 +308,7 @@ pub(crate) fn find_entry_ignore_case(dir: &Path, name: &str, want_dir: bool) -> 
         .filter(|p| matches_kind(p))
         .collect();
     found.sort();
+    found.sort_by_key(|p| p.file_name().is_none_or(|n| n != name));
     found.into_iter().next()
 }
 

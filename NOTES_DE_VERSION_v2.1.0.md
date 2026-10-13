@@ -50,5 +50,6 @@ traduites sont également à jour.
 ## Remarques
 
 - Les projets et FOMOD enregistrés par la 2.0.0 s'ouvrent sans changement.
+- Corrigé sous Windows et macOS : le paquet de traduction complet d'un FOMOD dont le dossier ou les fichiers ont une autre casse (`Fomod/Info.xml`, `moduleconfig.xml`) ne contient plus les deux fichiers XML en double.
 - Interface en 33 langues ; chaque nouvelle chaîne est traduite partout.
-- La compilation depuis les sources requiert Rust 1.98.1 ou ultérieur.
+- La compilation depuis les sources requiert Rust 1.99.0 ou ultérieur.

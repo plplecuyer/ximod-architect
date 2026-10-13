@@ -182,8 +182,15 @@ mod windows {
                 *pixel_data.add(offset + 3) = a as u8; // Alpha
             }
 
+            // Window position and size, shared by every UpdateLayeredWindow call
+            let pos = POINT { x, y };
+            let size = SIZE {
+                cx: width as i32,
+                cy: height as i32,
+            };
+
             // Update layered window with full opacity initially
-            update_layered_window(hwnd, hdc_screen, hdc_mem, x, y, width, height, 255);
+            update_layered_window(hwnd, hdc_screen, hdc_mem, &pos, &size, 255);
 
             // Show window
             ShowWindow(hwnd, SW_SHOWNOACTIVATE);
@@ -220,7 +227,7 @@ mod windows {
                 };
 
                 // Update window alpha
-                update_layered_window(hwnd, hdc_screen, hdc_mem, x, y, width, height, alpha);
+                update_layered_window(hwnd, hdc_screen, hdc_mem, &pos, &size, alpha);
 
                 std::thread::sleep(Duration::from_millis(16)); // ~60 FPS
             }
@@ -237,22 +244,8 @@ mod windows {
         }
     }
 
-    unsafe fn update_layered_window(
-        hwnd: HWND,
-        hdc_screen: HDC,
-        hdc_mem: HDC,
-        x: i32,
-        y: i32,
-        width: u32,
-        height: u32,
-        alpha: u8,
-    ) {
-        let mut pt_pos = POINT { x, y };
-        let mut pt_src = POINT { x: 0, y: 0 };
-        let mut size = SIZE {
-            cx: width as i32,
-            cy: height as i32,
-        };
+    unsafe fn update_layered_window(hwnd: HWND, hdc_screen: HDC, hdc_mem: HDC, pos: &POINT, size: &SIZE, alpha: u8) {
+        let pt_src = POINT { x: 0, y: 0 };
         let blend = BLENDFUNCTION {
             BlendOp: AC_SRC_OVER,
             BlendFlags: 0,
@@ -261,17 +254,7 @@ mod windows {
         };
 
         unsafe {
-            UpdateLayeredWindow(
-                hwnd,
-                hdc_screen,
-                &mut pt_pos,
-                &mut size,
-                hdc_mem,
-                &mut pt_src,
-                0,
-                &blend,
-                ULW_ALPHA,
-            );
+            UpdateLayeredWindow(hwnd, hdc_screen, pos, size, hdc_mem, &pt_src, 0, &blend, ULW_ALPHA);
         }
     }
 

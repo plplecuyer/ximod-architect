@@ -30,7 +30,7 @@ See [`CHANGELOG.md`](CHANGELOG.md) for the full list of changes in 2.1.0.
 
 ### Prerequisites
 
-- Rust 1.98.1 or later (install from https://rustup.rs)
+- Rust 1.99.0 or later (install from https://rustup.rs)
 - On Linux, the system development libraries. The quickest way is the helper script,
   which detects your distribution (Debian/Ubuntu, Fedora, Arch):
 

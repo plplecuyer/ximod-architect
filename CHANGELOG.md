@@ -41,9 +41,12 @@ editor that followed the 2.0.0 release.
 
 ### Changed
 
+- Minimum supported Rust version raised to 1.99.0 (`rust-version` in
+  `Cargo.toml`), the current stable toolchain.
 - `Cargo.lock`: toml_datetime 1.1.2, toml_edit 0.25.17, toml_parser 1.1.5,
   zerocopy / zerocopy-derive 0.8.62, cc 1.8.0, litrs 1.0.1, serde_json 1.0.154,
-  smallvec 1.16.3, syn 3.0.8, unicode-ident 1.0.27, uuid 1.28.0, zopfli 0.8.4.
+  smallvec 1.16.3, syn 3.0.9, unicode-ident 1.0.27, uuid 1.28.0, zopfli 0.8.4,
+  deranged 0.5.9.
 - 33 interface languages: every new key translated in every locale (818
   messages per locale); test suite at 323 tests.
 - Release workflow: GitHub Actions moved to the Node 24 runtime
@@ -51,6 +54,18 @@ editor that followed the 2.0.0 release.
   release job pinned to `ubuntu-24.04` (ubuntu-latest moves to Ubuntu 26).
 - UTF-16 decoding (`xml/mod.rs`, `xml/patch.rs`): `chunks_exact(2)` replaced
   by `as_chunks::<2>()` (new Clippy 1.99 lint `chunks_exact_to_as_chunks`).
+- Windows splash screen (`splash/mod.rs`): `update_layered_window` takes the
+  window position and size as `&POINT` / `&SIZE` (8 → 6 arguments) and passes
+  shared references to `UpdateLayeredWindow`, which takes `*const` pointers
+  (Clippy `too_many_arguments`, `unnecessary_mut_passed` on Windows).
+
+### Fixed
+
+- Translating an existing FOMOD on Windows or macOS: when the folder or files
+  are spelled differently from `fomod/info.xml` / `ModuleConfig.xml` (for
+  example `Fomod/Info.xml`, `moduleconfig.xml`), the case-insensitive lookup
+  now returns the name actually on disk. A full translation package no longer
+  contains the two XML files twice under two spellings.
 
 ## [2.0.0] — 2026-10-07
 
