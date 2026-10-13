@@ -44,5 +44,6 @@ New sections in English and French: § 7.5 "Preset with customisable defaults",
 ## Notes
 
 - Projects and FOMODs saved by 2.0.0 open unchanged.
+- Fixed on Windows and macOS: a full translation package of a FOMOD whose folder or files use another capitalisation (`Fomod/Info.xml`, `moduleconfig.xml`) no longer holds the two XML files twice.
 - Interface in 33 languages; every new string is translated in every locale.
-- Building from source requires Rust 1.98.1 or later.
+- Building from source requires Rust 1.99.0 or later.
