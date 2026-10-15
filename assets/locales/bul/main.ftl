@@ -63,7 +63,7 @@ tab-conditional = Условни инсталации
 
 # Info Tab
 label-workspace = Работна среда
-label-root-dir = Коренна директория:
+label-root-dir = Коренова директория:
 label-mod-name = Име на мода:
 label-author = Автор:
 label-version = Версия:
@@ -87,7 +87,7 @@ label-visibility = Условия за видимост
 label-operator = Оператор:
 
 # Buttons
-btn-browse = Преглед...
+btn-browse = Преглед…
 btn-clear = Изчисти
 btn-add = Добави
 btn-remove = Премахни
@@ -100,8 +100,8 @@ btn-remove-plugin = Премахни опция
 btn-add-file = Добави файл
 btn-add-folder = Добави папка
 btn-remove-file = Премахни
-btn-add-flag = Добави маркер
-btn-remove-flag = Премахване на маркер
+btn-add-flag = Добави флаг
+btn-remove-flag = Премахни флаг
 btn-add-condition = Добавяне на условие
 btn-remove-condition = Премахване на условие
 btn-add-dependency = Добавяне на зависимост
@@ -372,8 +372,8 @@ conflict-certain = Конфликт на местоназначение: „{ $p
 conflict-potential = Възможен конфликт на местоназначение: „{ $path }“ е цел на { $count } препратки ({ $locs }) — презаписването зависи от избора/условията.
 
 # Multi-FOMOD tabs & exit prompt (V2)
-menu-close-fomod = Затваряне на FOMOD
-menu-close-all-fomods = Затваряне на всички FOMOD
+menu-close-fomod = Затвори FOMOD
+menu-close-all-fomods = Затвори всички FOMOD
 tab-untitled = (без име)
 msg-drop-not-fomod = Пуснатият елемент не е FOMOD (не е открита папка „fomod“)
 exit-title = Незапазени промени
@@ -415,13 +415,13 @@ msg-img-optimized = Изображението е оптимизирано.
 msg-img-ok = Изображението вече е в границите.
 msg-img-none = Няма изображение за оптимизиране.
 msg-crash-recovery = Предишната сесия приключи неочаквано. Резервно копие на проекта ви беше записано в { $path }
-export-progress-title = Създаване на архива за разпространение…
+export-progress-title = Създаване на архива на дистрибуцията…
 export-progress-files = { $done } / { $total } файла
 msg-export-cancelled = Експортирането е отменено; частичният архив беше премахнат.
 verify-running = Проверка на файловете на диска…
 verify-stale = Забележка: проектът беше променен по време на проверката на файловете; стартирайте проверката отново.
 prop-col-name = Име
-menu-save-as = Запазване като…
+menu-save-as = Запази като…
 menu-project = Проект
 menu-tools = Инструменти
 menu-manual = Ръководство за потребителя
@@ -718,7 +718,7 @@ nexus-added = Добавено
 nexus-removed = Премахнато
 nexus-changed = Променено
 btn-copy = Копирай
-btn-save-as = Запазване като…
+btn-save-as = Запази като…
 msg-copied = Копирано в клипборда
 msg-saved-to = Запазено в { $path }
 
@@ -929,3 +929,52 @@ req-dest-hint = Задава едно местоназначение за инс
 btn-apply-req-dest = Приложи към всички задължителни файлове
 cond-dest-hint = Задава едно местоназначение за инсталиране за всеки файл от този условен набор.
 btn-apply-cond-dest = Приложи към всички файлове от този набор
+
+# --- 2.2.0
+menu-cut = Изрежи
+menu-copy = Копирай
+menu-paste = Постави
+tree-cut = Изрежи
+tree-copy = Копирай
+tree-paste = Постави
+msg-node-copied = Елементът „{ $name }“ е копиран — поставете го в този или в друг FOMOD.
+msg-node-cut = Елементът „{ $name }“ е изрязан — Редактиране → Отмяна го връща обратно.
+msg-node-pasted = Елементът „{ $name }“ е поставен.
+msg-paste-need-step = Изберете стъпка, в която да поставите групата.
+msg-paste-need-group = Изберете група, в която да поставите опцията.
+msg-paste-missing-files = Файлове, използвани от поставения елемент, които липсват в папката на този мод: { $num }
+msg-paste-unset-flags = Поставеният елемент проверява флагове, които нищо в този проект не задава: { $flags }
+msg-clipboard-empty = Клипбордът не съдържа стъпка, група или опция.
+btn-rename-on-disk = Преименувай на диска…
+btn-rename-on-disk-hint = Преименува избрания файл или папка в папката на мода и обновява всички препратки към тях.
+rename-title = Преименуване на диска
+rename-current = Текущо: { $path }
+rename-new-name = Ново име
+rename-uses = Препратки в този проект, които ще бъдат обновени: { $num }
+rename-warning = Файлът или папката се преименуват веднага. Редактиране → Отмяна възстановява препратките, но не и името на диска.
+btn-rename = Преименувай
+rename-err-empty = Въведете име.
+rename-err-invalid = Името не може да съдържа / \ : * ? " < > | или да завършва с точка или интервал.
+rename-err-outside = Тази препратка е извън папката на мода.
+rename-err-missing = На този път вече няма нищо — използвайте Проект → Намиране на липсващи файлове…
+rename-err-exists = В тази папка вече съществува елемент с това име.
+rename-err-io = Системата отказа преименуването: { $error }
+msg-renamed = Преименувано на „{ $path }“ — обновени препратки: { $num }.
+menu-find-missing = Намиране на липсващи файлове…
+relink-title = Намиране на липсващи файлове
+relink-hint = Файлове, папки и изображения, използвани от този проект, които вече не съществуват, заедно с намереното от XIMOD в папката на мода. Изберете ново местоположение за всеки, който искате да поправите, след което натиснете „Приложи“.
+relink-none = Всички файлове, папки и изображения на този проект съществуват. Няма нищо за поправяне.
+relink-col-missing = Липсва
+relink-col-uses = Употреби
+relink-col-new = Ново местоположение
+relink-keep = (остави както е)
+relink-moved = същото име, преместен
+relink-renamed = подобно име, преименуван
+relink-browse = Преглед…
+relink-rescan = Повторно сканиране
+btn-apply-relink = Приложи ({ $num })
+msg-relinked = Обновени препратки: { $num }.
+
+# --- 2.2.0: destination cell
+files-dest-hint = (корен на Data)
+files-dest-tooltip = Път за инсталиране спрямо папката Data на играта, например SKSE\Plugins. Оставете празно, за да се инсталира в корена на Data. Щракнете върху клетката, за да я редактирате.

@@ -11,6 +11,7 @@ pub mod jobs;
 pub mod labels;
 pub mod main_window;
 pub mod menu;
+pub mod node_clipboard;
 pub mod preview;
 pub mod problems;
 pub mod project_strings;

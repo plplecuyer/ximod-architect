@@ -252,7 +252,7 @@ trans-saved = Preklad uložený
 trans-save-error = Chyba pri ukladaní prekladu
 
 # XML editor
-xml-editor-title = XML Editor
+xml-editor-title = Editor XML
 xml-editor-edit = Upraviť
 xml-editor-apply = Použiť
 xml-editor-revert = Zrušiť
@@ -373,7 +373,7 @@ conflict-potential = Možný konflikt cieľa: „{ $path }“ je cieľom { $coun
 
 # Multi-FOMOD tabs & exit prompt (V2)
 menu-close-fomod = Zavrieť FOMOD
-menu-close-all-fomods = Zavrieť všetky FOMODy
+menu-close-all-fomods = Zavrieť všetky FOMOD-y
 tab-untitled = (bez názvu)
 msg-drop-not-fomod = Presunutá položka nie je FOMOD (priečinok „fomod“ sa nenašiel)
 exit-title = Neuložené zmeny
@@ -929,3 +929,52 @@ req-dest-hint = Nastaví jeden cieľ inštalácie pre každý povinný súbor.
 btn-apply-req-dest = Použiť na všetky povinné súbory
 cond-dest-hint = Nastaví jeden cieľ inštalácie pre každý súbor tejto podmienenej sady.
 btn-apply-cond-dest = Použiť na všetky súbory tejto sady
+
+# --- 2.2.0
+menu-cut = Vystrihnúť
+menu-copy = Kopírovať
+menu-paste = Prilepiť
+tree-cut = Vystrihnúť
+tree-copy = Kopírovať
+tree-paste = Prilepiť
+msg-node-copied = „{ $name }“ skopírované — prilepte ho do tohto alebo iného FOMOD.
+msg-node-cut = „{ $name }“ vystrihnuté — Úpravy → Späť ho vráti.
+msg-node-pasted = „{ $name }“ prilepené.
+msg-paste-need-step = Vyberte krok, do ktorého sa má skupina prilepiť.
+msg-paste-need-group = Vyberte skupinu, do ktorej sa má možnosť prilepiť.
+msg-paste-missing-files = Počet súborov použitých prilepenou položkou, ktoré nie sú v priečinku tohto modu: { $num }
+msg-paste-unset-flags = Prilepená položka testuje príznaky, ktoré v tomto projekte nič nenastavuje: { $flags }
+msg-clipboard-empty = Schránka neobsahuje žiadny krok, skupinu ani možnosť.
+btn-rename-on-disk = Premenovať na disku…
+btn-rename-on-disk-hint = Premenuje vybraný súbor alebo priečinok v priečinku modu a aktualizuje všetky odkazy naň.
+rename-title = Premenovať na disku
+rename-current = Aktuálne: { $path }
+rename-new-name = Nový názov
+rename-uses = Počet odkazov v tomto projekte, ktoré sa aktualizujú: { $num }
+rename-warning = Súbor alebo priečinok sa premenuje okamžite. Úpravy → Späť obnoví odkazy, nie názov na disku.
+btn-rename = Premenovať
+rename-err-empty = Zadajte názov.
+rename-err-invalid = Názov nesmie obsahovať / \ : * ? " < > | ani končiť bodkou alebo medzerou.
+rename-err-outside = Tento odkaz je mimo priečinka modu.
+rename-err-missing = Na tejto ceste už nič neexistuje — použite Projekt → Nájsť chýbajúce súbory…
+rename-err-exists = V tomto priečinku už existuje položka s týmto názvom.
+rename-err-io = Systém premenovanie odmietol: { $error }
+msg-renamed = Premenované na „{ $path }“ — aktualizovaných odkazov: { $num }.
+menu-find-missing = Nájsť chýbajúce súbory…
+relink-title = Nájsť chýbajúce súbory
+relink-hint = Súbory, priečinky a obrázky používané týmto projektom, ktoré už neexistujú, spolu s tým, čo XIMOD našiel v priečinku modu. Pre každú položku, ktorú chcete opraviť, zvoľte nové umiestnenie a potom kliknite na Použiť.
+relink-none = Všetky súbory, priečinky a obrázky tohto projektu existujú. Nie je čo opravovať.
+relink-col-missing = Chýbajúce
+relink-col-uses = Použitia
+relink-col-new = Nové umiestnenie
+relink-keep = (ponechať bez zmeny)
+relink-moved = rovnaký názov, presunuté
+relink-renamed = podobný názov, premenované
+relink-browse = Prehľadávať…
+relink-rescan = Znova prehľadať
+btn-apply-relink = Použiť ({ $num })
+msg-relinked = Aktualizovaných odkazov: { $num }.
+
+# --- 2.2.0: destination cell
+files-dest-hint = (koreň priečinka Data)
+files-dest-tooltip = Inštalačná cesta relatívna k priečinku Data hry, napríklad SKSE\Plugins. Ak chcete inštalovať do koreňa priečinka Data, nechajte prázdne. Kliknutím na bunku ju upravíte.

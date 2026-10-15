@@ -43,7 +43,7 @@ menu-translation = Translatar l'interfatscha…
 # Menu - Help
 menu-help = Agid
 menu-check-updates = Tschertgar actualisaziuns…
-menu-about = Davart
+menu-about = Davart XIMOD Architect
 
 # Update check
 update-checking = Tschertga d'actualisaziuns…
@@ -87,7 +87,7 @@ label-visibility = Cundiziuns da visibilitad
 label-operator = Operatur:
 
 # Buttons
-btn-browse = Tschertgar...
+btn-browse = Tschertgar…
 btn-clear = Svidar
 btn-add = Agiuntar
 btn-remove = Allontanar
@@ -293,8 +293,8 @@ trans-package-error = Impussibel da crear l’archiv:
 trans-lang-not-iso = La translaziun è pussaivla mo per ina lingua cun in code ISO 639-3.
 
 # FOMOD installer preview
-menu-preview = Prevista da l’installader…
-preview-title = Prevista da l’installader FOMOD
+menu-preview = Prevista da l'installatur…
+preview-title = Prevista da l'installatur FOMOD
 preview-refresh = Actualisar
 preview-assumptions = Premissas davart las datotecas
 preview-details = Detagls
@@ -393,10 +393,10 @@ msg-template-inserted = Model inserì en il project.
 msg-template-no-step = Tscherna l'emprim ina pass per la memorisar sco model.
 msg-template-no-dir = Impussibel da chattar l'ordinatur dals models.
 msg-drop-assigned = Agiuntà { $added } funtauna(s) a l'opziun ({ $rejected } ordaifora da la ragisch ignorà).
-menu-compare = Cumparar cun…
-compare-title = Cumparaziun FOMOD
+menu-compare = Cumparegliar cun…
+compare-title = Cumparegliaziun FOMOD
 compare-none = Naginas differenzas.
-btn-optimize-image = Optimar l'maletg
+btn-optimize-image = Optimar il maletg
 msg-image-optimized = Maletg da chau optimà.
 msg-image-ok = Il maletg da chau è gia entaifer las limitas.
 msg-no-header-image = Nagin maletg da chau per optimar.
@@ -929,3 +929,52 @@ req-dest-hint = Definescha ina destinaziun d'installaziun per mintga datoteca ne
 btn-apply-req-dest = Applitgar a tut las datotecas necessarias
 cond-dest-hint = Definescha ina destinaziun d'installaziun per mintga datoteca da quest set cundiziunal.
 btn-apply-cond-dest = Applitgar a tut las datotecas da quest set
+
+# --- 2.2.0
+menu-cut = Tagliar
+menu-copy = Copiar
+menu-paste = Encollar
+tree-cut = Tagliar
+tree-copy = Copiar
+tree-paste = Encollar
+msg-node-copied = «{ $name }» copià — encolla el en quest FOMOD u en in auter.
+msg-node-cut = «{ $name }» taglià — Modifitgar → Revocar al metta puspè en ses lieu.
+msg-node-pasted = «{ $name }» encollà.
+msg-paste-need-step = Tscherna in pass en il qual encollar la gruppa.
+msg-paste-need-group = Tscherna ina gruppa en la quala encollar l'opziun.
+msg-paste-missing-files = { $num } datoteca(s) utilisada(s) da l'element encollà na sa chattan betg en l'ordinatur da quest mod.
+msg-paste-unset-flags = L'element encollà controllescha flags che nagut en quest project na definescha: { $flags }
+msg-clipboard-empty = L'archiv provisoric na cuntegna ni pass, ni gruppa, ni opziun.
+btn-rename-on-disk = Renumnar sin il disc…
+btn-rename-on-disk-hint = Renumna la datoteca u l'ordinatur tschernì en l'ordinatur dal mod ed actualisescha tut las referenzas a quel.
+rename-title = Renumnar sin il disc
+rename-current = Actual: { $path }
+rename-new-name = Num nov
+rename-uses = { $num } referenza(s) en quest project vegnan adattadas.
+rename-warning = La datoteca u l'ordinatur vegn renumnà immediatamain. Modifitgar → Revocar restaurescha las referenzas, betg il num sin il disc.
+btn-rename = Renumnar
+rename-err-empty = Endatescha in num.
+rename-err-invalid = In num na po betg cuntegnair / \ : * ? " < > | e na po betg finir cun in punct u cun in spazi.
+rename-err-outside = Questa referenza è ordaifer l'ordinatur dal mod.
+rename-err-missing = I na dat nagut pli a questa via — utilisescha Project → Tschertgar datotecas mancantas…
+rename-err-exists = Igl exista gia insatge cun quest num en quest ordinatur.
+rename-err-io = Il sistem ha refusà la renumnaziun: { $error }
+msg-renamed = Renumnà en «{ $path }» — { $num } referenza(s) actualisada(s).
+menu-find-missing = Tschertgar datotecas mancantas…
+relink-title = Tschertgar datotecas mancantas
+relink-hint = Datotecas, ordinaturs e maletgs che quest project utilisescha e ch'existan betg pli, cun quai che XIMOD ha chattà en l'ordinatur dal mod. Tscherna in nov lieu per mintgin che ti vuls curreger, lura Applitgar.
+relink-none = Tut las datotecas, ils ordinaturs ed ils maletgs da quest project existan. Nagut da curreger.
+relink-col-missing = Mancant
+relink-col-uses = Utilisaziuns
+relink-col-new = Nov lieu
+relink-keep = (laschar sco quai ch'igl è)
+relink-moved = medem num, spustà
+relink-renamed = num sumegliant, renumnà
+relink-browse = Tschertgar…
+relink-rescan = Analisar danovamain
+btn-apply-relink = Applitgar ({ $num })
+msg-relinked = { $num } referenza(s) actualisada(s).
+
+# --- 2.2.0: destination cell
+files-dest-hint = (ragisch da Data)
+files-dest-tooltip = Via d'installaziun relativa a l'ordinatur Data dal gieu, per exempel SKSE\Plugins. Laschar vid per installar en la ragisch da Data. Cliccar sin la cella per la modifitgar.

@@ -4,6 +4,64 @@ All notable changes to XIMOD Architect are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [2.2.0] — 2026-10-14
+
+Three additions suggested by Wenderer, author of the original FOMOD Creation
+Tool, and by one of its users: moving installer pieces between FOMODs, and
+keeping file references in step with the disk. The release also answers
+feedback from Nexus users (TheRealDoctorNormal, VikMorroHun, rbtRvlt,
+Krou705).
+
+### Added
+
+- Cut / copy / paste of steps, groups and options (Edit menu, tree context
+  menus, Ctrl+X / Ctrl+C / Ctrl+V while the tree has the focus). The clipboard
+  is shared by every open FOMOD tab, and a copy also reaches the system
+  clipboard, so nodes travel between two XIMOD windows. Pasting follows the
+  selection: a step goes after the selected step, a group into the selected
+  step, an option into the selected group; one undoable edit. After a paste,
+  XIMOD warns about files the pasted node uses that are not in this mod's
+  folder and about flags it tests that nothing in the project sets.
+- Rename on disk… (files tables of options, required files and conditional
+  sets): renames the selected file or folder in the mod folder and updates
+  every reference to it — for a folder, every reference inside it as well —
+  keeping each reference's separator style. Case-only renames work on every
+  file system.
+- Project → Find missing files…: lists the files, folders and images the
+  project uses that no longer exist, with candidates found in the mod folder
+  (same name elsewhere → moved; similar name where it was → renamed). A single
+  "moved" match is pre-selected; Browse… picks any other location; Apply
+  updates every reference at once (one undo step) and rescans.
+- The Destination cell of the files tables shows "(root of Data)" in grey
+  while it is empty, and its tooltip explains the path and that the cell is
+  edited by clicking in it — some users did not realise it was editable.
+- The "Created with…" comment at the top of info.xml and ModuleConfig.xml now
+  carries the application's Nexus page, as the original FOMOD Creation Tool
+  did.
+
+### Changed
+
+- 33 interface languages: the 45 new strings are translated in every locale
+  (863 messages per locale); Chinese "Duplicate" becomes 创建副本 so that it
+  differs from the new "Copy" (复制). Test suite at 337 tests.
+- Interface labels reviewed in every language: 128 labels corrected (typos,
+  incomplete phrases, a verb form out of line with the rest of its menu, one
+  concept translated two ways, a space before "…", "..." instead of "…"),
+  for example Greek "About", Croatian "Merge FOMOD…", Maltese "Move before /
+  after", Norwegian ellipses, Japanese spacing.
+- One term per concept, in the interface and the manual: "flag" is drapeau
+  (French), bandera (Spanish), bandeira (Portuguese) and pavilion (Romanian);
+  an installation step is tappa (Italian); an option is opció (Hungarian).
+- User manual (32 languages): § 1.1 now says that FOMOD is a mod-manager
+  format — installers work with every Bethesda game and most other games that
+  Vortex or Mod Organizer 2 can manage; the built-in game list only fills in
+  info.xml. F1 is documented as opening the manual (it was given as opening
+  the About window); the tree's Move before / Move after commands are named
+  correctly; menu, tab and button names now match the interface of each
+  language, including the Bulgarian, Korean and Maltese editions, which
+  still used English names; the original tool is called by its real name,
+  FOMOD Creation Tool.
+
 ## [2.1.0] — 2026-10-12
 
 Three additions driven by user feedback on the 2.0 interface, plus the games

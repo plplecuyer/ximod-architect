@@ -33,7 +33,7 @@ menu-save = Lagre
 menu-recent = Nylige
 menu-exit = Avslutt
 menu-merge = Slå sammen FOMOD…
-menu-export = Eksporter distribusjonsarkiv …
+menu-export = Eksporter distribusjonsarkiv…
 # Menu - Options
 menu-options = Alternativer
 menu-settings = Innstillinger…
@@ -242,7 +242,7 @@ msg-settings-save-error = Feil ved lagring av innstillinger
 msg-script-save-error = Feil ved lagring av skript
 
 # Translation editor
-trans-title = Oversettelseseditor
+trans-title = Oversettelsesredigerer
 trans-source-lang = Vist språk:
 trans-target-lang = Språk å oversette:
 trans-col-key = Nøkkel
@@ -274,7 +274,7 @@ flags-none = Fant ingen flagg
 trans-endonym = Landets endonym:
 trans-font = Skrift:
 trans-no-font = (ingen)
-trans-browse = Bla gjennom …
+trans-browse = Bla gjennom…
 trans-google-fonts = Google Fonts
 trans-pick-country = Klikk for å velge landet
 trans-font-outside = Skriften må først installeres i assets/fonts.
@@ -283,7 +283,7 @@ trans-font-dir-missing = Fant ikke mappen assets/fonts.
 # Translation submission
 trans-lang-endonym = Språkets endonym:
 trans-author = Forfatter:
-trans-submit = Send …
+trans-submit = Send…
 trans-submit-hint = Bygg en zip og åpne en forhåndsutfylt e-post
 trans-data-updated = Referansedata oppdatert (Languages.json / Countries.json)
 trans-package-ready = Arkiv klart:
@@ -293,7 +293,7 @@ trans-package-error = Kunne ikke bygge arkivet:
 trans-lang-not-iso = Oversettelse er bare mulig for et språk med en ISO 639-3-kode.
 
 # FOMOD installer preview
-menu-preview = Forhåndsvis installasjonsprogram …
+menu-preview = Forhåndsvis installasjonsprogram…
 preview-title = Forhåndsvisning av FOMOD-installasjonsprogram
 preview-refresh = Oppdater
 preview-assumptions = Filantakelser
@@ -339,7 +339,7 @@ reorder-before = Flytt før
 reorder-after = Flytt etter
 
 # Country / language database explorer (Properties)
-menu-properties = Egenskaper …
+menu-properties = Egenskaper…
 prop-title = Database over land og språk
 prop-tab-countries = Land
 prop-tab-languages = Språk
@@ -597,8 +597,8 @@ ftr-use-suggestion = Bruk
 ftr-propagate = Overfør til identiske
 ftr-propagate-hint = Kopier denne oversettelsen til alle andre strenger med samme kildetekst som fortsatt er uoversatte.
 ftr-propagated = { $num } identiske strenger fylt ut.
-ftr-csv-export = Eksporter CSV …
-ftr-csv-import = Importer CSV …
+ftr-csv-export = Eksporter CSV…
+ftr-csv-import = Importer CSV…
 ftr-csv-imported = { $num } strenger oppdatert fra CSV-filen.
 ftr-csv-error = CSV-feil: { $error }
 ftr-glossary = Ordliste
@@ -857,7 +857,7 @@ tree-colors-theme-dark = Disse fargene gjelder for det mørke temaet.
 tree-colors-theme-light = Disse fargene gjelder for det lyse temaet.
 tree-colors-click = Rediger denne fargen…
 tree-colors-reset = Tilbakestill farger
-tree-kind-info = Modinformasjon
+tree-kind-info = Mod-informasjon
 tree-kind-step = Trinn
 tree-kind-group = Grupper
 tree-kind-option = Alternativer
@@ -929,3 +929,52 @@ req-dest-hint = Angir ett installasjonsmål for hver påkrevde fil.
 btn-apply-req-dest = Bruk på alle påkrevde filer
 cond-dest-hint = Angir ett installasjonsmål for hver fil i dette betingede settet.
 btn-apply-cond-dest = Bruk på alle filer i dette settet
+
+# --- 2.2.0
+menu-cut = Klipp ut
+menu-copy = Kopier
+menu-paste = Lim inn
+tree-cut = Klipp ut
+tree-copy = Kopier
+tree-paste = Lim inn
+msg-node-copied = «{ $name }» kopiert – lim den inn i denne eller en annen FOMOD.
+msg-node-cut = «{ $name }» klippet ut – Rediger → Angre legger den tilbake.
+msg-node-pasted = «{ $name }» limt inn.
+msg-paste-need-step = Velg et trinn å lime inn gruppen i.
+msg-paste-need-group = Velg en gruppe å lime inn alternativet i.
+msg-paste-missing-files = { $num } fil(er) som brukes av det innlimte elementet, finnes ikke i denne moddens mappe.
+msg-paste-unset-flags = Det innlimte elementet tester flagg som ingenting i dette prosjektet setter: { $flags }
+msg-clipboard-empty = Utklippstavlen inneholder verken trinn, gruppe eller alternativ.
+btn-rename-on-disk = Gi nytt navn på disk…
+btn-rename-on-disk-hint = Gir den valgte filen eller mappen nytt navn i mod-mappen og oppdaterer alle referanser til den.
+rename-title = Gi nytt navn på disk
+rename-current = Nåværende: { $path }
+rename-new-name = Nytt navn
+rename-uses = { $num } referanse(r) i dette prosjektet følger med.
+rename-warning = Filen eller mappen får nytt navn med en gang. Rediger → Angre gjenoppretter referansene, ikke navnet på disken.
+btn-rename = Gi nytt navn
+rename-err-empty = Skriv inn et navn.
+rename-err-invalid = Et navn kan ikke inneholde / \ : * ? " < > | eller slutte med punktum eller mellomrom.
+rename-err-outside = Denne referansen ligger utenfor mod-mappen.
+rename-err-missing = Det finnes ikke lenger noe på denne banen – bruk Prosjekt → Finn manglende filer…
+rename-err-exists = Det finnes allerede noe med det navnet i denne mappen.
+rename-err-io = Systemet avviste navneendringen: { $error }
+msg-renamed = Nytt navn: «{ $path }» – { $num } referanse(r) oppdatert.
+menu-find-missing = Finn manglende filer…
+relink-title = Finn manglende filer
+relink-hint = Filer, mapper og bilder som dette prosjektet bruker, men som ikke lenger finnes, med det XIMOD fant i mod-mappen. Velg en ny plassering for hver som skal rettes, og klikk deretter Bruk.
+relink-none = Alle filer, mapper og bilder i dette prosjektet finnes. Ingenting å rette.
+relink-col-missing = Mangler
+relink-col-uses = Forekomster
+relink-col-new = Ny plassering
+relink-keep = (la være som det er)
+relink-moved = samme navn, flyttet
+relink-renamed = lignende navn, omdøpt
+relink-browse = Bla gjennom…
+relink-rescan = Skann på nytt
+btn-apply-relink = Bruk ({ $num })
+msg-relinked = { $num } referanse(r) oppdatert.
+
+# --- 2.2.0: destination cell
+files-dest-hint = (roten av Data)
+files-dest-tooltip = Installasjonsbane relativt til spillets Data-mappe, for eksempel SKSE\Plugins. La stå tomt for å installere i roten av Data. Klikk på cellen for å redigere den.

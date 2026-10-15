@@ -37,13 +37,13 @@ menu-export = Easpórtáil cartlann dáilte…
 # Menu - Options
 menu-options = Roghanna
 menu-settings = Socruithe…
-menu-pre-save-script = Scriptiúr Réamhshábhála…
-menu-post-save-script = Scriptiúr Iarshábhála…
+menu-pre-save-script = Script réamhshábhála…
+menu-post-save-script = Script iarshábhála…
 menu-translation = Aistrigh an comhéadan…
 # Menu - Help
 menu-help = Cabhair
 menu-check-updates = Seiceáil le haghaidh nuashonruithe…
-menu-about = Maidir le
+menu-about = Faoi XIMOD Architect
 
 # Update check
 update-checking = Ag seiceáil le haghaidh nuashonruithe…
@@ -87,7 +87,7 @@ label-visibility = Coinníollacha Infheictheachta
 label-operator = Oibritheoir:
 
 # Buttons
-btn-browse = Brabhsáil...
+btn-browse = Brabhsáil…
 btn-clear = Glan
 btn-add = Cuir Leis
 btn-remove = Bain
@@ -168,7 +168,7 @@ about-copyright = © 2025-2026 Foireann XIMOD
 about-credit = Port Rust den uirlis bhunaidh ag Wenderer:
 
 # Script Dialog
-script-title = Eagar a chur ar an Scrípt
+script-title = Eagar a chur ar an script
 script-info = Ritheann scripteanna roimh shábháil nó ina diaidh. Is féidir leat na macraí seo a leanas a úsáid:
 script-macros = Macraí ar Fáil:
 macro-modname = $MODNAME$ - Ainm an mhod
@@ -319,8 +319,8 @@ preview-sel-all = Tá na roghanna go léir suiteáilte.
 preview-sel-atleastone = Roghnaigh roghanna amháin ar a laghad.
 
 # FOMOD validation (ModConfig 5.0 schema)
-menu-validate = Fíoraigh FOMOD
-validate-report-title = Fíorú FOMOD
+menu-validate = Bailíochtaigh FOMOD
+validate-report-title = Bailíochtú FOMOD
 validate-ok = Níor aimsíodh aon fhadhb. Comhlíonann an FOMOD an scéimre.
 xml-editor-schema-ok = Comhlíonann sé scéimre ModConfig 5.0.
 xml-editor-schema-issues = Fadhbanna scéime:
@@ -335,8 +335,8 @@ schema-bad-enum = Luach neamhbhailí "{ $value }" do { $element }/@{ $attr } (a 
 schema-choose-one = Caithfidh "{ $parent }" a bheith ann go díreach ceann amháin de: { $options }.
 
 # Reordering (steps / groups / plugins)
-reorder-before = Bogadh roimh
-reorder-after = Bogadh i ndiaidh
+reorder-before = Bog roimh
+reorder-after = Bog i ndiaidh
 
 # Country / language database explorer (Properties)
 menu-properties = Airíonna…
@@ -929,3 +929,52 @@ req-dest-hint = Socraíonn sé sprioc shuiteála amháin do gach comhad riachtan
 btn-apply-req-dest = Cuir i bhfeidhm ar gach comhad riachtanach
 cond-dest-hint = Socraíonn sé sprioc shuiteála amháin do gach comhad sa tacar coinníollach seo.
 btn-apply-cond-dest = Cuir i bhfeidhm ar gach comhad sa tacar seo
+
+# --- 2.2.0
+menu-cut = Gearr
+menu-copy = Cóipeáil
+menu-paste = Greamaigh
+tree-cut = Gearr
+tree-copy = Cóipeáil
+tree-paste = Greamaigh
+msg-node-copied = Cóipeáladh “{ $name }” — greamaigh isteach sa FOMOD seo nó i FOMOD eile é.
+msg-node-cut = Gearradh “{ $name }” — cuireann Eagar → Cealaigh ar ais é.
+msg-node-pasted = Greamaíodh “{ $name }”.
+msg-paste-need-step = Roghnaigh céim chun grúpa a ghreamú isteach inti.
+msg-paste-need-group = Roghnaigh grúpa chun rogha a ghreamú isteach ann.
+msg-paste-missing-files = Comhaid a úsáideann an mhír ghreamaithe nach bhfuil i bhfillteán an mhod seo: { $num }
+msg-paste-unset-flags = Tástálann an mhír ghreamaithe bratacha nach socraíonn aon rud sa tionscadal seo: { $flags }
+msg-clipboard-empty = Níl aon chéim, grúpa ná rogha sa ghearrthaisce.
+btn-rename-on-disk = Athainmnigh ar an diosca…
+btn-rename-on-disk-hint = Athainmníonn sé an comhad nó an fillteán roghnaithe i bhfillteán an mhod agus nuashonraíonn sé gach tagairt dó.
+rename-title = Athainmnigh ar an diosca
+rename-current = Reatha: { $path }
+rename-new-name = Ainm nua
+rename-uses = Tagairtí sa tionscadal seo a nuashonrófar dá réir: { $num }
+rename-warning = Athainmnítear an comhad nó an fillteán láithreach. Aischuireann Eagar → Cealaigh na tagairtí, ach ní an t-ainm ar an diosca.
+btn-rename = Athainmnigh
+rename-err-empty = Cuir ainm isteach.
+rename-err-invalid = Ní féidir / \ : * ? " < > | a bheith in ainm, ná ní féidir leis críochnú le ponc ná le spás.
+rename-err-outside = Tá an tagairt seo lasmuigh d'fhillteán an mhod.
+rename-err-missing = Níl aon rud ag an gcosán seo a thuilleadh — úsáid Tionscadal → Aimsigh comhaid ar iarraidh…
+rename-err-exists = Tá rud leis an ainm sin san fhillteán seo cheana féin.
+rename-err-io = Dhiúltaigh an córas don athainmniú: { $error }
+msg-renamed = Athainmníodh go “{ $path }” — tagairtí nuashonraithe: { $num }.
+menu-find-missing = Aimsigh comhaid ar iarraidh…
+relink-title = Aimsigh comhaid ar iarraidh
+relink-hint = Comhaid, fillteáin agus íomhánna a úsáideann an tionscadal seo nach ann dóibh a thuilleadh, mar aon leis an méid a d'aimsigh XIMOD i bhfillteán an mhod. Roghnaigh suíomh nua do gach ceann is mian leat a dheisiú, ansin Cuir i bhfeidhm.
+relink-none = Tá gach comhad, fillteán agus íomhá den tionscadal seo ann. Níl aon rud le deisiú.
+relink-col-missing = Ar iarraidh
+relink-col-uses = Úsáidí
+relink-col-new = Suíomh nua
+relink-keep = (fág mar atá)
+relink-moved = an t-ainm céanna, bogtha
+relink-renamed = ainm cosúil, athainmnithe
+relink-browse = Brabhsáil…
+relink-rescan = Athscan
+btn-apply-relink = Cuir i bhfeidhm ({ $num })
+msg-relinked = Tagairtí nuashonraithe: { $num }.
+
+# --- 2.2.0: destination cell
+files-dest-hint = (fréamh Data)
+files-dest-tooltip = Conair suiteála coibhneasta le fillteán Data an chluiche, mar shampla SKSE\Plugins. Fág folamh chun suiteáil i bhfréamh Data. Cliceáil ar an gcill chun í a chur in eagar.

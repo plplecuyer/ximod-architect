@@ -87,7 +87,7 @@ label-visibility = Условия видимости
 label-operator = Оператор:
 
 # Buttons
-btn-browse = Обзор...
+btn-browse = Обзор…
 btn-clear = Очистить
 btn-add = Добавить
 btn-remove = Удалить
@@ -266,7 +266,7 @@ xml-editor-error-at = Строка { $line }, столбец { $col }: { $msg }
 # Country / flag picker
 settings-country-name = Название страны:
 settings-pick-country = Нажмите, чтобы выбрать страну
-flags-title = Выбрать страну
+flags-title = Выбор страны
 flags-filter = Фильтр:
 flags-none = Флаг не найден
 
@@ -335,7 +335,7 @@ schema-bad-enum = Недопустимое значение «{ $value }» дл�
 schema-choose-one = «{ $parent }» должен содержать ровно один из элементов: { $options }.
 
 # Reordering (steps / groups / plugins)
-reorder-before = Переместить вперед
+reorder-before = Переместить вперёд
 reorder-after = Переместить назад
 
 # Country / language database explorer (Properties)
@@ -415,7 +415,7 @@ msg-img-optimized = Изображение оптимизировано.
 msg-img-ok = Изображение уже в пределах.
 msg-img-none = Нет изображения для оптимизации.
 msg-crash-recovery = Предыдущий сеанс завершился непредвиденно. Резервная копия вашего проекта сохранена в { $path }
-export-progress-title = Создание архива для распространения…
+export-progress-title = Создание архива дистрибутива…
 export-progress-files = { $done } / { $total } файлов
 msg-export-cancelled = Экспорт отменён; частичный архив удалён.
 verify-running = Проверка файлов на диске…
@@ -929,3 +929,52 @@ req-dest-hint = Задаёт одно место установки для ка�
 btn-apply-req-dest = Применить ко всем обязательным файлам
 cond-dest-hint = Задаёт одно место установки для каждого файла этого условного набора.
 btn-apply-cond-dest = Применить ко всем файлам этого набора
+
+# --- 2.2.0
+menu-cut = Вырезать
+menu-copy = Копировать
+menu-paste = Вставить
+tree-cut = Вырезать
+tree-copy = Копировать
+tree-paste = Вставить
+msg-node-copied = Элемент «{ $name }» скопирован — вставьте его в этот или другой FOMOD.
+msg-node-cut = Элемент «{ $name }» вырезан — Правка → Отменить вернёт его на место.
+msg-node-pasted = Элемент «{ $name }» вставлен.
+msg-paste-need-step = Выберите шаг, в который нужно вставить группу.
+msg-paste-need-group = Выберите группу, в которую нужно вставить опцию.
+msg-paste-missing-files = Файлы, используемые вставленным элементом, отсутствуют в папке этого мода: { $num }
+msg-paste-unset-flags = Вставленный элемент проверяет флаги, которые ничто в этом проекте не задаёт: { $flags }
+msg-clipboard-empty = В буфере обмена нет ни шага, ни группы, ни опции.
+btn-rename-on-disk = Переименовать на диске…
+btn-rename-on-disk-hint = Переименовать выбранный файл или папку в папке мода и обновить все ссылки на них.
+rename-title = Переименование на диске
+rename-current = Текущее: { $path }
+rename-new-name = Новое имя
+rename-uses = Ссылок в этом проекте, которые будут обновлены: { $num }
+rename-warning = Файл или папка переименовываются сразу. Правка → Отменить восстанавливает ссылки, но не имя на диске.
+btn-rename = Переименовать
+rename-err-empty = Введите имя.
+rename-err-invalid = Имя не может содержать / \ : * ? " < > | и не может заканчиваться точкой или пробелом.
+rename-err-outside = Эта ссылка находится вне папки мода.
+rename-err-missing = По этому пути больше ничего нет — используйте Проект → Найти отсутствующие файлы…
+rename-err-exists = В этой папке уже есть элемент с таким именем.
+rename-err-io = Система отказала в переименовании: { $error }
+msg-renamed = Переименовано в «{ $path }» — обновлено ссылок: { $num }.
+menu-find-missing = Найти отсутствующие файлы…
+relink-title = Найти отсутствующие файлы
+relink-hint = Файлы, папки и изображения, используемые этим проектом, которых больше не существует, и то, что XIMOD нашёл в папке мода. Выберите новое расположение для каждого элемента, который нужно исправить, затем нажмите «Применить».
+relink-none = Все файлы, папки и изображения этого проекта существуют. Исправлять нечего.
+relink-col-missing = Отсутствует
+relink-col-uses = Использования
+relink-col-new = Новое расположение
+relink-keep = (оставить как есть)
+relink-moved = то же имя, перемещён
+relink-renamed = похожее имя, переименован
+relink-browse = Обзор…
+relink-rescan = Сканировать заново
+btn-apply-relink = Применить ({ $num })
+msg-relinked = Обновлено ссылок: { $num }.
+
+# --- 2.2.0: destination cell
+files-dest-hint = (корень Data)
+files-dest-tooltip = Путь установки относительно папки Data игры, например SKSE\Plugins. Оставьте пустым, чтобы установить в корень Data. Нажмите на ячейку, чтобы изменить её.

@@ -1,6 +1,6 @@
 # XIMOD Architect
 
-A cross-platform FOMOD installer creation tool for Bethesda game mods (Skyrim, Fallout 4, Starfield, etc.).
+A cross-platform FOMOD installer creation tool for Bethesda game mods (Skyrim, Fallout 4, Starfield, etc.) — and, since FOMOD is a mod-manager format, for most other games that Vortex or Mod Organizer 2 can manage.
 
 This is a Rust port of Wenderer's original FOMOD Creation Tool, offering improved performance, cross-platform support, and a modern UI.
 
@@ -8,6 +8,8 @@ This is a Rust port of Wenderer's original FOMOD Creation Tool, offering improve
 
 - **FOMOD Package Creation**: Create complete FOMOD installer packages, with nested condition groups, `moduleDependencies`, `alwaysInstall` / `installIfUsable` and explicit ordering preserved
 - **Multi-Step Wizards**: Design complex installation wizards with multiple steps, in a project tree with an inspector, undo/redo, drag-and-drop reordering and full keyboard navigation; tree colours per kind of node, customisable per theme
+- **Cut / Copy / Paste**: Move steps, groups and options between open FOMODs (or two XIMOD windows), with warnings for files and flags the pasted node needs
+- **File references kept in sync**: Rename a source on disk and every reference follows; Find missing files proposes where moved or renamed files went
 - **Plugin Groups**: Organize plugins with various selection types (SelectOne, SelectAny, etc.)
 - **Conditional Installation**: Set up file installation based on user choices, with one-click destinations for a whole group, page, conditional set or the required files
 - **Preset Wizard**: Generate a "preset + customise" installer in one step — presets that pre-select features, feature pages shown on demand with the preset's choices as defaults, and conditional installs so nothing is ever installed twice
@@ -24,7 +26,7 @@ This is a Rust port of Wenderer's original FOMOD Creation Tool, offering improve
 - **Cross-Platform**: Works on Windows, Linux, and macOS
 - **Native Splash Screen**: Transparent splash screen with fade effect
 
-See [`CHANGELOG.md`](CHANGELOG.md) for the full list of changes in 2.1.0.
+See [`CHANGELOG.md`](CHANGELOG.md) for the full list of changes in 2.2.0.
 
 ## Building
 

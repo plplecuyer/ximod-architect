@@ -5,9 +5,11 @@ mod ximod;
 
 // --- V2 roadmap (skeletons) ---
 pub mod bethesda_archive;
+pub mod clipboard;
 pub mod compare;
 pub mod condition_text;
 pub mod conflicts;
+pub mod file_refs;
 pub mod flags;
 pub mod nexus_desc;
 pub mod plugin_checks;

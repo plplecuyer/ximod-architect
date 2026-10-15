@@ -57,7 +57,7 @@ update-later = Plus tard
 
 # Tabs
 tab-info = Info Mod
-tab-steps = Étapes d'Installation
+tab-steps = Étapes d'installation
 tab-required = Installations requises
 tab-conditional = Installations conditionnelles
 
@@ -87,7 +87,7 @@ label-visibility = Conditions de visibilité
 label-operator = Opérateur :
 
 # Buttons
-btn-browse = Parcourir...
+btn-browse = Parcourir…
 btn-clear = Effacer
 btn-add = Ajouter
 btn-remove = Supprimer
@@ -100,14 +100,14 @@ btn-remove-plugin = Supprimer l'option
 btn-add-file = Ajouter fichier
 btn-add-folder = Ajouter dossier
 btn-remove-file = Supprimer
-btn-add-flag = Ajouter flag
-btn-remove-flag = Supprimer flag
+btn-add-flag = Ajouter drapeau
+btn-remove-flag = Supprimer drapeau
 btn-add-condition = Ajouter condition
 btn-remove-condition = Supprimer condition
 btn-add-dependency = Ajouter dépendance
 btn-remove-dependency = Supprimer dépendance
-btn-add-pattern = Nouveau pattern
-btn-remove-pattern = Supprimer pattern
+btn-add-pattern = Nouveau motif
+btn-remove-pattern = Supprimer motif
 btn-save = Enregistrer
 btn-cancel = Annuler
 btn-ok = OK
@@ -115,7 +115,7 @@ btn-yes = Oui
 btn-no = Non
 
 # Condition/Dependency Labels
-label-flag-name = Nom du flag :
+label-flag-name = Nom du drapeau :
 label-flag-value = Valeur :
 label-condition-type = Type :
 label-condition-name = Nom :
@@ -231,7 +231,7 @@ filter-images = Images
 filter-xml = XML
 
 # Dependency types
-dep-type-flag = Flag
+dep-type-flag = Drapeau
 dep-type-file = Fichier
 
 # Status bar
@@ -372,8 +372,8 @@ conflict-certain = Conflit de destination : « { $path } » est écrit par { $co
 conflict-potential = Conflit de destination possible : « { $path } » est visé par { $count } références ({ $locs }) — l'écrasement dépend de la sélection/des conditions.
 
 # Onglets multi-FOMOD & alerte de fermeture (V2)
-menu-close-fomod = Fermer le Fomod
-menu-close-all-fomods = Fermer tous les Fomods
+menu-close-fomod = Fermer le FOMOD
+menu-close-all-fomods = Fermer tous les FOMOD
 tab-untitled = (sans titre)
 msg-drop-not-fomod = L'élément déposé n'est pas un FOMOD (dossier « fomod » introuvable)
 exit-title = Modifications non enregistrées
@@ -929,3 +929,52 @@ req-dest-hint = Définit une seule destination d'installation pour tous les fich
 btn-apply-req-dest = Appliquer à tous les fichiers requis
 cond-dest-hint = Définit une seule destination d'installation pour tous les fichiers de cet ensemble conditionnel.
 btn-apply-cond-dest = Appliquer à tous les fichiers de l'ensemble
+
+# --- 2.2.0 : presse-papiers, renommage sur le disque, fichiers manquants
+menu-cut = Couper
+menu-copy = Copier
+menu-paste = Coller
+tree-cut = Couper
+tree-copy = Copier
+tree-paste = Coller
+msg-node-copied = « { $name } » copié — collez-le dans ce FOMOD ou dans un autre.
+msg-node-cut = « { $name } » coupé — Édition → Annuler le remet en place.
+msg-node-pasted = « { $name } » collé.
+msg-paste-need-step = Sélectionnez une étape dans laquelle coller le groupe.
+msg-paste-need-group = Sélectionnez un groupe dans lequel coller l'option.
+msg-paste-missing-files = { $num } fichier(s) utilisé(s) par l'élément collé ne se trouvent pas dans le dossier de ce mod.
+msg-paste-unset-flags = L'élément collé teste des drapeaux qu'aucune option de ce projet ne définit : { $flags }
+msg-clipboard-empty = Le presse-papiers ne contient ni étape, ni groupe, ni option.
+btn-rename-on-disk = Renommer sur le disque…
+btn-rename-on-disk-hint = Renomme le fichier ou le dossier sélectionné dans le dossier du mod et met à jour toutes ses références.
+rename-title = Renommer sur le disque
+rename-current = Actuel : { $path }
+rename-new-name = Nouveau nom
+rename-uses = { $num } référence(s) de ce projet suivront.
+rename-warning = Le fichier ou le dossier est renommé immédiatement. Édition → Annuler rétablit les références, pas le nom sur le disque.
+btn-rename = Renommer
+rename-err-empty = Saisissez un nom.
+rename-err-invalid = Un nom ne peut pas contenir / \ : * ? " < > | ni se terminer par un point ou une espace.
+rename-err-outside = Cette référence est en dehors du dossier du mod.
+rename-err-missing = Plus rien n'existe à cet emplacement — utilisez Projet → Retrouver les fichiers manquants…
+rename-err-exists = Un élément de ce nom existe déjà dans ce dossier.
+rename-err-io = Le système a refusé le renommage : { $error }
+msg-renamed = Renommé en « { $path } » — { $num } référence(s) mise(s) à jour.
+menu-find-missing = Retrouver les fichiers manquants…
+relink-title = Retrouver les fichiers manquants
+relink-hint = Fichiers, dossiers et images utilisés par ce projet qui n'existent plus, avec ce que XIMOD a trouvé dans le dossier du mod. Choisissez un nouvel emplacement pour chacun de ceux à corriger, puis Appliquer.
+relink-none = Tous les fichiers, dossiers et images de ce projet existent. Rien à corriger.
+relink-col-missing = Manquant
+relink-col-uses = Utilisations
+relink-col-new = Nouvel emplacement
+relink-keep = (laisser tel quel)
+relink-moved = même nom, déplacé
+relink-renamed = nom proche, renommé
+relink-browse = Parcourir…
+relink-rescan = Analyser à nouveau
+btn-apply-relink = Appliquer ({ $num })
+msg-relinked = { $num } référence(s) mise(s) à jour.
+
+# --- 2.2.0: destination cell
+files-dest-hint = (racine de Data)
+files-dest-tooltip = Chemin d'installation relatif au dossier Data du jeu, par exemple SKSE\Plugins. Laissez vide pour installer à la racine de Data. Cliquez dans la cellule pour la modifier.

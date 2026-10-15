@@ -7,7 +7,7 @@ feuille de route initiale, la section 8 l'organisation du code, et la section 9
 les lots ajoutés ensuite à partir de l'audit `ANALYSE_V2.md`.
 
 - Version du paquet : **`2.0.0`** (dans `Cargo.toml`), publiée le 2026-10-07.
-- Toolchain : Rust 1.98.1 (MSRV), édition 2024, eframe/egui 0.29.1.
+- Toolchain : Rust 1.99.0 (MSRV), édition 2024, eframe/egui 0.29.1.
 - État : `cargo fmt --check`, `cargo clippy --all-targets -D warnings` et
   `cargo test` verts — **299 tests**, 47 394 lignes de Rust, 84 fichiers.
 - **Lot A livré** : conflits de destination (2) + export 7z (3).

@@ -32,12 +32,12 @@ menu-open-file = Otvori datoteku…
 menu-save = Spremi
 menu-recent = Nedavno
 menu-exit = Izlaz
-menu-merge = Spoj FOMOD…
+menu-merge = Spoji FOMOD…
 menu-export = Izvezi arhivu distribucije…
 # Menu - Options
 menu-options = Opcije
 menu-settings = Postavke…
-menu-pre-save-script = Skripta za spremanje…
+menu-pre-save-script = Skripta prije spremanja…
 menu-post-save-script = Skripta nakon spremanja…
 menu-translation = Prevedi sučelje…
 # Menu - Help
@@ -87,7 +87,7 @@ label-visibility = Uvjeti vidljivosti
 label-operator = Operator:
 
 # Buttons
-btn-browse = Pregledaj...
+btn-browse = Pregledaj…
 btn-clear = Očisti
 btn-add = Dodaj
 btn-remove = Ukloni
@@ -857,7 +857,7 @@ tree-colors-theme-dark = Ove se boje primjenjuju na tamnu temu.
 tree-colors-theme-light = Ove se boje primjenjuju na svijetlu temu.
 tree-colors-click = Uredi ovu boju…
 tree-colors-reset = Vrati zadane boje
-tree-kind-info = Podaci o modu
+tree-kind-info = Informacije o modu
 tree-kind-step = Koraci
 tree-kind-group = Grupe
 tree-kind-option = Opcije
@@ -929,3 +929,52 @@ req-dest-hint = Postavlja jedno odredište instalacije za svaku obaveznu datotek
 btn-apply-req-dest = Primijeni na sve obavezne datoteke
 cond-dest-hint = Postavlja jedno odredište instalacije za svaku datoteku ovog uvjetnog skupa.
 btn-apply-cond-dest = Primijeni na sve datoteke ovog skupa
+
+# --- 2.2.0
+menu-cut = Izreži
+menu-copy = Kopiraj
+menu-paste = Zalijepi
+tree-cut = Izreži
+tree-copy = Kopiraj
+tree-paste = Zalijepi
+msg-node-copied = „{ $name }“ kopirano — zalijepite ga u ovaj ili drugi FOMOD.
+msg-node-cut = „{ $name }“ izrezano — Uredi → Poništi vraća ga natrag.
+msg-node-pasted = „{ $name }“ zalijepljeno.
+msg-paste-need-step = Odaberite korak u koji želite zalijepiti grupu.
+msg-paste-need-group = Odaberite grupu u koju želite zalijepiti opciju.
+msg-paste-missing-files = Broj datoteka koje koristi zalijepljena stavka, a nisu u mapi ovog moda: { $num }
+msg-paste-unset-flags = Zalijepljena stavka provjerava zastavice koje ništa u ovom projektu ne postavlja: { $flags }
+msg-clipboard-empty = Međuspremnik ne sadrži korak, grupu ni opciju.
+btn-rename-on-disk = Preimenuj na disku…
+btn-rename-on-disk-hint = Preimenuje odabranu datoteku ili mapu u mapi moda i ažurira sve reference na nju.
+rename-title = Preimenuj na disku
+rename-current = Trenutno: { $path }
+rename-new-name = Novi naziv
+rename-uses = Broj referenci u ovom projektu koje će se ažurirati: { $num }
+rename-warning = Datoteka ili mapa preimenuje se odmah. Uredi → Poništi vraća reference, ali ne i naziv na disku.
+btn-rename = Preimenuj
+rename-err-empty = Unesite naziv.
+rename-err-invalid = Naziv ne smije sadržavati / \ : * ? " < > | niti završavati točkom ili razmakom.
+rename-err-outside = Ova referenca nalazi se izvan mape moda.
+rename-err-missing = Na ovoj putanji više ništa ne postoji — upotrijebite Projekt → Pronađi datoteke koje nedostaju…
+rename-err-exists = U ovoj mapi već postoji stavka s tim nazivom.
+rename-err-io = Sustav je odbio preimenovanje: { $error }
+msg-renamed = Preimenovano u „{ $path }“ — ažurirano referenci: { $num }.
+menu-find-missing = Pronađi datoteke koje nedostaju…
+relink-title = Pronađi datoteke koje nedostaju
+relink-hint = Datoteke, mape i slike koje ovaj projekt koristi, a više ne postoje, uz ono što je XIMOD pronašao u mapi moda. Za svaku stavku koju želite popraviti odaberite novu lokaciju, a zatim kliknite Primijeni.
+relink-none = Sve datoteke, mape i slike ovog projekta postoje. Nema se što popraviti.
+relink-col-missing = Nedostaje
+relink-col-uses = Korištenja
+relink-col-new = Nova lokacija
+relink-keep = (ostavi kako jest)
+relink-moved = isti naziv, premješteno
+relink-renamed = sličan naziv, preimenovano
+relink-browse = Pregledaj…
+relink-rescan = Ponovno skeniraj
+btn-apply-relink = Primijeni ({ $num })
+msg-relinked = Ažurirano referenci: { $num }.
+
+# --- 2.2.0: destination cell
+files-dest-hint = (korijen mape Data)
+files-dest-tooltip = Putanja instalacije u odnosu na mapu Data igre, na primjer SKSE\Plugins. Ostavite prazno za instalaciju u korijen mape Data. Kliknite ćeliju da biste je uredili.

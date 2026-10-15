@@ -87,7 +87,7 @@ label-visibility = Visibility Conditions
 label-operator = Operator:
 
 # Buttons
-btn-browse = Browse...
+btn-browse = Browse…
 btn-clear = Clear
 btn-add = Add
 btn-remove = Remove
@@ -929,3 +929,52 @@ req-dest-hint = Set one install destination for every required file.
 btn-apply-req-dest = Apply to all required files
 cond-dest-hint = Set one install destination for every file of this conditional set.
 btn-apply-cond-dest = Apply to all files of this set
+
+# --- 2.2.0: clipboard, rename on disk, missing files
+menu-cut = Cut
+menu-copy = Copy
+menu-paste = Paste
+tree-cut = Cut
+tree-copy = Copy
+tree-paste = Paste
+msg-node-copied = Copied “{ $name }” — paste it into this or another FOMOD.
+msg-node-cut = Cut “{ $name }” — Edit → Undo puts it back.
+msg-node-pasted = Pasted “{ $name }”.
+msg-paste-need-step = Select a step to paste a group into.
+msg-paste-need-group = Select a group to paste an option into.
+msg-paste-missing-files = { $num } file(s) used by the pasted node are not in this mod's folder.
+msg-paste-unset-flags = The pasted node tests flags that nothing in this project sets: { $flags }
+msg-clipboard-empty = The clipboard holds no step, group or option.
+btn-rename-on-disk = Rename on disk…
+btn-rename-on-disk-hint = Rename the selected file or folder in the mod folder and update every reference to it.
+rename-title = Rename on disk
+rename-current = Current: { $path }
+rename-new-name = New name
+rename-uses = { $num } reference(s) in this project will follow.
+rename-warning = The file or folder is renamed at once. Edit → Undo restores the references, not the name on disk.
+btn-rename = Rename
+rename-err-empty = Enter a name.
+rename-err-invalid = A name cannot contain / \ : * ? " < > | nor end with a dot or a space.
+rename-err-outside = This reference is outside the mod folder.
+rename-err-missing = Nothing exists at this path any more — use Project → Find missing files…
+rename-err-exists = Something with that name already exists in this folder.
+rename-err-io = The system refused the rename: { $error }
+msg-renamed = Renamed to “{ $path }” — { $num } reference(s) updated.
+menu-find-missing = Find missing files…
+relink-title = Find missing files
+relink-hint = Files, folders and images this project uses that no longer exist, with what XIMOD found in the mod folder. Choose a new location for each one to fix, then Apply.
+relink-none = Every file, folder and image of this project exists. Nothing to fix.
+relink-col-missing = Missing
+relink-col-uses = Uses
+relink-col-new = New location
+relink-keep = (leave as is)
+relink-moved = same name, moved
+relink-renamed = similar name, renamed
+relink-browse = Browse…
+relink-rescan = Rescan
+btn-apply-relink = Apply ({ $num })
+msg-relinked = { $num } reference(s) updated.
+
+# --- 2.2.0: destination cell
+files-dest-hint = (root of Data)
+files-dest-tooltip = Install path relative to the game's Data folder, for example SKSE\Plugins. Leave empty to install at the root of Data. Click the cell to edit it.

@@ -8,6 +8,7 @@
 //! an option onto a group, a group onto a step, a step onto a step.
 
 use super::main_window::{ConfirmAction, Tab, XimodApp};
+use crate::models::clipboard::NodeRef;
 use crate::models::{Plugin, PluginGroup, SelectionType, Step};
 use crate::tree_colors::TreeKind;
 use crate::ui::components::{section_header, section_header_hint};
@@ -55,6 +56,11 @@ enum TreeAction {
     MovePlugin(usize, usize, usize, isize),
     SaveTemplate(usize),
     Drop(DragItem, DropTarget),
+    /// Clipboard commands from the context menus (Edit menu / Ctrl+X, C, V
+    /// go through `ui/node_clipboard.rs` directly).
+    Cut(NodeRef),
+    Copy(NodeRef),
+    Paste(NodeRef),
 }
 
 /// A selectable tree label that is also a drag source for `payload`.
@@ -410,6 +416,11 @@ impl XimodApp {
                 self.open_templates();
             }
             TreeAction::Drop(item, target) => self.apply_drop(item, target),
+            TreeAction::Cut(at) => self.cut_node(None, at),
+            TreeAction::Copy(at) => {
+                self.copy_node(None, at);
+            }
+            TreeAction::Paste(at) => self.paste_node(Some(at)),
         }
     }
 
@@ -532,6 +543,10 @@ impl XimodApp {
         let m_add_option = t("btn-add-plugin");
         let m_add_cond = t("btn-add-pattern");
         let m_duplicate = t("tree-duplicate");
+        let m_cut = t("tree-cut");
+        let m_copy = t("tree-copy");
+        let m_paste = t("tree-paste");
+        let has_clip = self.node_clipboard.is_some();
         let m_delete = t("tree-delete");
         let m_up = t("reorder-before");
         let m_down = t("reorder-after");
@@ -704,6 +719,18 @@ impl XimodApp {
                                 action = Some(TreeAction::DuplicateStep(si));
                                 ui.close_menu();
                             }
+                            if ui.button(&m_cut).clicked() {
+                                action = Some(TreeAction::Cut(NodeRef::Step(si)));
+                                ui.close_menu();
+                            }
+                            if ui.button(&m_copy).clicked() {
+                                action = Some(TreeAction::Copy(NodeRef::Step(si)));
+                                ui.close_menu();
+                            }
+                            if ui.add_enabled(has_clip, egui::Button::new(&m_paste)).clicked() {
+                                action = Some(TreeAction::Paste(NodeRef::Step(si)));
+                                ui.close_menu();
+                            }
                             if ui.button(&m_template).clicked() {
                                 action = Some(TreeAction::SaveTemplate(si));
                                 ui.close_menu();
@@ -799,6 +826,18 @@ impl XimodApp {
                                             action = Some(TreeAction::DuplicateGroup(si, gi));
                                             ui.close_menu();
                                         }
+                                        if ui.button(&m_cut).clicked() {
+                                            action = Some(TreeAction::Cut(NodeRef::Group(si, gi)));
+                                            ui.close_menu();
+                                        }
+                                        if ui.button(&m_copy).clicked() {
+                                            action = Some(TreeAction::Copy(NodeRef::Group(si, gi)));
+                                            ui.close_menu();
+                                        }
+                                        if ui.add_enabled(has_clip, egui::Button::new(&m_paste)).clicked() {
+                                            action = Some(TreeAction::Paste(NodeRef::Group(si, gi)));
+                                            ui.close_menu();
+                                        }
                                         ui.separator();
                                         if ui.add_enabled(gi > 0, egui::Button::new(&m_up)).clicked() {
                                             action = Some(TreeAction::MoveGroup(si, gi, -1));
@@ -866,6 +905,18 @@ impl XimodApp {
                                         resp.context_menu(|ui| {
                                             if ui.button(&m_duplicate).clicked() {
                                                 action = Some(TreeAction::DuplicatePlugin(si, gi, pi));
+                                                ui.close_menu();
+                                            }
+                                            if ui.button(&m_cut).clicked() {
+                                                action = Some(TreeAction::Cut(NodeRef::Plugin(si, gi, pi)));
+                                                ui.close_menu();
+                                            }
+                                            if ui.button(&m_copy).clicked() {
+                                                action = Some(TreeAction::Copy(NodeRef::Plugin(si, gi, pi)));
+                                                ui.close_menu();
+                                            }
+                                            if ui.add_enabled(has_clip, egui::Button::new(&m_paste)).clicked() {
+                                                action = Some(TreeAction::Paste(NodeRef::Plugin(si, gi, pi)));
                                                 ui.close_menu();
                                             }
                                             ui.separator();
@@ -1060,7 +1111,15 @@ impl XimodApp {
             }
         }
         if let Some(a) = action {
-            self.apply_tree_action(a);
+            // The context-menu copy also reaches the system clipboard.
+            let ctx = ui.ctx().clone();
+            match a {
+                TreeAction::Cut(at) => self.cut_node(Some(&ctx), at),
+                TreeAction::Copy(at) => {
+                    self.copy_node(Some(&ctx), at);
+                }
+                a => self.apply_tree_action(a),
+            }
         }
     }
 

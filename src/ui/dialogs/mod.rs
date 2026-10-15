@@ -7,6 +7,8 @@ pub mod compare;
 pub mod confirm;
 pub mod nexus_desc;
 pub mod plugins;
+pub mod relink;
+pub mod rename_file;
 pub mod script;
 pub mod settings;
 pub mod templates;

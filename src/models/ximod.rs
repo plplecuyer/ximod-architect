@@ -1332,6 +1332,15 @@ mod tests {
     }
 
     #[test]
+    fn new_files_and_folders_install_at_the_root_of_data() {
+        // A source folder such as "00 Data/1. Ultra Version" must not become
+        // its own destination: the destination stays empty (= Data root)
+        // until the author types one.
+        assert_eq!(InstallFile::new_folder("00 Data/1. Ultra Version").destination, "");
+        assert_eq!(InstallFile::new_file("00 Data\\CBPCSystem.ini").destination, "");
+    }
+
+    #[test]
     fn test_proper_destination_path() {
         assert_eq!(get_proper_destination_path("textures\\test.dds"), "textures\\test.dds");
         assert_eq!(

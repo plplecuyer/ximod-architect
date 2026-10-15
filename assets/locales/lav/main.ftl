@@ -87,7 +87,7 @@ label-visibility = Redzamības nosacījumi
 label-operator = Operators:
 
 # Buttons
-btn-browse = Pārlūkot...
+btn-browse = Pārlūkot…
 btn-clear = Dzēst
 btn-add = Pievienot
 btn-remove = Noņemt
@@ -100,8 +100,8 @@ btn-remove-plugin = Noņemt opciju
 btn-add-file = Pievienot failu
 btn-add-folder = Pievienot mapi
 btn-remove-file = Noņemt
-btn-add-flag = Pievienot atzīmi
-btn-remove-flag = Noņemt atzīmi
+btn-add-flag = Pievienot karodziņu
+btn-remove-flag = Noņemt karodziņu
 btn-add-condition = Pievienot nosacījumu
 btn-remove-condition = Noņemt nosacījumu
 btn-add-dependency = Pievienot atkarību
@@ -182,11 +182,11 @@ macro-random = $RANDOM$ — nejaušs skaitlis
 # Plugin Dependencies
 label-plugin-dependencies = Opcijas atkarības
 label-default-type = Noklusējuma tips:
-label-pattern-type = Veidnes tips:
-label-pattern-operator = Veidnes operators:
+label-pattern-type = Parauga tips:
+label-pattern-operator = Parauga operators:
 
 # Conditional Files
-label-pattern = Veidne
+label-pattern = Paraugs
 
 # Validation Messages
 validation-no-name = Nepieciešams moduļa nosaukums
@@ -218,7 +218,7 @@ error-create-dir = Neizdevās izveidot direktoriju
 default-step-name = Solis { $num }
 default-group-name = Grupa { $num }
 default-plugin-name = Opcija { $num }
-pattern-label = Šablons { $num }
+pattern-label = Paraugs { $num }
 
 # Selection prompts
 msg-select-group-first = Vispirms izvēlieties grupu.
@@ -734,7 +734,7 @@ condeditor-value-never-set = { $value } — tiek pārbaudīta, bet nekad netiek 
 condeditor-value-never-tested = { $value } — tiek iestatīta, bet nekad netiek pārbaudīta
 condeditor-builder = Nosacījumu veidotājs
 condeditor-builder-none = Galvenajā logā atlasiet soli, opciju, nosacījumu failu kopu vai moda informāciju, lai šeit rediģētu tā nosacījumus.
-condeditor-builder-pattern = Šablons:
+condeditor-builder-pattern = Paraugs:
 condeditor-sentence-if = JA
 condeditor-sentence-and = UN
 condeditor-sentence-or = VAI
@@ -857,12 +857,12 @@ tree-colors-theme-dark = Šīs krāsas attiecas uz tumšo motīvu.
 tree-colors-theme-light = Šīs krāsas attiecas uz gaišo motīvu.
 tree-colors-click = Rediģēt šo krāsu…
 tree-colors-reset = Atiestatīt krāsas
-tree-kind-info = Informācija par modu
+tree-kind-info = Modifikācijas informācija
 tree-kind-step = Soļi
 tree-kind-group = Grupas
 tree-kind-option = Opcijas
-tree-kind-required = Nepieciešamie faili
-tree-kind-conditional = Nosacījuma instalācijas
+tree-kind-required = Obligātie faili
+tree-kind-conditional = Nosacītās instalācijas
 picker-title = Izvēlieties krāsu
 picker-index-tab = Indeksa krāsa
 picker-true-tab = Patiesās krāsas
@@ -929,3 +929,52 @@ req-dest-hint = Iestata vienu instalēšanas galamērķi katram obligātajam fai
 btn-apply-req-dest = Lietot visiem obligātajiem failiem
 cond-dest-hint = Iestata vienu instalēšanas galamērķi katram šīs nosacījumu kopas failam.
 btn-apply-cond-dest = Lietot visiem šīs kopas failiem
+
+# --- 2.2.0
+menu-cut = Izgriezt
+menu-copy = Kopēt
+menu-paste = Ielīmēt
+tree-cut = Izgriezt
+tree-copy = Kopēt
+tree-paste = Ielīmēt
+msg-node-copied = “{ $name }” nokopēts — ielīmējiet to šajā vai citā FOMOD.
+msg-node-cut = “{ $name }” izgriezts — Rediģēt → Atsaukt to atjauno.
+msg-node-pasted = “{ $name }” ielīmēts.
+msg-paste-need-step = Izvēlieties soli, kurā ielīmēt grupu.
+msg-paste-need-group = Izvēlieties grupu, kurā ielīmēt opciju.
+msg-paste-missing-files = Ielīmētā elementa izmantoto failu skaits, kas nav šīs modifikācijas mapē: { $num }
+msg-paste-unset-flags = Ielīmētais elements pārbauda karogus, kurus neiestata nekas šajā projektā: { $flags }
+msg-clipboard-empty = Starpliktuvē nav ne soļa, ne grupas, ne opcijas.
+btn-rename-on-disk = Pārdēvēt diskā…
+btn-rename-on-disk-hint = Pārdēvē atlasīto failu vai mapi modifikācijas mapē un atjaunina visas atsauces uz to.
+rename-title = Pārdēvēt diskā
+rename-current = Pašreizējais: { $path }
+rename-new-name = Jaunais nosaukums
+rename-uses = Šī projekta atsauču skaits, kas tiks atjauninātas: { $num }
+rename-warning = Fails vai mape tiek pārdēvēta nekavējoties. Rediģēt → Atsaukt atjauno atsauces, bet ne nosaukumu diskā.
+btn-rename = Pārdēvēt
+rename-err-empty = Ievadiet nosaukumu.
+rename-err-invalid = Nosaukums nedrīkst saturēt / \ : * ? " < > | un nedrīkst beigties ar punktu vai atstarpi.
+rename-err-outside = Šī atsauce ir ārpus modifikācijas mapes.
+rename-err-missing = Šajā ceļā vairs nekā nav — izmantojiet Projekts → Atrast trūkstošos failus…
+rename-err-exists = Šajā mapē jau ir elements ar šādu nosaukumu.
+rename-err-io = Sistēma atteica pārdēvēšanu: { $error }
+msg-renamed = Pārdēvēts par “{ $path }” — atjaunināto atsauču skaits: { $num }.
+menu-find-missing = Atrast trūkstošos failus…
+relink-title = Atrast trūkstošos failus
+relink-hint = Faili, mapes un attēli, ko izmanto šis projekts, bet kas vairs nepastāv, kopā ar to, ko XIMOD atrada modifikācijas mapē. Izvēlieties jaunu atrašanās vietu katram, ko vēlaties labot, un pēc tam noklikšķiniet uz Piemērot.
+relink-none = Visi šī projekta faili, mapes un attēli pastāv. Nav ko labot.
+relink-col-missing = Trūkst
+relink-col-uses = Lietojumi
+relink-col-new = Jaunā atrašanās vieta
+relink-keep = (atstāt kā ir)
+relink-moved = tas pats nosaukums, pārvietots
+relink-renamed = līdzīgs nosaukums, pārdēvēts
+relink-browse = Pārlūkot…
+relink-rescan = Skenēt vēlreiz
+btn-apply-relink = Piemērot ({ $num })
+msg-relinked = Atjaunināto atsauču skaits: { $num }.
+
+# --- 2.2.0: destination cell
+files-dest-hint = (Data sakne)
+files-dest-tooltip = Instalēšanas ceļš attiecībā pret spēles Data mapi, piemēram, SKSE\Plugins. Atstājiet tukšu, lai instalētu Data saknē. Noklikšķiniet uz šūnas, lai to rediģētu.

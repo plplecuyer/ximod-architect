@@ -52,9 +52,10 @@ pub const APP_NAME: &str = "XIMOD Architect";
 pub const APP_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// Public page of the application, embedded in the "Created with…" signature
-/// comment of generated XML files. Leave empty to omit the URL from the
-/// comment; set it to the Nexus/GitHub page once published.
-pub const APP_URL: &str = "";
+/// comment of generated XML files (as the original FOMOD Creation Tool did:
+/// `<!-- Created with FOMOD Creation Tool 1.7.0.37 [http://…] -->`). An empty
+/// value omits the URL from the comment.
+pub const APP_URL: &str = "https://www.nexusmods.com/site/mods/2141";
 
 /// Default window size
 pub const DEFAULT_WINDOW_WIDTH: f32 = 1280.0;

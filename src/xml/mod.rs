@@ -1638,6 +1638,18 @@ mod tests {
         let out = module_config_to_string(&m).unwrap();
         // Skip the declaration and the "Created with" signature line.
         let body = out.splitn(3, '\n').nth(2).expect("body");
+        // Like the original FOMOD Creation Tool, the second line names the
+        // tool, its version and its page.
+        let sig = out.lines().nth(1).expect("signature");
+        assert_eq!(
+            sig,
+            format!(
+                "<!-- Created with {} {} [{}] -->",
+                crate::APP_NAME,
+                crate::APP_VERSION,
+                crate::APP_URL
+            )
+        );
         assert_eq!(body, FLAT_BASELINE);
         // And it reads back to the same model.
         let mut back = Ximod::default();

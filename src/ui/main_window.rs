@@ -236,6 +236,14 @@ pub struct XimodApp {
     // Tree colours window + the colour picker it opens (Tools menu)
     pub show_tree_colors: bool,
     pub color_picker: crate::ui::color_picker::ColorPicker,
+
+    /// Copied step / group / option, shared by every FOMOD tab (Edit menu,
+    /// tree context menus, Ctrl+X / C / V).
+    pub node_clipboard: Option<crate::models::clipboard::ClipItem>,
+    /// "Rename on disk…" window (files tables), when open.
+    pub rename_dialog: Option<crate::ui::dialogs::rename_file::RenameDialog>,
+    /// Project → Find missing files… window, when open.
+    pub relink: Option<crate::ui::dialogs::relink::RelinkState>,
     pub games_editor: crate::ui::games_editor::GamesEditorState,
 
     // XML editor state
@@ -559,6 +567,9 @@ impl XimodApp {
             preset_wizard: Default::default(),
             show_tree_colors: false,
             color_picker: crate::ui::color_picker::ColorPicker::default(),
+            node_clipboard: None,
+            rename_dialog: None,
+            relink: None,
             games_editor: crate::ui::games_editor::GamesEditorState::default(),
             properties: crate::ui::properties::PropertiesState::default(),
             show_xml_editor: false,
@@ -1206,6 +1217,8 @@ impl eframe::App for XimodApp {
         self.render_games_editor(ctx);
         self.render_preset_wizard(ctx);
         self.render_tree_colors(ctx);
+        self.render_rename_dialog(ctx);
+        self.render_relink(ctx);
         self.render_color_picker(ctx);
         self.render_flag_picker(ctx);
         self.render_fomod_translation(ctx);

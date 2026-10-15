@@ -37,9 +37,16 @@ struct FilesTableLabels {
     btn_add_file: String,
     btn_add_folder: String,
     btn_remove: String,
+    btn_rename: String,
+    btn_rename_hint: String,
     col_type: String,
     col_source: String,
     col_destination: String,
+    /// Grey placeholder of an empty Destination cell ("(root of Data)").
+    dest_hint: String,
+    /// Tooltip of the Destination header and cells: what the path means and
+    /// that the cell is edited by clicking in it.
+    dest_tooltip: String,
     col_priority: String,
     col_always: String,
     col_always_hint: String,
@@ -58,6 +65,8 @@ enum FilesAction {
     AddFolder,
     /// Open the archive contents of the row at this index.
     ViewArchive(usize),
+    /// Rename the source of the row at this index on disk.
+    Rename(usize),
 }
 
 /// Draw the grid and the buttons. Destination edits and removals are applied
@@ -83,7 +92,8 @@ fn files_table(
                 .show(ui, |ui| {
                     ui.label(RichText::new(&labels.col_type).strong());
                     ui.label(RichText::new(&labels.col_source).strong());
-                    ui.label(RichText::new(&labels.col_destination).strong());
+                    ui.label(RichText::new(&labels.col_destination).strong())
+                        .on_hover_text(&labels.dest_tooltip);
                     ui.label(RichText::new(&labels.col_priority).strong());
                     ui.label(RichText::new(&labels.col_always).strong())
                         .on_hover_text(&labels.col_always_hint);
@@ -113,7 +123,12 @@ fn files_table(
                             ui.label(&f.source);
                         }
                         if ui
-                            .add(egui::TextEdit::singleline(&mut f.destination).desired_width(220.0))
+                            .add(
+                                egui::TextEdit::singleline(&mut f.destination)
+                                    .hint_text(&labels.dest_hint)
+                                    .desired_width(220.0),
+                            )
+                            .on_hover_text(&labels.dest_tooltip)
                             .changed()
                         {
                             modified = true;
@@ -159,6 +174,16 @@ fn files_table(
             }
             *selected = None;
         }
+        // Renaming needs the mod folder (same condition as the archive view).
+        let can_rename = labels.can_view_archive && selected.is_some_and(|i| i < files.len());
+        if ui
+            .add_enabled(can_rename, egui::Button::new(&labels.btn_rename))
+            .on_hover_text(&labels.btn_rename_hint)
+            .clicked()
+            && let Some(file_idx) = *selected
+        {
+            action = Some(FilesAction::Rename(file_idx));
+        }
     });
 
     (modified, action)
@@ -188,9 +213,13 @@ impl XimodApp {
             btn_add_file: self.i18n.t("btn-add-file"),
             btn_add_folder: self.i18n.t("btn-add-folder"),
             btn_remove: self.i18n.t("btn-remove-file"),
+            btn_rename: self.i18n.t("btn-rename-on-disk"),
+            btn_rename_hint: self.i18n.t("btn-rename-on-disk-hint"),
             col_type: self.i18n.t("label-file-type"),
             col_source: self.i18n.t("label-source"),
             col_destination: self.i18n.t("label-destination"),
+            dest_hint: self.i18n.t("files-dest-hint"),
+            dest_tooltip: self.i18n.t("files-dest-tooltip"),
             col_priority: self.i18n.t("label-priority"),
             col_always: self.i18n.t("file-always-install"),
             col_always_hint: self.i18n.t("file-always-install-hint"),
@@ -229,6 +258,12 @@ impl XimodApp {
                 let source = self.files_target_mut(target).0.get(idx).map(|f| f.source.clone());
                 if let Some(source) = source {
                     self.open_archive_view_rel(&source);
+                }
+            }
+            Some(FilesAction::Rename(idx)) => {
+                let source = self.files_target_mut(target).0.get(idx).map(|f| f.source.clone());
+                if let Some(source) = source {
+                    self.open_rename(&source);
                 }
             }
             None => {}

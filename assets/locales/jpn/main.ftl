@@ -87,7 +87,7 @@ label-visibility = 表示条件
 label-operator = 演算子:
 
 # Buttons
-btn-browse = 参照...
+btn-browse = 参照…
 btn-clear = クリア
 btn-add = 追加
 btn-remove = 削除
@@ -100,7 +100,7 @@ btn-remove-plugin = オプションの削除
 btn-add-file = ファイルの追加
 btn-add-folder = フォルダの追加
 btn-remove-file = 削除
-btn-add-flag = フラグの追加
+btn-add-flag = フラグを追加
 btn-remove-flag = フラグを削除
 btn-add-condition = 条件を追加
 btn-remove-condition = 条件を削除
@@ -242,7 +242,7 @@ msg-settings-save-error = 設定の保存に失敗しました
 msg-script-save-error = スクリプトの保存に失敗しました
 
 # Translation editor
-trans-title = 翻訳エディタ
+trans-title = 翻訳エディター
 trans-source-lang = 表示言語:
 trans-target-lang = 翻訳先言語:
 trans-col-key = キー
@@ -252,7 +252,7 @@ trans-saved = 翻訳が保存されました
 trans-save-error = 翻訳の保存に失敗しました
 
 # XML editor
-xml-editor-title = XMLエディタ
+xml-editor-title = XMLエディター
 xml-editor-edit = 編集
 xml-editor-apply = 適用
 xml-editor-revert = 取り消し
@@ -294,7 +294,7 @@ trans-lang-not-iso = 翻訳は、ISO 639-3 コードを持つ言語でのみ可�
 
 # FOMOD installer preview
 menu-preview = インストーラのプレビュー…
-preview-title = FOMOD インストーラのプレビュー
+preview-title = FOMODインストーラのプレビュー
 preview-refresh = 更新
 preview-assumptions = ファイルの想定
 preview-details = 詳細
@@ -319,8 +319,8 @@ preview-sel-all = すべてのオプションがインストールされます�
 preview-sel-atleastone = 少なくとも 1 つのオプションを選択してください。
 
 # FOMOD validation (ModConfig 5.0 schema)
-menu-validate = FOMOD を検証
-validate-report-title = FOMOD 検証
+menu-validate = FOMODを検証
+validate-report-title = FOMOD検証
 validate-ok = 問題は見つかりませんでした。FOMOD はスキーマに準拠しています。
 xml-editor-schema-ok = ModConfig 5.0 スキーマに準拠しています。
 xml-editor-schema-issues = スキーマの問題:
@@ -379,7 +379,7 @@ msg-drop-not-fomod = ドロップされた項目はFOMODではありません（
 exit-title = 未保存の変更
 exit-unsaved = 保存されていないFOMODがあります。保存しますか？
 tab-close-hint = このFOMODを閉じる
-menu-new-from-folder = フォルダーから新規…
+menu-new-from-folder = フォルダから新規…
 menu-templates = テンプレート…
 templates-title = 再利用可能なテンプレート
 templates-empty = 保存されたテンプレートはまだありません。上で選択したステップを保存して作成してください。
@@ -394,7 +394,7 @@ msg-template-no-step = テンプレートとして保存するには、まずス
 msg-template-no-dir = テンプレートフォルダーが見つかりませんでした。
 msg-drop-assigned = オプションに { $added } 個のソースを追加しました（ルート外の { $rejected } 個は無視）。
 menu-compare = 比較…
-compare-title = FOMOD の比較
+compare-title = FOMODの比較
 compare-none = 差分はありません。
 btn-optimize-image = 画像を最適化
 msg-image-optimized = ヘッダー画像を最適化しました。
@@ -415,7 +415,7 @@ msg-img-optimized = 画像を最適化しました。
 msg-img-ok = 画像はすでに制限内です。
 msg-img-none = 最適化する画像がありません。
 msg-crash-recovery = 前回のセッションは予期せず終了しました。プロジェクトのバックアップを { $path } に保存しました
-export-progress-title = 配布アーカイブを作成しています…
+export-progress-title = 配布用アーカイブを作成しています…
 export-progress-files = { $done } / { $total } ファイル
 msg-export-cancelled = エクスポートをキャンセルしました。不完全なアーカイブは削除されました。
 verify-running = ディスク上のファイルを確認しています…
@@ -696,8 +696,8 @@ issue-unreachable-cond = 条件付きファイルセット { $num } は適用さ
 size-option = インストールサイズ: { $size }（{ $num } ファイル）
 size-missing = { $num } 件のソースが見つかりません
 size-unknown = インストールサイズ: —（計測するには「検証」を実行してください）
-menu-nexus-desc = Nexus 用説明文…
-nexus-title = Nexus Mods 用説明文
+menu-nexus-desc = Nexus用説明文…
+nexus-title = Nexus Mods用説明文
 nexus-format = 形式:
 nexus-include-requirements = 必要条件
 nexus-include-options = インストールオプション
@@ -929,3 +929,52 @@ req-dest-hint = すべての必須ファイルに単一のインストール先�
 btn-apply-req-dest = すべての必須ファイルに適用
 cond-dest-hint = この条件セットのすべてのファイルに単一のインストール先を設定します。
 btn-apply-cond-dest = このセットのすべてのファイルに適用
+
+# --- 2.2.0
+menu-cut = 切り取り
+menu-copy = コピー
+menu-paste = 貼り付け
+tree-cut = 切り取り
+tree-copy = コピー
+tree-paste = 貼り付け
+msg-node-copied = 「{ $name }」をコピーしました — この FOMOD または別の FOMOD に貼り付けできます。
+msg-node-cut = 「{ $name }」を切り取りました — 編集 → 元に戻す で元の位置に戻せます。
+msg-node-pasted = 「{ $name }」を貼り付けました。
+msg-paste-need-step = グループを貼り付けるステップを選択してください。
+msg-paste-need-group = オプションを貼り付けるグループを選択してください。
+msg-paste-missing-files = 貼り付けた項目が使用するファイルのうち { $num } 件が、この MOD のフォルダーにありません。
+msg-paste-unset-flags = 貼り付けた項目は、このプロジェクト内のどこでも設定されていないフラグを判定しています: { $flags }
+msg-clipboard-empty = クリップボードにステップ、グループ、オプションがありません。
+btn-rename-on-disk = ディスク上で名前を変更…
+btn-rename-on-disk-hint = MOD フォルダー内で選択したファイルまたはフォルダーの名前を変更し、それへのすべての参照を更新します。
+rename-title = ディスク上で名前を変更
+rename-current = 現在: { $path }
+rename-new-name = 新しい名前
+rename-uses = このプロジェクト内の { $num } 件の参照も追従して更新されます。
+rename-warning = ファイルまたはフォルダーの名前はすぐに変更されます。編集 → 元に戻す で復元されるのは参照のみで、ディスク上の名前は戻りません。
+btn-rename = 名前を変更
+rename-err-empty = 名前を入力してください。
+rename-err-invalid = 名前に / \ : * ? " < > | を含めることはできません。また、末尾をピリオドまたはスペースにすることもできません。
+rename-err-outside = この参照は MOD フォルダーの外にあります。
+rename-err-missing = このパスにはもう何も存在しません — プロジェクト → 欠落ファイルを検索… を使用してください。
+rename-err-exists = このフォルダーには同じ名前のものが既に存在します。
+rename-err-io = システムが名前の変更を拒否しました: { $error }
+msg-renamed = 「{ $path }」に名前を変更しました — { $num } 件の参照を更新しました。
+menu-find-missing = 欠落ファイルを検索…
+relink-title = 欠落ファイルを検索
+relink-hint = このプロジェクトが使用しているのに、もう存在しないファイル、フォルダー、画像と、XIMOD が MOD フォルダー内で見つけた候補です。修正するものごとに新しい場所を選択し、「適用」をクリックしてください。
+relink-none = このプロジェクトのファイル、フォルダー、画像はすべて存在します。修正するものはありません。
+relink-col-missing = 欠落
+relink-col-uses = 使用数
+relink-col-new = 新しい場所
+relink-keep = （そのまま）
+relink-moved = 同じ名前、移動済み
+relink-renamed = 類似の名前、名前変更済み
+relink-browse = 参照…
+relink-rescan = 再スキャン
+btn-apply-relink = 適用（{ $num }）
+msg-relinked = { $num } 件の参照を更新しました。
+
+# --- 2.2.0: destination cell
+files-dest-hint = （Dataのルート）
+files-dest-tooltip = ゲームのDataフォルダを基準としたインストール先のパスです（例：SKSE\Plugins）。空のままにするとDataのルートにインストールされます。セルをクリックして編集します。

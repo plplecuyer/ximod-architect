@@ -83,9 +83,12 @@ impl XimodApp {
             || self.show_plugin_report
             || self.show_archive_view
             || (self.show_xml_editor && self.xml_editor_editing)
+            || self.rename_dialog.is_some()
         {
             return;
         }
+        // Ctrl+X / C / V on the tree selection (text fields keep them).
+        self.handle_clipboard_events(ctx);
         let sc = Self::menu_shortcuts();
 
         // Ctrl+Shift+O / Ctrl+Shift+S must be tested before Ctrl+O / Ctrl+S
@@ -190,6 +193,10 @@ impl XimodApp {
         let menu_edit = t("menu-edit");
         let menu_undo = t("menu-undo");
         let menu_redo = t("menu-redo");
+        let menu_cut = t("menu-cut");
+        let menu_copy = t("menu-copy");
+        let menu_paste = t("menu-paste");
+        let menu_find_missing = t("menu-find-missing");
         let menu_tools = t("menu-tools");
         let menu_xml_editor = t("xml-editor-title");
         let menu_settings = t("menu-settings");
@@ -232,6 +239,13 @@ impl XimodApp {
         let sct_redo = ctx.format_shortcut(&sc.redo);
         let can_undo = self.history.can_undo();
         let can_redo = self.history.can_redo();
+        // Clipboard shortcuts are handled by egui as Cut / Copy / Paste events;
+        // these only label the menu entries.
+        let sct_cut = ctx.format_shortcut(&egui::KeyboardShortcut::new(egui::Modifiers::COMMAND, egui::Key::X));
+        let sct_copy = ctx.format_shortcut(&egui::KeyboardShortcut::new(egui::Modifiers::COMMAND, egui::Key::C));
+        let sct_paste = ctx.format_shortcut(&egui::KeyboardShortcut::new(egui::Modifiers::COMMAND, egui::Key::V));
+        let selected_node = self.selected_node();
+        let has_clip = self.node_clipboard.is_some();
 
         // A menu entry: wide label, optional shortcut hint, optional enabling.
         fn item(ui: &mut egui::Ui, label: &str, shortcut: Option<&str>, enabled: bool) -> bool {
@@ -333,6 +347,20 @@ impl XimodApp {
                     if item(ui, &menu_redo, Some(&sct_redo), can_redo) {
                         self.redo();
                     }
+                    ui.separator();
+                    if item(ui, &menu_cut, Some(&sct_cut), selected_node.is_some())
+                        && let Some(at) = selected_node
+                    {
+                        self.cut_node(Some(&ui.ctx().clone()), at);
+                    }
+                    if item(ui, &menu_copy, Some(&sct_copy), selected_node.is_some())
+                        && let Some(at) = selected_node
+                    {
+                        self.copy_node(Some(&ui.ctx().clone()), at);
+                    }
+                    if item(ui, &menu_paste, Some(&sct_paste), has_clip) {
+                        self.paste_node(selected_node);
+                    }
                 });
 
                 // ------------------------------------------------- Project
@@ -342,6 +370,9 @@ impl XimodApp {
                     }
                     if item(ui, &menu_preview, None, true) {
                         self.open_preview();
+                    }
+                    if item(ui, &menu_find_missing, None, has_root) {
+                        self.open_relink();
                     }
                     ui.separator();
                     if item(ui, &menu_condition_editor, None, true) {

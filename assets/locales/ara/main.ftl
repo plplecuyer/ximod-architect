@@ -63,7 +63,7 @@ tab-conditional = التثبيتات المشروطة
 
 # Info Tab
 label-workspace = مساحة العمل
-label-root-dir = الدليل الجذري:
+label-root-dir = المجلد الجذر:
 label-mod-name = اسم التعديل:
 label-author = المؤلف:
 label-version = الإصدار:
@@ -87,7 +87,7 @@ label-visibility = شروط الظهور
 label-operator = المشغل:
 
 # Buttons
-btn-browse = استعراض...
+btn-browse = استعراض…
 btn-clear = مسح
 btn-add = إضافة
 btn-remove = إزالة
@@ -266,7 +266,7 @@ xml-editor-error-at = السطر { $line }، العمود { $col }: { $msg }
 # Country / flag picker
 settings-country-name = اسم البلد:
 settings-pick-country = انقر لاختيار بلدك
-flags-title = اختر بلدًا
+flags-title = اختيار البلد
 flags-filter = تصفية:
 flags-none = لم يتم العثور على أي علم
 
@@ -294,7 +294,7 @@ trans-lang-not-iso = لا يمكن الترجمة إلا للغات التي ل�
 
 # FOMOD installer preview
 menu-preview = معاينة المثبت…
-preview-title = معاينة أداة تثبيت FOMOD
+preview-title = معاينة مثبت FOMOD
 preview-refresh = تحديث
 preview-assumptions = افتراضات الملفات
 preview-details = التفاصيل
@@ -393,7 +393,7 @@ msg-template-inserted = تم إدراج القالب في المشروع.
 msg-template-no-step = حدد خطوة أولاً لحفظها كقالب.
 msg-template-no-dir = تعذر العثور على مجلد القوالب.
 msg-drop-assigned = تمت إضافة { $added } مصدر إلى الخيار (تم تجاهل { $rejected } خارج الجذر).
-menu-compare = قارن مع…
+menu-compare = مقارنة مع…
 compare-title = مقارنة FOMOD
 compare-none = لا توجد اختلافات.
 btn-optimize-image = تحسين الصورة
@@ -857,12 +857,12 @@ tree-colors-theme-dark = تنطبق هذه الألوان على السمة ال
 tree-colors-theme-light = تنطبق هذه الألوان على السمة الفاتحة.
 tree-colors-click = تعديل هذا اللون…
 tree-colors-reset = إعادة تعيين الألوان
-tree-kind-info = معلومات المود
+tree-kind-info = معلومات التعديل
 tree-kind-step = الخطوات
 tree-kind-group = المجموعات
 tree-kind-option = الخيارات
 tree-kind-required = الملفات المطلوبة
-tree-kind-conditional = التثبيتات الشرطية
+tree-kind-conditional = التثبيتات المشروطة
 picker-title = اختيار لون
 picker-index-tab = لون الفهرس
 picker-true-tab = الألوان الحقيقية
@@ -929,3 +929,52 @@ req-dest-hint = يحدد وجهة تثبيت واحدة لكل ملف مطلوب
 btn-apply-req-dest = تطبيق على جميع الملفات المطلوبة
 cond-dest-hint = يحدد وجهة تثبيت واحدة لكل ملف في هذه المجموعة الشرطية.
 btn-apply-cond-dest = تطبيق على جميع ملفات هذه المجموعة
+
+# --- 2.2.0
+menu-cut = قص
+menu-copy = نسخ
+menu-paste = لصق
+tree-cut = قص
+tree-copy = نسخ
+tree-paste = لصق
+msg-node-copied = تم نسخ «{ $name }» — يمكنك لصقه في ملف FOMOD هذا أو في ملف FOMOD آخر.
+msg-node-cut = تم قص «{ $name }» — استخدم تحرير ← تراجع لإعادته.
+msg-node-pasted = تم لصق «{ $name }».
+msg-paste-need-step = حدّد خطوة للصق المجموعة فيها.
+msg-paste-need-group = حدّد مجموعة للصق الخيار فيها.
+msg-paste-missing-files = عدد الملفات التي يستخدمها العنصر الملصوق وليست في مجلد هذا التعديل: { $num }
+msg-paste-unset-flags = يختبر العنصر الملصوق علامات لا يعيّنها أي شيء في هذا المشروع: { $flags }
+msg-clipboard-empty = لا تحتوي الحافظة على أي خطوة أو مجموعة أو خيار.
+btn-rename-on-disk = إعادة التسمية على القرص…
+btn-rename-on-disk-hint = يعيد تسمية الملف أو المجلد المحدد في مجلد التعديل ويحدّث كل المراجع إليه.
+rename-title = إعادة التسمية على القرص
+rename-current = الحالي: { $path }
+rename-new-name = الاسم الجديد
+rename-uses = عدد المراجع في هذا المشروع التي ستُحدَّث تبعًا لذلك: { $num }
+rename-warning = تتم إعادة تسمية الملف أو المجلد فورًا. يستعيد تحرير ← تراجع المراجع، لا الاسم على القرص.
+btn-rename = إعادة تسمية
+rename-err-empty = أدخل اسمًا.
+rename-err-invalid = لا يمكن أن يحتوي الاسم على / \ : * ? " < > | ولا أن ينتهي بنقطة أو مسافة.
+rename-err-outside = هذا المرجع خارج مجلد التعديل.
+rename-err-missing = لم يعد هناك أي شيء في هذا المسار — استخدم المشروع ← البحث عن الملفات المفقودة…
+rename-err-exists = يوجد بالفعل عنصر بهذا الاسم في هذا المجلد.
+rename-err-io = رفض النظام إعادة التسمية: { $error }
+msg-renamed = تمت إعادة التسمية إلى «{ $path }» — عدد المراجع المحدَّثة: { $num }.
+menu-find-missing = البحث عن الملفات المفقودة…
+relink-title = البحث عن الملفات المفقودة
+relink-hint = الملفات والمجلدات والصور التي يستخدمها هذا المشروع ولم تعد موجودة، مع ما عثر عليه XIMOD في مجلد التعديل. اختر موقعًا جديدًا لكل عنصر تريد إصلاحه، ثم انقر على تطبيق.
+relink-none = جميع ملفات هذا المشروع ومجلداته وصوره موجودة. لا يوجد ما يجب إصلاحه.
+relink-col-missing = مفقود
+relink-col-uses = الاستخدامات
+relink-col-new = الموقع الجديد
+relink-keep = (اتركه كما هو)
+relink-moved = الاسم نفسه، تم نقله
+relink-renamed = اسم مشابه، أُعيدت تسميته
+relink-browse = تصفح…
+relink-rescan = إعادة الفحص
+btn-apply-relink = تطبيق ({ $num })
+msg-relinked = عدد المراجع المحدَّثة: { $num }.
+
+# --- 2.2.0: destination cell
+files-dest-hint = (جذر Data)
+files-dest-tooltip = مسار التثبيت نسبةً إلى مجلد Data الخاص باللعبة، مثل SKSE\Plugins. اتركه فارغًا للتثبيت في جذر Data. انقر على الخلية لتعديلها.
