@@ -135,8 +135,8 @@ label-group-dest = Cél az egész csoporthoz
 label-page-dest = Telepítési cél (egész oldal)
 btn-apply-group-dest = Alkalmazás a csoport összes opciójára
 btn-apply-page-dest = Alkalmazás az oldal összes opciójára
-group-dest-hint = Egyetlen telepítési célt állít be a csoport minden opciójának minden fájljához.
-page-dest-hint = Egyetlen telepítési célt állít be az oldal minden opciójának minden fájljához (minden csoport).
+group-dest-hint = Egyetlen telepítési célt állít be a csoport minden opciójának minden fájljához — beleértve azokat a fájlokat is, amelyeket az előbeállítás-varázsló a feltételes telepítésekbe helyezett át.
+page-dest-hint = Egyetlen telepítési célt állít be az oldal minden opciójának minden fájljához (minden csoport) — beleértve azokat a fájlokat is, amelyeket az előbeállítás-varázsló a feltételes telepítésekbe helyezett át.
 bulk-dest-nofiles = Még nincs frissítendő fájl — először adjon fájlokat az opciókhoz.
 status-dest-applied = Cél alkalmazva { $num } fájlra.
 preview-hidden-steps = { $num } lépés elrejtve a jelenlegi választások miatt.
@@ -978,3 +978,8 @@ msg-relinked = { $num } hivatkozás frissítve.
 # --- 2.2.0: destination cell
 files-dest-hint = (a Data gyökere)
 files-dest-tooltip = Telepítési útvonal a játék Data mappájához képest, például SKSE\Plugins. Hagyja üresen a Data gyökerébe történő telepítéshez. Kattintson a cellára a szerkesztéséhez.
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = Egyszerre egyetlen telepítési célt állít be minden feltételes készlet minden fájljához.
+btn-apply-all-cond-dest = Alkalmazás az összes feltételes készletre
+preset-rebuild-hint = Ez a projekt már tartalmaz egy, a varázsló által létrehozott struktúrát: az oldalai, nevei és előbeállításai alább be vannak töltve. Az „Alkalmaz“ a módosításaival újraépíti, és megtartja a jelzők nevét.

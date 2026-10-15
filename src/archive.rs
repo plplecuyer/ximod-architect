@@ -223,7 +223,13 @@ fn write_archive(
                     .large_file(true);
                 for (i, entry) in entries.iter().enumerate() {
                     step(i, entry)?;
-                    zip.start_file(entry.name.as_str(), opts)?;
+                    // Keep each file's modification date (generated files get
+                    // the current time).
+                    let time = match &entry.source {
+                        EntrySource::Disk(abs) => export::zip_time_of(abs),
+                        EntrySource::Bytes(_) => export::zip_time(None),
+                    };
+                    zip.start_file(entry.name.as_str(), opts.last_modified_time(time))?;
                     std::io::copy(&mut open_entry(entry)?, &mut zip)
                         .with_context(|| format!("adding {} to the archive", entry.name))?;
                 }

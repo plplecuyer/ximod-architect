@@ -63,6 +63,10 @@ pub struct PresetWizardState {
     pub skeleton: Vec<SkeletonRow>,
     /// Last validation error of the plan, for the status line.
     pub error: Option<PresetError>,
+    /// The project as it was before an earlier run of the wizard, when one is
+    /// detected: the page list and the matrix refer to it, and Apply rebuilds
+    /// the structure instead of stacking a second one on top of the first.
+    pub base: Option<crate::models::Ximod>,
 }
 
 impl PresetWizardState {
@@ -95,6 +99,38 @@ impl PresetWizardState {
         };
         self.error = None;
         self.loaded = true;
+    }
+
+    /// Prefill the window from the structure an earlier run of the wizard
+    /// left in the project (see [`presets::unapply`]): its names, its feature
+    /// pages and its presets with their choices.
+    pub fn load_existing(&mut self, plan: &PresetPlan, step_count: usize) {
+        self.settings = plan.settings.clone();
+        self.selected = vec![false; step_count];
+        for &si in &plan.feature_steps {
+            if si < step_count {
+                self.selected[si] = true;
+            }
+        }
+        self.presets = plan
+            .presets
+            .iter()
+            .map(|p| {
+                let mut choices = HashMap::new();
+                for (f, groups) in p.choices.iter().enumerate() {
+                    if let Some(&si) = plan.feature_steps.get(f) {
+                        for (gi, c) in groups.iter().enumerate() {
+                            choices.insert((si, gi), c.clone());
+                        }
+                    }
+                }
+                PresetRow {
+                    name: p.name.clone(),
+                    choices,
+                }
+            })
+            .collect();
+        self.tab = WizardTab::Existing;
     }
 
     /// Keep the page list in step with the project (steps added or removed
@@ -198,6 +234,7 @@ struct Texts {
     skel_remove: String,
     skel_create: String,
     skel_none: String,
+    rebuild_hint: String,
 }
 
 impl Texts {
@@ -240,6 +277,7 @@ impl Texts {
             skel_remove: i.t("preset-skel-remove"),
             skel_create: i.t("preset-skel-create"),
             skel_none: i.t("preset-skel-none"),
+            rebuild_hint: i.t("preset-rebuild-hint"),
         }
     }
 
@@ -282,10 +320,25 @@ impl XimodApp {
             return;
         }
         if !self.preset_wizard.loaded {
-            let n = self.ximod.steps.len();
+            // A structure left by an earlier run is undone on a copy: the
+            // window then edits the original pages and the existing presets.
+            let mut restored = self.ximod.clone();
+            let existing = presets::unapply(&mut restored);
+            let n = restored.steps.len();
             self.preset_wizard.load(&self.i18n, n);
+            match existing {
+                Some(plan) => {
+                    self.preset_wizard.load_existing(&plan, n);
+                    self.preset_wizard.base = Some(restored);
+                }
+                None => self.preset_wizard.base = None,
+            }
         }
-        self.preset_wizard.sync(self.ximod.steps.len());
+        // The project the page list and the matrix refer to.
+        let mut base = self.preset_wizard.base.take();
+        let rebuild = base.is_some();
+        self.preset_wizard
+            .sync(base.as_ref().map_or(self.ximod.steps.len(), |b| b.steps.len()));
 
         let t = Texts::new(&self.i18n);
         let vb = self.free_viewport_builder(ctx, WINDOW_ID, t.title.clone(), [960.0, 620.0], false);
@@ -295,7 +348,7 @@ impl XimodApp {
 
         let st = &mut self.preset_wizard;
         let cfg = &mut self.config;
-        let ximod = &self.ximod;
+        let ximod = base.as_ref().unwrap_or(&self.ximod);
         let mut do_apply = false;
         let mut do_close = false;
         let mut do_create_pages = false;
@@ -385,6 +438,10 @@ impl XimodApp {
                         .show(ctx, |ui| {
                             egui::ScrollArea::vertical().auto_shrink([false, false]).show(ui, |ui| {
                                 ui.add_space(4.0);
+                                if rebuild {
+                                    ui.label(RichText::new(&t.rebuild_hint).color(ui.visuals().warn_fg_color));
+                                    ui.add_space(6.0);
+                                }
                                 ui.strong(&t.pages);
                                 ui.label(RichText::new(&t.pages_hint).weak().small());
                                 ui.add_space(4.0);
@@ -594,10 +651,16 @@ impl XimodApp {
 
         if do_create_pages {
             let specs = self.preset_wizard.skeleton_specs();
-            let created = presets::create_feature_pages(&mut self.ximod, &specs);
+            let mut created = presets::create_feature_pages(&mut self.ximod, &specs);
+            if let Some(b) = base.as_mut() {
+                // The page list refers to the restored project: add the pages
+                // there too, and tick them by their indices in it.
+                created = presets::create_feature_pages(b, &specs);
+            }
             if !created.is_empty() {
                 self.mark_modified();
-                self.preset_wizard.sync(self.ximod.steps.len());
+                self.preset_wizard
+                    .sync(base.as_ref().map_or(self.ximod.steps.len(), |b| b.steps.len()));
                 for &si in &created {
                     self.preset_wizard.selected[si] = true;
                 }
@@ -608,9 +671,16 @@ impl XimodApp {
             }
         }
         if do_apply {
-            let plan = self.preset_wizard.plan(&self.ximod);
-            match presets::apply(&mut self.ximod, &plan) {
+            let plan = self.preset_wizard.plan(base.as_ref().unwrap_or(&self.ximod));
+            // Rebuild: undo the earlier structure on a working copy, then
+            // apply the new plan to it — one undoable edit either way.
+            let mut work = self.ximod.clone();
+            if rebuild {
+                presets::unapply(&mut work);
+            }
+            match presets::apply(&mut work, &plan) {
                 Ok(summary) => {
+                    self.ximod = work;
                     self.mark_modified();
                     self.reset_selection();
                     self.select_step(Some(0));
@@ -631,6 +701,8 @@ impl XimodApp {
             self.show_preset_wizard = false;
             self.preset_wizard.loaded = false;
             self.free_window_closed(WINDOW_ID);
+        } else {
+            self.preset_wizard.base = base;
         }
     }
 }
@@ -698,5 +770,51 @@ mod tests {
         app.preset_wizard.tab = WizardTab::Existing;
         let _ = ctx.run(egui::RawInput::default(), |ctx| app.render_preset_wizard(ctx));
         assert!(app.preset_wizard.error.is_none());
+    }
+
+    /// Reopening the wizard on a project it already transformed loads the
+    /// existing presets, and Apply rebuilds instead of stacking.
+    #[test]
+    fn reopening_loads_the_existing_structure_and_rebuilds() {
+        let mut app = XimodApp::default();
+        app.i18n.set_locale("eng");
+        let specs = vec![FeatureSpec {
+            name: "Lighting".into(),
+            exclusive: true,
+            variants: vec!["Warm".into(), "Cold".into()],
+        }];
+        presets::create_feature_pages(&mut app.ximod, &specs);
+        let plan = PresetPlan {
+            settings: PresetSettings::default(),
+            feature_steps: vec![0],
+            presets: vec![PresetDef {
+                name: "Cosy".into(),
+                choices: vec![vec![GroupChoice::One(0)]],
+            }],
+        };
+        presets::apply(&mut app.ximod, &plan).unwrap();
+        assert_eq!(app.ximod.steps.len(), 2);
+
+        app.open_preset_wizard();
+        let ctx = egui::Context::default();
+        let _ = ctx.run(egui::RawInput::default(), |ctx| app.render_preset_wizard(ctx));
+        let st = &app.preset_wizard;
+        assert!(st.base.is_some(), "earlier structure detected");
+        assert_eq!(st.selected, vec![true]);
+        assert_eq!(st.presets.len(), 1);
+        assert_eq!(st.presets[0].name, "Cosy");
+        assert_eq!(st.presets[0].choices.get(&(0, 0)), Some(&GroupChoice::One(0)));
+
+        // A second preset, then the same rebuild as Apply.
+        app.preset_wizard.presets.push(PresetRow {
+            name: "Bright".into(),
+            choices: HashMap::from([((0, 0), GroupChoice::One(1))]),
+        });
+        let plan = app.preset_wizard.plan(app.preset_wizard.base.as_ref().unwrap());
+        let mut work = app.ximod.clone();
+        presets::unapply(&mut work);
+        presets::apply(&mut work, &plan).unwrap();
+        assert_eq!(work.steps.len(), 2, "still one installation-mode step");
+        assert_eq!(work.steps[0].plugin_groups[0].plugins.len(), 2);
     }
 }

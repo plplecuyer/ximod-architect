@@ -135,8 +135,8 @@ label-group-dest = Koko ryhmän kohde
 label-page-dest = Asennuskohde (koko sivu)
 btn-apply-group-dest = Käytä kaikkiin tämän ryhmän vaihtoehtoihin
 btn-apply-page-dest = Käytä kaikkiin tämän sivun vaihtoehtoihin
-group-dest-hint = Asettaa yhden asennuskohteen tämän ryhmän jokaisen vaihtoehdon jokaiselle tiedostolle.
-page-dest-hint = Asettaa yhden asennuskohteen tämän sivun jokaisen vaihtoehdon jokaiselle tiedostolle (kaikki ryhmät).
+group-dest-hint = Asettaa yhden asennuskohteen tämän ryhmän jokaisen vaihtoehdon jokaiselle tiedostolle — myös tiedostoille, jotka ohjattu esiasetusten luonti on siirtänyt ehdollisiin asennuksiin.
+page-dest-hint = Asettaa yhden asennuskohteen tämän sivun jokaisen vaihtoehdon jokaiselle tiedostolle (kaikki ryhmät) — myös tiedostoille, jotka ohjattu esiasetusten luonti on siirtänyt ehdollisiin asennuksiin.
 bulk-dest-nofiles = Ei vielä päivitettäviä tiedostoja — lisää ensin tiedostoja vaihtoehtoihin.
 status-dest-applied = Kohde otettu käyttöön { $num } tiedostolle.
 preview-hidden-steps = { $num } vaihe(tta) piilotettu nykyisillä valinnoilla.
@@ -978,3 +978,8 @@ msg-relinked = Päivitettyjä viittauksia: { $num }.
 # --- 2.2.0: destination cell
 files-dest-hint = (Data-kansion juuri)
 files-dest-tooltip = Asennuspolku suhteessa pelin Data-kansioon, esimerkiksi SKSE\Plugins. Jätä tyhjäksi, jos haluat asentaa Data-kansion juureen. Muokkaa solua napsauttamalla sitä.
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = Asettaa kerralla yhden asennuskohteen jokaisen ehdollisen joukon jokaiselle tiedostolle.
+btn-apply-all-cond-dest = Käytä kaikkiin ehdollisiin joukkoihin
+preset-rebuild-hint = Tässä projektissa on jo ohjatun toiminnon luoma rakenne: sen sivut, nimet ja esiasetukset on ladattu alle. ”Käytä” rakentaa sen uudelleen muutoksillasi ja säilyttää lippujen nimet.

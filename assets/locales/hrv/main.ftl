@@ -135,8 +135,8 @@ label-group-dest = Odredište za cijelu grupu
 label-page-dest = Odredište instalacije (cijela stranica)
 btn-apply-group-dest = Primijeni na sve opcije u ovoj grupi
 btn-apply-page-dest = Primijeni na sve opcije na ovoj stranici
-group-dest-hint = Postavlja jedno odredište instalacije za svaku datoteku svake opcije u ovoj grupi.
-page-dest-hint = Postavlja jedno odredište instalacije za svaku datoteku svake opcije na ovoj stranici (sve grupe).
+group-dest-hint = Postavlja jedno odredište instalacije za svaku datoteku svake opcije u ovoj grupi — uključujući datoteke koje je čarobnjak za presete premjestio u uvjetne instalacije.
+page-dest-hint = Postavlja jedno odredište instalacije za svaku datoteku svake opcije na ovoj stranici (sve grupe) — uključujući datoteke koje je čarobnjak za presete premjestio u uvjetne instalacije.
 bulk-dest-nofiles = Još nema datoteka za ažuriranje — najprije dodajte datoteke opcijama.
 status-dest-applied = Odredište primijenjeno na { $num } datoteku(a).
 preview-hidden-steps = { $num } korak(a) skriveno trenutnim odabirom.
@@ -978,3 +978,8 @@ msg-relinked = Ažurirano referenci: { $num }.
 # --- 2.2.0: destination cell
 files-dest-hint = (korijen mape Data)
 files-dest-tooltip = Putanja instalacije u odnosu na mapu Data igre, na primjer SKSE\Plugins. Ostavite prazno za instalaciju u korijen mape Data. Kliknite ćeliju da biste je uredili.
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = Postavlja jedno odredište instalacije za svaku datoteku svakog uvjetnog skupa odjednom.
+btn-apply-all-cond-dest = Primijeni na sve uvjetne skupove
+preset-rebuild-hint = Ovaj projekt već sadrži strukturu koju je stvorio čarobnjak: njezine stranice, nazivi i preseti učitani su u nastavku. „Primijeni“ je ponovno gradi s vašim izmjenama i zadržava nazive zastavica.

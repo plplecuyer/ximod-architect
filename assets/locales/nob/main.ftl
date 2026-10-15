@@ -135,8 +135,8 @@ label-group-dest = Mål for hele gruppen
 label-page-dest = Installasjonsmål (hele siden)
 btn-apply-group-dest = Bruk på alle alternativer i denne gruppen
 btn-apply-page-dest = Bruk på alle alternativer på denne siden
-group-dest-hint = Angir ett installasjonsmål for hver fil i hvert alternativ i denne gruppen.
-page-dest-hint = Angir ett installasjonsmål for hver fil i hvert alternativ på denne siden (alle grupper).
+group-dest-hint = Angir ett installasjonsmål for hver fil i hvert alternativ i denne gruppen — inkludert filene som veiviseren for forhåndsinnstillinger har flyttet til de betingede installasjonene.
+page-dest-hint = Angir ett installasjonsmål for hver fil i hvert alternativ på denne siden (alle grupper) — inkludert filene som veiviseren for forhåndsinnstillinger har flyttet til de betingede installasjonene.
 bulk-dest-nofiles = Ingen filer å oppdatere ennå — legg til filer i alternativene først.
 status-dest-applied = Mål brukt på { $num } fil(er).
 preview-hidden-steps = { $num } trinn skjult av gjeldende valg.
@@ -978,3 +978,8 @@ msg-relinked = { $num } referanse(r) oppdatert.
 # --- 2.2.0: destination cell
 files-dest-hint = (roten av Data)
 files-dest-tooltip = Installasjonsbane relativt til spillets Data-mappe, for eksempel SKSE\Plugins. La stå tomt for å installere i roten av Data. Klikk på cellen for å redigere den.
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = Angir ett installasjonsmål for hver fil i hvert betinget sett på én gang.
+btn-apply-all-cond-dest = Bruk på alle betingede sett
+preset-rebuild-hint = Dette prosjektet inneholder allerede en struktur laget av veiviseren: sidene, navnene og forhåndsinnstillingene er lastet inn nedenfor. «Bruk» bygger den opp på nytt med endringene dine og beholder flaggnavnene.

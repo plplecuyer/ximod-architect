@@ -743,8 +743,9 @@ impl XimodApp {
 
         let file = std::fs::File::create(&zip_path)?;
         let mut zip = zip::ZipWriter::new(file);
-        let opts: zip::write::FileOptions<()> =
-            zip::write::FileOptions::default().compression_method(zip::CompressionMethod::Deflated);
+        let opts: zip::write::FileOptions<()> = zip::write::FileOptions::default()
+            .compression_method(zip::CompressionMethod::Deflated)
+            .last_modified_time(crate::export::zip_time(None));
 
         // Only the translated file, keeping its folder so the layout is obvious.
         // Its metadata header (country, language, font, endonyms, author) lets

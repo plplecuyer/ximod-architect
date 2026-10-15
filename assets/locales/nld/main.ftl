@@ -135,8 +135,8 @@ label-group-dest = Bestemming voor de hele groep
 label-page-dest = Installatiebestemming (hele pagina)
 btn-apply-group-dest = Toepassen op alle opties in deze groep
 btn-apply-page-dest = Toepassen op alle opties op deze pagina
-group-dest-hint = Stelt één installatiebestemming in voor elk bestand van elke optie in deze groep.
-page-dest-hint = Stelt één installatiebestemming in voor elk bestand van elke optie op deze pagina (alle groepen).
+group-dest-hint = Stelt één installatiebestemming in voor elk bestand van elke optie in deze groep — inclusief de bestanden die de presetwizard naar de voorwaardelijke installaties heeft verplaatst.
+page-dest-hint = Stelt één installatiebestemming in voor elk bestand van elke optie op deze pagina (alle groepen) — inclusief de bestanden die de presetwizard naar de voorwaardelijke installaties heeft verplaatst.
 bulk-dest-nofiles = Nog geen bestanden om bij te werken — voeg eerst bestanden toe aan de opties.
 status-dest-applied = Bestemming toegepast op { $num } bestand(en).
 preview-hidden-steps = { $num } stap(pen) verborgen door huidige selectie.
@@ -978,3 +978,8 @@ msg-relinked = { $num } verwijzing(en) bijgewerkt.
 # --- 2.2.0: destination cell
 files-dest-hint = (hoofdmap van Data)
 files-dest-tooltip = Installatiepad relatief aan de Data-map van het spel, bijvoorbeeld SKSE\Plugins. Laat leeg om in de hoofdmap van Data te installeren. Klik op de cel om deze te bewerken.
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = Stelt in één keer één installatiebestemming in voor elk bestand van elke voorwaardelijke set.
+btn-apply-all-cond-dest = Toepassen op alle voorwaardelijke sets
+preset-rebuild-hint = Dit project bevat al een structuur die door de wizard is gemaakt: de pagina’s, namen en presets ervan zijn hieronder geladen. “Toepassen” bouwt deze opnieuw op met uw wijzigingen en behoudt de vlagnamen.

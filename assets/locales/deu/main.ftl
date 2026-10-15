@@ -135,8 +135,8 @@ label-group-dest = Ziel für die ganze Gruppe
 label-page-dest = Installationsziel (ganze Seite)
 btn-apply-group-dest = Auf alle Optionen dieser Gruppe anwenden
 btn-apply-page-dest = Auf alle Optionen dieser Seite anwenden
-group-dest-hint = Legt ein Installationsziel für jede Datei jeder Option dieser Gruppe fest.
-page-dest-hint = Legt ein Installationsziel für jede Datei jeder Option dieser Seite fest (alle Gruppen).
+group-dest-hint = Legt ein Installationsziel für jede Datei jeder Option dieser Gruppe fest — einschließlich der Dateien, die der Preset-Assistent in die bedingten Installationen verschoben hat.
+page-dest-hint = Legt ein Installationsziel für jede Datei jeder Option dieser Seite fest (alle Gruppen) — einschließlich der Dateien, die der Preset-Assistent in die bedingten Installationen verschoben hat.
 bulk-dest-nofiles = Noch keine Dateien zum Aktualisieren — fügen Sie zuerst Dateien zu den Optionen hinzu.
 status-dest-applied = Ziel auf { $num } Datei(en) angewendet.
 preview-hidden-steps = { $num } Schritt(e) durch aktuelle Auswahl ausgeblendet.
@@ -978,3 +978,8 @@ msg-relinked = { $num } Verweis(e) aktualisiert.
 # --- 2.2.0: destination cell
 files-dest-hint = (Stammordner von Data)
 files-dest-tooltip = Installationspfad relativ zum Data-Ordner des Spiels, zum Beispiel SKSE\Plugins. Leer lassen, um im Stammordner von Data zu installieren. Klicken Sie auf die Zelle, um sie zu bearbeiten.
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = Legt auf einmal ein Installationsziel für jede Datei jedes bedingten Satzes fest.
+btn-apply-all-cond-dest = Auf alle bedingten Sätze anwenden
+preset-rebuild-hint = Dieses Projekt enthält bereits eine vom Assistenten erstellte Struktur: Ihre Seiten, Namen und Presets sind unten geladen. „Anwenden“ baut sie mit Ihren Änderungen neu auf und behält die Flag-Namen bei.

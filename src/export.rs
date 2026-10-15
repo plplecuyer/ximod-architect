@@ -87,6 +87,37 @@ pub fn collect_distribution_files(root: &Path, out_archive: &Path) -> Result<Vec
 
 /// Zip the contents of `root` (recursively) into `out_zip`, using relative paths
 /// with forward slashes. Junk files and the output archive itself are skipped.
+/// A ZIP entry timestamp for `time` (the file's modification time), in local
+/// time as ZIP (DOS) timestamps are. `None` — a generated file — uses the
+/// current time. Without this every entry was dated 1980-01-01 (the `zip`
+/// crate's default when its `time` feature is off), and mod managers deploy
+/// the files with that date. Dates ZIP cannot store (before 1980, after 2107)
+/// fall back to the nearest bound.
+pub(crate) fn zip_time(time: Option<std::time::SystemTime>) -> zip::DateTime {
+    use chrono::{Datelike, Timelike};
+    let dt: chrono::DateTime<chrono::Local> = time.unwrap_or_else(std::time::SystemTime::now).into();
+    let year = dt.year().clamp(1980, 2107) as u16;
+    let (month, day, hour, minute, second) = if dt.year() < 1980 {
+        (1, 1, 0, 0, 0)
+    } else if dt.year() > 2107 {
+        (12, 31, 23, 59, 58)
+    } else {
+        (
+            dt.month() as u8,
+            dt.day() as u8,
+            dt.hour() as u8,
+            dt.minute() as u8,
+            dt.second() as u8,
+        )
+    };
+    zip::DateTime::from_date_and_time(year, month, day, hour, minute, second).unwrap_or_default()
+}
+
+/// The modification time of a file on disk, as a ZIP timestamp.
+pub(crate) fn zip_time_of(path: &Path) -> zip::DateTime {
+    zip_time(std::fs::metadata(path).and_then(|m| m.modified()).ok())
+}
+
 pub fn zip_directory(root: &Path, out_zip: &Path) -> Result<usize> {
     zip_directory_with(root, out_zip, &mut |_, _, _| true)
 }
@@ -113,7 +144,7 @@ pub fn zip_directory_with(root: &Path, out_zip: &Path, progress: Progress<'_>) -
             }
             let abs = root.join(rel);
             let name = rel.to_string_lossy().replace('\\', "/");
-            zip.start_file(name, opts)?;
+            zip.start_file(name, opts.last_modified_time(zip_time_of(&abs)))?;
             let mut reader = std::io::BufReader::new(
                 std::fs::File::open(&abs).with_context(|| format!("reading {}", abs.display()))?,
             );
@@ -280,5 +311,40 @@ mod tests {
         x.version = "1.2".into();
         assert_eq!(default_archive_name(&x), "My_ Mod_Name-1.2.zip");
         assert_eq!(default_archive_name_with_ext(&Ximod::default(), "7z"), "fomod.7z");
+    }
+
+    #[test]
+    fn zip_entries_keep_the_files_modification_date() {
+        use chrono::{Datelike, Timelike};
+        let dir = sample_root("mtime");
+        let f = dir.join("textures/a.dds");
+        // A fixed date in the past, so "now" cannot pass the test by accident.
+        let when = std::time::SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(1_600_000_000);
+        std::fs::File::options()
+            .write(true)
+            .open(&f)
+            .unwrap()
+            .set_modified(when)
+            .unwrap();
+        let out = dir.with_extension("mtime.zip");
+        zip_directory(&dir, &out).unwrap();
+        let mut z = zip::ZipArchive::new(std::fs::File::open(&out).unwrap()).unwrap();
+        let entry = z.by_name("textures/a.dds").unwrap();
+        let t = entry.last_modified().expect("timestamp");
+        let local: chrono::DateTime<chrono::Local> = when.into();
+        assert_eq!(
+            (t.year(), t.month(), t.day(), t.hour(), t.minute()),
+            (
+                local.year() as u16,
+                local.month() as u8,
+                local.day() as u8,
+                local.hour() as u8,
+                local.minute() as u8
+            )
+        );
+        assert_ne!(t.year(), 1980, "no more 1980-01-01 dates");
+        drop(entry);
+        let _ = std::fs::remove_file(&out);
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }

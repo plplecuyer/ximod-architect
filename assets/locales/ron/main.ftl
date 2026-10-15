@@ -135,8 +135,8 @@ label-group-dest = Destinație pentru tot grupul
 label-page-dest = Destinație de instalare (toată pagina)
 btn-apply-group-dest = Aplică la toate opțiunile din acest grup
 btn-apply-page-dest = Aplică la toate opțiunile de pe această pagină
-group-dest-hint = Setează o singură destinație de instalare pentru fiecare fișier al fiecărei opțiuni din acest grup.
-page-dest-hint = Setează o singură destinație de instalare pentru fiecare fișier al fiecărei opțiuni de pe această pagină (toate grupurile).
+group-dest-hint = Setează o singură destinație de instalare pentru fiecare fișier al fiecărei opțiuni din acest grup — inclusiv fișierele pe care asistentul pentru presetări le-a mutat în instalările condiționate.
+page-dest-hint = Setează o singură destinație de instalare pentru fiecare fișier al fiecărei opțiuni de pe această pagină (toate grupurile) — inclusiv fișierele pe care asistentul pentru presetări le-a mutat în instalările condiționate.
 bulk-dest-nofiles = Încă nu există fișiere de actualizat — adăugați mai întâi fișiere la opțiuni.
 status-dest-applied = Destinație aplicată la { $num } fișier(e).
 preview-hidden-steps = { $num } pas(i) ascunși de selecțiile curente.
@@ -978,3 +978,8 @@ msg-relinked = { $num } referință(e) actualizată(e).
 # --- 2.2.0: destination cell
 files-dest-hint = (rădăcina Data)
 files-dest-tooltip = Calea de instalare relativă la folderul Data al jocului, de exemplu SKSE\Plugins. Lăsați gol pentru a instala în rădăcina Data. Faceți clic pe celulă pentru a o edita.
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = Setează deodată o singură destinație de instalare pentru fiecare fișier al fiecărui set condiționat.
+btn-apply-all-cond-dest = Aplică la toate seturile condiționate
+preset-rebuild-hint = Acest proiect conține deja o structură creată de asistent: paginile, numele și presetările sale sunt încărcate mai jos. Aplică o reconstruiește cu modificările dumneavoastră și păstrează numele pavilioanelor.

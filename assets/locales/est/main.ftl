@@ -135,8 +135,8 @@ label-group-dest = Kogu grupi sihtkoht
 label-page-dest = Paigalduse sihtkoht (kogu leht)
 btn-apply-group-dest = Rakenda kõigile selle rühma valikutele
 btn-apply-page-dest = Rakenda kõigile selle lehe valikutele
-group-dest-hint = Määrab ühe paigalduse sihtkoha selle grupi iga valiku igale failile.
-page-dest-hint = Määrab ühe paigalduse sihtkoha selle lehe iga valiku igale failile (kõik grupid).
+group-dest-hint = Määrab ühe paigalduse sihtkoha selle grupi iga valiku igale failile — ka failidele, mille eelseadistuste viisard on tingimuslikesse paigaldustesse teisaldanud.
+page-dest-hint = Määrab ühe paigalduse sihtkoha selle lehe iga valiku igale failile (kõik grupid) — ka failidele, mille eelseadistuste viisard on tingimuslikesse paigaldustesse teisaldanud.
 bulk-dest-nofiles = Veel pole faile, mida uuendada — lisa esmalt valikutele faile.
 status-dest-applied = Sihtkoht rakendatud { $num } failile.
 preview-hidden-steps = { $num } sammu peidetud praeguste valikutega.
@@ -978,3 +978,8 @@ msg-relinked = Uuendatud viiteid: { $num }.
 # --- 2.2.0: destination cell
 files-dest-hint = (Data juurkaust)
 files-dest-tooltip = Paigaldustee mängu Data-kausta suhtes, näiteks SKSE\Plugins. Jätke tühjaks, et paigaldada Data juurkausta. Klõpsake lahtril, et seda muuta.
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = Määrab korraga ühe paigalduse sihtkoha iga tingimusliku komplekti igale failile.
+btn-apply-all-cond-dest = Rakenda kõigile tingimuslikele komplektidele
+preset-rebuild-hint = Selles projektis on juba viisardi loodud struktuur: selle lehed, nimed ja eelseadistused on allpool laaditud. „Rakenda“ ehitab selle teie muudatustega uuesti üles ja säilitab lippude nimed.

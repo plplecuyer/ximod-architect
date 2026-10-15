@@ -135,8 +135,8 @@ label-group-dest = Cieľ pre celú skupinu
 label-page-dest = Cieľ inštalácie (celá stránka)
 btn-apply-group-dest = Použiť na všetky možnosti v tejto skupine
 btn-apply-page-dest = Použiť na všetky možnosti na tejto stránke
-group-dest-hint = Nastaví jeden cieľ inštalácie pre každý súbor každej možnosti v tejto skupine.
-page-dest-hint = Nastaví jeden cieľ inštalácie pre každý súbor každej možnosti na tejto stránke (všetky skupiny).
+group-dest-hint = Nastaví jeden cieľ inštalácie pre každý súbor každej možnosti v tejto skupine — vrátane súborov, ktoré sprievodca predvoľbami presunul do podmienených inštalácií.
+page-dest-hint = Nastaví jeden cieľ inštalácie pre každý súbor každej možnosti na tejto stránke (všetky skupiny) — vrátane súborov, ktoré sprievodca predvoľbami presunul do podmienených inštalácií.
 bulk-dest-nofiles = Zatiaľ žiadne súbory na aktualizáciu — najprv pridajte súbory do možností.
 status-dest-applied = Cieľ použitý na { $num } súbor(ov).
 preview-hidden-steps = { $num } krok(ov) skrytých aktuálnym výberom.
@@ -978,3 +978,8 @@ msg-relinked = Aktualizovaných odkazov: { $num }.
 # --- 2.2.0: destination cell
 files-dest-hint = (koreň priečinka Data)
 files-dest-tooltip = Inštalačná cesta relatívna k priečinku Data hry, napríklad SKSE\Plugins. Ak chcete inštalovať do koreňa priečinka Data, nechajte prázdne. Kliknutím na bunku ju upravíte.
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = Nastaví naraz jeden cieľ inštalácie pre každý súbor každej podmienenej sady.
+btn-apply-all-cond-dest = Použiť na všetky podmienené sady
+preset-rebuild-hint = Tento projekt už obsahuje štruktúru vytvorenú sprievodcom: jej stránky, názvy a predvoľby sú načítané nižšie. Použiť ju znova zostaví s vašimi zmenami a zachová názvy príznakov.

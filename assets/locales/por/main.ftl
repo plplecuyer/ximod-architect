@@ -135,8 +135,8 @@ label-group-dest = Destino para todo o grupo
 label-page-dest = Destino de instalação (página inteira)
 btn-apply-group-dest = Aplicar a todas as opções deste grupo
 btn-apply-page-dest = Aplicar a todas as opções desta página
-group-dest-hint = Define um único destino de instalação para cada ficheiro de cada opção deste grupo.
-page-dest-hint = Define um único destino de instalação para cada ficheiro de cada opção desta página (todos os grupos).
+group-dest-hint = Define um único destino de instalação para cada ficheiro de cada opção deste grupo — incluindo os ficheiros que o assistente de predefinições moveu para as instalações condicionais.
+page-dest-hint = Define um único destino de instalação para cada ficheiro de cada opção desta página (todos os grupos) — incluindo os ficheiros que o assistente de predefinições moveu para as instalações condicionais.
 bulk-dest-nofiles = Ainda não há ficheiros para atualizar — adicione primeiro ficheiros às opções.
 status-dest-applied = Destino aplicado a { $num } ficheiro(s).
 preview-hidden-steps = { $num } passo(s) ocultado(s) pelas seleções atuais.
@@ -978,3 +978,8 @@ msg-relinked = { $num } referência(s) atualizada(s).
 # --- 2.2.0: destination cell
 files-dest-hint = (raiz de Data)
 files-dest-tooltip = Caminho de instalação relativo à pasta Data do jogo, por exemplo SKSE\Plugins. Deixe vazio para instalar na raiz de Data. Clique na célula para a editar.
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = Define de uma só vez um único destino de instalação para cada ficheiro de cada conjunto condicional.
+btn-apply-all-cond-dest = Aplicar a todos os conjuntos condicionais
+preset-rebuild-hint = Este projeto já contém uma estrutura criada pelo assistente: as suas páginas, nomes e predefinições estão carregados abaixo. Aplicar reconstrói-a com as suas alterações e mantém os nomes das bandeiras.

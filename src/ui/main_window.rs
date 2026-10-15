@@ -85,6 +85,8 @@ pub struct XimodApp {
     /// Conditional Installs tabs.
     pub req_dest_buf: String,
     pub cond_dest_buf: String,
+    /// Text buffer of the "all conditional sets" destination control.
+    pub cond_all_dest_buf: String,
     /// Paging offset (in pages of 8) for the conditional-install tabs strip.
     pub cond_tab_page: usize,
     pub current_file_index: Option<usize>,
@@ -491,6 +493,7 @@ impl XimodApp {
             page_dest_buf: String::new(),
             req_dest_buf: String::new(),
             cond_dest_buf: String::new(),
+            cond_all_dest_buf: String::new(),
             current_file_index: None,
             current_flag_index: None,
             current_dependency_index: None,

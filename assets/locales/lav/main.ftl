@@ -135,8 +135,8 @@ label-group-dest = Visas grupas galamērķis
 label-page-dest = Instalēšanas galamērķis (visa lapa)
 btn-apply-group-dest = Lietot visām šīs grupas opcijām
 btn-apply-page-dest = Lietot visām šīs lapas opcijām
-group-dest-hint = Iestata vienu instalēšanas galamērķi katram šīs grupas katras opcijas failam.
-page-dest-hint = Iestata vienu instalēšanas galamērķi katram šīs lapas katras opcijas failam (visas grupas).
+group-dest-hint = Iestata vienu instalēšanas galamērķi katram šīs grupas katras opcijas failam — tostarp failiem, ko priekšiestatījumu vednis pārvietoja uz nosacītajām instalācijām.
+page-dest-hint = Iestata vienu instalēšanas galamērķi katram šīs lapas katras opcijas failam (visas grupas) — tostarp failiem, ko priekšiestatījumu vednis pārvietoja uz nosacītajām instalācijām.
 bulk-dest-nofiles = Vēl nav failu, ko atjaunināt — vispirms pievienojiet opcijām failus.
 status-dest-applied = Galamērķis lietots { $num } failam.
 preview-hidden-steps = { $num } solis(ļi) paslēpts ar pašreizējām izvēlēm.
@@ -978,3 +978,8 @@ msg-relinked = Atjaunināto atsauču skaits: { $num }.
 # --- 2.2.0: destination cell
 files-dest-hint = (Data sakne)
 files-dest-tooltip = Instalēšanas ceļš attiecībā pret spēles Data mapi, piemēram, SKSE\Plugins. Atstājiet tukšu, lai instalētu Data saknē. Noklikšķiniet uz šūnas, lai to rediģētu.
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = Uzreiz iestata vienu instalēšanas galamērķi katram katras nosacījumu kopas failam.
+btn-apply-all-cond-dest = Lietot visām nosacījumu kopām
+preset-rebuild-hint = Šajā projektā jau ir vedņa izveidota struktūra: tās lapas, nosaukumi un priekšiestatījumi ir ielādēti zemāk. Lietot to pārbūvē ar jūsu izmaiņām un saglabā karodziņu nosaukumus.

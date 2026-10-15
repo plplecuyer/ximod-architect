@@ -470,6 +470,279 @@ pub fn apply(ximod: &mut Ximod, plan: &PresetPlan) -> Result<PresetSummary, Pres
     Ok(summary)
 }
 
+/// `group` is a single flag test `name == value` (what [`flag_is`] builds).
+fn single_flag(group: &DependencyGroup) -> Option<(&str, &str)> {
+    if group.items.len() != 1 {
+        return None;
+    }
+    let d = group.items[0].as_leaf()?;
+    d.is_flag().then_some((d.name.as_str(), d.value.as_str()))
+}
+
+/// Remove the leaf `flag == value` from a step's visibility, undoing
+/// [`require_in_visibility`] (including the And wrapper it may have added).
+fn release_visibility(vis: &mut DependencyGroup, flag: &str, value: &str) {
+    vis.items
+        .retain(|it| !matches!(it.as_leaf(), Some(d) if d.is_flag() && d.name == flag && d.value == value));
+    if vis.operator == LogicalOperator::And
+        && vis.items.len() == 1
+        && let Some(inner) = vis.items[0].as_group().cloned()
+    {
+        *vis = inner;
+    }
+}
+
+/// The installation-mode step built by an earlier run of the wizard, if any:
+/// a step whose first group holds options that all set the same flag to
+/// distinct values (the presets) and whose second group holds options that
+/// each set a flag to "on" which some other step needs to be visible (the
+/// Customise options).
+fn find_mode_step(ximod: &Ximod) -> Option<usize> {
+    ximod.steps.iter().position(|step| {
+        if step.plugin_groups.len() != 2 {
+            return false;
+        }
+        let (pg, cg) = (&step.plugin_groups[0], &step.plugin_groups[1]);
+        if pg.plugins.is_empty() || cg.plugins.is_empty() {
+            return false;
+        }
+        let pf = match pg.plugins[0].condition_flags.first() {
+            Some(f) => f.name.clone(),
+            None => return false,
+        };
+        let mut values = HashSet::new();
+        let presets_ok = pg
+            .plugins
+            .iter()
+            .all(|p| matches!(p.condition_flags.first(), Some(f) if f.name == pf && values.insert(f.value.clone())));
+        let customise_ok = cg.plugins.iter().all(|o| match o.condition_flags.first() {
+            Some(f) if f.value == "on" => ximod.steps.iter().any(|s| {
+                s.visibility
+                    .items
+                    .iter()
+                    .filter_map(|it| it.as_leaf())
+                    .any(|d| d.is_flag() && d.name == f.name && d.value == "on")
+            }),
+            _ => false,
+        });
+        presets_ok && customise_ok
+    })
+}
+
+/// Whether the project holds a structure built by an earlier run of the
+/// wizard (see [`unapply`]).
+#[cfg(test)]
+pub fn has_structure(ximod: &Ximod) -> bool {
+    find_mode_step(ximod).is_some()
+}
+
+/// Undo an earlier run of the wizard and return the plan that would rebuild
+/// it: the installation-mode step is removed, the feature pages lose their
+/// visibility condition, their "None" options and the flags and Recommended
+/// patterns the wizard added, and the files the wizard moved to conditional
+/// installs go back to their options. `None` when the project holds no such
+/// structure (nothing is changed then).
+///
+/// Running the wizard again therefore never stacks a second structure on the
+/// first: the caller unapplies, lets the author add or change presets, and
+/// applies the new plan — which regenerates the same flag names, so a mod
+/// update keeps working with the flags of the previous release.
+pub fn unapply(ximod: &mut Ximod) -> Option<PresetPlan> {
+    let mi = find_mode_step(ximod)?;
+    let mode = ximod.steps[mi].clone();
+    let (pg, cg) = (&mode.plugin_groups[0], &mode.plugin_groups[1]);
+    let preset_flag = pg.plugins[0].condition_flags[0].name.clone();
+
+    // Feature pages, in the order of their Customise options.
+    struct Feature {
+        step: usize,
+        cust_flag: String,
+        /// Flags the Customise option resets: the wizard's flags of the page.
+        reset: HashSet<String>,
+    }
+    let mut features: Vec<Feature> = Vec::new();
+    for o in &cg.plugins {
+        let cust = &o.condition_flags[0].name;
+        let Some(si) = ximod.steps.iter().position(|s| {
+            s.visibility
+                .items
+                .iter()
+                .filter_map(|it| it.as_leaf())
+                .any(|d| d.is_flag() && &d.name == cust && d.value == "on")
+        }) else {
+            continue;
+        };
+        if si == mi || features.iter().any(|f| f.step == si) {
+            continue;
+        }
+        features.push(Feature {
+            step: si,
+            cust_flag: cust.clone(),
+            reset: o.condition_flags.iter().skip(1).map(|f| f.name.clone()).collect(),
+        });
+    }
+
+    let mut settings = PresetSettings {
+        mode_step_name: mode.name.clone(),
+        preset_group_name: pg.name.clone(),
+        customise_group_name: cg.name.clone(),
+        customise_label: "{name}".into(),
+        preset_flag: preset_flag.clone(),
+        none_name: PresetSettings::default().none_name,
+        add_none: false,
+    };
+    if let (Some(f), Some(o)) = (features.first(), cg.plugins.first()) {
+        let page = &ximod.steps[f.step].name;
+        if !page.is_empty() && o.name.contains(page.as_str()) {
+            settings.customise_label = o.name.replacen(page.as_str(), "{name}", 1);
+        }
+    }
+
+    // Per feature / group: the wizard flag and value of every remaining
+    // option, to read the presets' choices back.
+    #[derive(Clone)]
+    struct GroupInfo {
+        exclusive: bool,
+        flag: Option<String>,
+        option_flags: Vec<(String, String)>,
+    }
+    let mut infos: Vec<Vec<GroupInfo>> = Vec::new();
+    let all_preset =
+        |g: &DependencyGroup| g.leaf_count() > 0 && g.leaves().all(|d| d.is_flag() && d.name == preset_flag);
+    for f in &features {
+        let mut groups_info = Vec::new();
+        let step = &mut ximod.steps[f.step];
+        release_visibility(&mut step.visibility, &f.cust_flag, "on");
+        for group in &mut step.plugin_groups {
+            let exclusive = is_exclusive(group.selection_type);
+            // The "None" option: in an exclusive group, the option whose
+            // wizard flag is set to "none".
+            if exclusive
+                && let Some(ni) = group.plugins.iter().position(|p| {
+                    p.condition_flags
+                        .iter()
+                        .any(|c| f.reset.contains(&c.name) && c.value == "none")
+                })
+            {
+                settings.none_name = group.plugins[ni].name.clone();
+                settings.add_none = true;
+                group.plugins.remove(ni);
+            }
+            let mut info = GroupInfo {
+                exclusive,
+                flag: None,
+                option_flags: Vec::new(),
+            };
+            for plugin in &mut group.plugins {
+                let pos = plugin.condition_flags.iter().rposition(|c| f.reset.contains(&c.name));
+                let wf = pos.map(|i| plugin.condition_flags.remove(i));
+                plugin.dependency_patterns.retain(|pat| !all_preset(&pat.condition));
+                match wf {
+                    Some(c) => {
+                        if exclusive {
+                            info.flag = Some(c.name.clone());
+                        }
+                        info.option_flags.push((c.name, c.value));
+                    }
+                    None => info.option_flags.push((String::new(), String::new())),
+                }
+            }
+            groups_info.push(info);
+        }
+        infos.push(groups_info);
+    }
+
+    // Files moved to conditional installs go back to their options.
+    let mut moved: Vec<bool> = vec![false; ximod.conditional_files.len()];
+    for (fi, f) in features.iter().enumerate() {
+        for (gi, info) in infos[fi].iter().enumerate() {
+            for (pi, (flag, value)) in info.option_flags.iter().enumerate() {
+                if flag.is_empty() {
+                    continue;
+                }
+                for (ci, set) in ximod.conditional_files.iter().enumerate() {
+                    if moved[ci] || single_flag(&set.condition) != Some((flag.as_str(), value.as_str())) {
+                        continue;
+                    }
+                    moved[ci] = true;
+                    let files = set.files.clone();
+                    ximod.steps[f.step].plugin_groups[gi].plugins[pi].files.extend(files);
+                }
+            }
+        }
+    }
+    let mut k = 0;
+    ximod.conditional_files.retain(|_| {
+        let keep = !moved[k];
+        k += 1;
+        keep
+    });
+
+    // The presets' choices, read from their flags.
+    let presets = pg
+        .plugins
+        .iter()
+        .map(|p| {
+            let set: Vec<(&str, &str)> = p
+                .condition_flags
+                .iter()
+                .skip(1)
+                .map(|c| (c.name.as_str(), c.value.as_str()))
+                .collect();
+            let choices = infos
+                .iter()
+                .map(|groups| {
+                    groups
+                        .iter()
+                        .map(|g| {
+                            if g.exclusive {
+                                let Some(flag) = &g.flag else { return GroupChoice::None };
+                                match set.iter().find(|(n, _)| n == flag) {
+                                    Some((_, v)) if *v != "none" => g
+                                        .option_flags
+                                        .iter()
+                                        .position(|(n, val)| n == flag && val == v)
+                                        .map(GroupChoice::One)
+                                        .unwrap_or_default(),
+                                    _ => GroupChoice::None,
+                                }
+                            } else {
+                                let on: Vec<usize> = g
+                                    .option_flags
+                                    .iter()
+                                    .enumerate()
+                                    .filter(|(_, (n, _))| !n.is_empty() && set.contains(&(n.as_str(), "on")))
+                                    .map(|(i, _)| i)
+                                    .collect();
+                                if on.is_empty() {
+                                    GroupChoice::None
+                                } else {
+                                    GroupChoice::Many(on)
+                                }
+                            }
+                        })
+                        .collect()
+                })
+                .collect();
+            PresetDef {
+                name: p.name.clone(),
+                choices,
+            }
+        })
+        .collect();
+
+    ximod.steps.remove(mi);
+    let feature_steps = features
+        .iter()
+        .map(|f| if f.step > mi { f.step - 1 } else { f.step })
+        .collect();
+    Some(PresetPlan {
+        settings,
+        feature_steps,
+        presets,
+    })
+}
+
 /// Skeleton mode: append one step per feature, holding one group with one
 /// (file-less) option per variant. Returns the indices of the new steps, so
 /// the caller can feed them to [`PresetPlan::feature_steps`].
@@ -783,5 +1056,64 @@ mod tests {
         let summary = apply(&mut x, &plan).unwrap();
         assert_eq!(summary.conditional_sets, 0, "skeleton options carry no files yet");
         assert_eq!(x.steps.len(), 3);
+    }
+
+    fn xml(x: &Ximod) -> String {
+        crate::xml::module_config_to_string(x).unwrap()
+    }
+
+    #[test]
+    fn unapply_restores_the_project_and_returns_the_plan() {
+        let original = sample();
+        let mut x = original.clone();
+        apply(&mut x, &plan()).unwrap();
+        assert!(has_structure(&x));
+        let back = unapply(&mut x).expect("structure detected");
+        assert!(!has_structure(&x));
+        assert_eq!(
+            xml(&x),
+            xml(&original),
+            "files, flags, patterns and None options undone"
+        );
+        assert_eq!(back.feature_steps, vec![0, 1]);
+        assert_eq!(back.settings.mode_step_name, "Installation mode");
+        assert_eq!(back.settings.customise_label, "Customise {name}");
+        assert!(back.settings.add_none);
+        assert_eq!(back.presets.len(), 2);
+        assert_eq!(back.presets[0].name, "Full");
+        assert_eq!(back.presets[0].choices, plan().presets[0].choices);
+        assert_eq!(back.presets[1].choices, plan().presets[1].choices);
+        // A project without the structure is left alone.
+        assert!(unapply(&mut x).is_none());
+    }
+
+    #[test]
+    fn running_the_wizard_again_rebuilds_instead_of_stacking() {
+        let mut x = sample();
+        apply(&mut x, &plan()).unwrap();
+        let first = x.clone();
+        // Second run: one more preset.
+        let mut again = unapply(&mut x).unwrap();
+        again.presets.push(PresetDef {
+            name: "Minimal".into(),
+            choices: vec![vec![GroupChoice::None], vec![GroupChoice::None]],
+        });
+        apply(&mut x, &again).unwrap();
+        // Still one installation-mode step, the same page and flag names.
+        assert_eq!(x.steps.len(), first.steps.len());
+        assert_eq!(x.steps[0].plugin_groups[0].plugins.len(), 3);
+        let mut a = first.get_all_flags();
+        let mut b = x.get_all_flags();
+        a.sort();
+        b.sort();
+        assert_eq!(a, b, "flag names are kept, so an update of the mod keeps working");
+        assert_eq!(x.conditional_files.len(), first.conditional_files.len());
+        // The pages got exactly one "None" each.
+        let nones = x.steps[1].plugin_groups[0]
+            .plugins
+            .iter()
+            .filter(|p| p.name == "None")
+            .count();
+        assert_eq!(nones, 1);
     }
 }

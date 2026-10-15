@@ -135,8 +135,8 @@ label-group-dest = Tüm grup için hedef
 label-page-dest = Kurulum hedefi (tüm sayfa)
 btn-apply-group-dest = Bu gruptaki tüm seçeneklere uygula
 btn-apply-page-dest = Bu sayfadaki tüm seçeneklere uygula
-group-dest-hint = Bu gruptaki her seçeneğin her dosyası için tek bir kurulum hedefi ayarlar.
-page-dest-hint = Bu sayfadaki her seçeneğin her dosyası için tek bir kurulum hedefi ayarlar (tüm gruplar).
+group-dest-hint = Bu gruptaki her seçeneğin her dosyası için tek bir kurulum hedefi ayarlar — ön ayar sihirbazının koşullu kurulumlara taşıdığı dosyalar da dahil.
+page-dest-hint = Bu sayfadaki her seçeneğin her dosyası için tek bir kurulum hedefi ayarlar (tüm gruplar) — ön ayar sihirbazının koşullu kurulumlara taşıdığı dosyalar da dahil.
 bulk-dest-nofiles = Henüz güncellenecek dosya yok — önce seçeneklere dosya ekleyin.
 status-dest-applied = Hedef { $num } dosyaya uygulandı.
 preview-hidden-steps = Geçerli seçimlerle { $num } adım gizlendi.
@@ -978,3 +978,8 @@ msg-relinked = { $num } başvuru güncellendi.
 # --- 2.2.0: destination cell
 files-dest-hint = (Data'nın kökü)
 files-dest-tooltip = Oyunun Data klasörüne göre kurulum yolu, örneğin SKSE\Plugins. Data'nın köküne kurmak için boş bırakın. Düzenlemek için hücreye tıklayın.
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = Her koşullu kümenin her dosyası için tek bir kurulum hedefini bir kerede ayarlar.
+btn-apply-all-cond-dest = Tüm koşullu kümelere uygula
+preset-rebuild-hint = Bu proje, sihirbazın oluşturduğu bir yapıyı zaten içeriyor: sayfaları, adları ve ön ayarları aşağıda yüklü. “Uygula” onu değişikliklerinizle yeniden oluşturur ve bayrak adlarını korur.

@@ -135,8 +135,8 @@ label-group-dest = Destination for hele gruppen
 label-page-dest = Installationsdestination (hele siden)
 btn-apply-group-dest = Anvend på alle valgmuligheder i denne gruppe
 btn-apply-page-dest = Anvend på alle valgmuligheder på denne side
-group-dest-hint = Angiver én installationsdestination for hver fil i hver valgmulighed i denne gruppe.
-page-dest-hint = Angiver én installationsdestination for hver fil i hver valgmulighed på denne side (alle grupper).
+group-dest-hint = Angiver én installationsdestination for hver fil i hver valgmulighed i denne gruppe — herunder de filer, som guiden til forudindstillinger har flyttet til de betingede installationer.
+page-dest-hint = Angiver én installationsdestination for hver fil i hver valgmulighed på denne side (alle grupper) — herunder de filer, som guiden til forudindstillinger har flyttet til de betingede installationer.
 bulk-dest-nofiles = Ingen filer at opdatere endnu — tilføj først filer til valgmulighederne.
 status-dest-applied = Destination anvendt på { $num } fil(er).
 preview-hidden-steps = { $num } trin skjult af aktuelle valg.
@@ -978,3 +978,8 @@ msg-relinked = { $num } reference(r) opdateret.
 # --- 2.2.0: destination cell
 files-dest-hint = (roden af Data)
 files-dest-tooltip = Installationssti i forhold til spillets Data-mappe, for eksempel SKSE\Plugins. Lad stå tomt for at installere i roden af Data. Klik på cellen for at redigere den.
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = Angiver én installationsdestination for hver fil i hvert betinget sæt på én gang.
+btn-apply-all-cond-dest = Anvend på alle betingede sæt
+preset-rebuild-hint = Dette projekt indeholder allerede en struktur, som guiden har oprettet: dens sider, navne og forudindstillinger er indlæst nedenfor. Anvend genopbygger den med dine ændringer og bevarer flagnavnene.

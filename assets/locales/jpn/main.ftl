@@ -135,8 +135,8 @@ label-group-dest = グループ全体の宛先
 label-page-dest = インストール先（ページ全体）
 btn-apply-group-dest = このグループのすべてのオプションに適用
 btn-apply-page-dest = このページのすべてのオプションに適用
-group-dest-hint = このグループの各オプションのすべてのファイルに単一のインストール先を設定します。
-page-dest-hint = このページの各オプションのすべてのファイルに単一のインストール先を設定します（すべてのグループ）。
+group-dest-hint = このグループの各オプションのすべてのファイルに単一のインストール先を設定します — プリセットウィザードが条件付きインストールに移動したファイルも含みます。
+page-dest-hint = このページの各オプションのすべてのファイルに単一のインストール先を設定します（すべてのグループ） — プリセットウィザードが条件付きインストールに移動したファイルも含みます。
 bulk-dest-nofiles = 更新するファイルがまだありません — まずオプションにファイルを追加してください。
 status-dest-applied = { $num } 個のファイルに宛先を適用しました。
 preview-hidden-steps = 現在の選択により { $num } 個のステップが非表示です。
@@ -978,3 +978,8 @@ msg-relinked = { $num } 件の参照を更新しました。
 # --- 2.2.0: destination cell
 files-dest-hint = （Dataのルート）
 files-dest-tooltip = ゲームのDataフォルダを基準としたインストール先のパスです（例：SKSE\Plugins）。空のままにするとDataのルートにインストールされます。セルをクリックして編集します。
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = すべての条件セットのすべてのファイルに単一のインストール先を一度に設定します。
+btn-apply-all-cond-dest = すべての条件セットに適用
+preset-rebuild-hint = このプロジェクトにはウィザードで作成された構造がすでにあります。そのページ、名前、プリセットを下に読み込みました。「適用」を押すと変更を反映して構造を再構築し、フラグ名は維持されます。

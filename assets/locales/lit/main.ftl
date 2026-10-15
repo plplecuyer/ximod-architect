@@ -135,8 +135,8 @@ label-group-dest = Visos grupės paskirties vieta
 label-page-dest = Diegimo paskirties vieta (visas puslapis)
 btn-apply-group-dest = Taikyti visoms šios grupės parinktims
 btn-apply-page-dest = Taikyti visoms šio puslapio parinktims
-group-dest-hint = Nustato vieną diegimo paskirties vietą kiekvienam šios grupės kiekvienos parinkties failui.
-page-dest-hint = Nustato vieną diegimo paskirties vietą kiekvienam šio puslapio kiekvienos parinkties failui (visos grupės).
+group-dest-hint = Nustato vieną diegimo paskirties vietą kiekvienam šios grupės kiekvienos parinkties failui — įskaitant failus, kuriuos išankstinių nustatymų vediklis perkėlė į sąlyginius diegimus.
+page-dest-hint = Nustato vieną diegimo paskirties vietą kiekvienam šio puslapio kiekvienos parinkties failui (visos grupės) — įskaitant failus, kuriuos išankstinių nustatymų vediklis perkėlė į sąlyginius diegimus.
 bulk-dest-nofiles = Kol kas nėra failų, kuriuos reikia atnaujinti — pirmiausia pridėkite failų prie parinkčių.
 status-dest-applied = Paskirties vieta pritaikyta { $num } failui(-ams).
 preview-hidden-steps = { $num } veiksmas(-ai) paslėptas(-i) dėl dabartinių pasirinkimų.
@@ -978,3 +978,8 @@ msg-relinked = Atnaujinta nuorodų: { $num }.
 # --- 2.2.0: destination cell
 files-dest-hint = (Data aplanko šaknis)
 files-dest-tooltip = Įdiegimo kelias žaidimo Data aplanko atžvilgiu, pavyzdžiui, SKSE\Plugins. Palikite tuščią, kad būtų įdiegta Data aplanko šaknyje. Spustelėkite langelį, kad jį redaguotumėte.
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = Iškart nustato vieną diegimo paskirties vietą kiekvienam kiekvieno sąlyginio rinkinio failui.
+btn-apply-all-cond-dest = Taikyti visiems sąlyginiams rinkiniams
+preset-rebuild-hint = Šiame projekte jau yra vediklio sukurta struktūra: jos puslapiai, pavadinimai ir išankstiniai nustatymai įkelti žemiau. „Taikyti“ ją perkuria su jūsų pakeitimais ir išsaugo vėliavėlių pavadinimus.

@@ -135,8 +135,8 @@ label-group-dest = Destinaziun per tut la gruppa
 label-page-dest = Destinaziun d'installaziun (tut la pagina)
 btn-apply-group-dest = Applitgar a tut las opziuns da questa gruppa
 btn-apply-page-dest = Applitgar a tut las opziuns da questa pagina
-group-dest-hint = Definescha ina destinaziun d'installaziun per mintga datoteca da mintga opziun da questa gruppa.
-page-dest-hint = Definescha ina destinaziun d'installaziun per mintga datoteca da mintga opziun da questa pagina (tut las gruppas).
+group-dest-hint = Definescha ina destinaziun d'installaziun per mintga datoteca da mintga opziun da questa gruppa — inclusiv las datotecas che l'assistent da presets ha spustà en las installaziuns cundiziunalas.
+page-dest-hint = Definescha ina destinaziun d'installaziun per mintga datoteca da mintga opziun da questa pagina (tut las gruppas) — inclusiv las datotecas che l'assistent da presets ha spustà en las installaziuns cundiziunalas.
 bulk-dest-nofiles = Anc naginas datotecas per actualisar — agiuntai l'emprim datotecas a las opziuns.
 status-dest-applied = Destinaziun applitgada a { $num } datoteca(s).
 preview-hidden-steps = { $num } pass zuppentads tras las tschernas actualas.
@@ -978,3 +978,8 @@ msg-relinked = { $num } referenza(s) actualisada(s).
 # --- 2.2.0: destination cell
 files-dest-hint = (ragisch da Data)
 files-dest-tooltip = Via d'installaziun relativa a l'ordinatur Data dal gieu, per exempel SKSE\Plugins. Laschar vid per installar en la ragisch da Data. Cliccar sin la cella per la modifitgar.
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = Definescha en ina giada ina destinaziun d'installaziun per mintga datoteca da mintga set cundiziunal.
+btn-apply-all-cond-dest = Applitgar a tut ils sets cundiziunals
+preset-rebuild-hint = Quest project cuntegna gia ina structura creada da l'assistent: sias paginas, ses nums e ses presets èn chargiads sutvart. «Applitgar» la reconstruescha cun vossas midadas e mantegna ils nums dals flags.

@@ -1386,11 +1386,7 @@ impl XimodApp {
             });
 
             // Bulk destination for the whole group (all options in it).
-            let group_file_count: usize = self.ximod.steps[si].plugin_groups[gi]
-                .plugins
-                .iter()
-                .map(|p| p.files.len())
-                .sum();
+            let group_file_count = self.ximod.destination_file_count(si, Some(gi));
             ui.add_space(4.0);
             ui.label(
                 RichText::new(&group_dest_hint)

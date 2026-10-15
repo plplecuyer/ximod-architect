@@ -135,8 +135,8 @@ label-group-dest = Mål för hela gruppen
 label-page-dest = Installationsmål (hela sidan)
 btn-apply-group-dest = Tillämpa på alla alternativ i denna grupp
 btn-apply-page-dest = Tillämpa på alla alternativ på denna sida
-group-dest-hint = Anger ett installationsmål för varje fil i varje alternativ i denna grupp.
-page-dest-hint = Anger ett installationsmål för varje fil i varje alternativ på denna sida (alla grupper).
+group-dest-hint = Anger ett installationsmål för varje fil i varje alternativ i denna grupp — inklusive de filer som förinställningsguiden har flyttat till de villkorliga installationerna.
+page-dest-hint = Anger ett installationsmål för varje fil i varje alternativ på denna sida (alla grupper) — inklusive de filer som förinställningsguiden har flyttat till de villkorliga installationerna.
 bulk-dest-nofiles = Inga filer att uppdatera ännu — lägg först till filer i alternativen.
 status-dest-applied = Mål tillämpat på { $num } fil(er).
 preview-hidden-steps = { $num } steg dolda av aktuella val.
@@ -978,3 +978,8 @@ msg-relinked = { $num } referens(er) uppdaterade.
 # --- 2.2.0: destination cell
 files-dest-hint = (roten av Data)
 files-dest-tooltip = Installationssökväg relativt spelets Data-mapp, till exempel SKSE\Plugins. Lämna tomt för att installera i roten av Data. Klicka på cellen för att redigera den.
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = Anger ett installationsmål för varje fil i varje villkorlig uppsättning på en gång.
+btn-apply-all-cond-dest = Tillämpa på alla villkorliga uppsättningar
+preset-rebuild-hint = Det här projektet innehåller redan en struktur som skapats av guiden: dess sidor, namn och förinställningar har lästs in nedan. Tillämpa bygger om den med dina ändringar och behåller flaggnamnen.

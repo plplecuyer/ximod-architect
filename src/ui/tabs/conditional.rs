@@ -18,6 +18,9 @@ impl XimodApp {
 
         section_header(ui, &title);
 
+        self.render_all_cond_destination(ui);
+        ui.add_space(6.0);
+
         let pattern_count = self.ximod.conditional_files.len();
 
         // Pre-compute translated pattern labels to avoid borrow conflicts in the closure
@@ -202,5 +205,29 @@ impl XimodApp {
                     .color(ui.visuals().weak_text_color()),
             );
         }
+    }
+
+    /// Panel: one install destination for every file of every conditional set
+    /// at once — after the preset wizard there can be dozens of sets, one per
+    /// option, that would otherwise each need their own destination.
+    pub(crate) fn render_all_cond_destination(&mut self, ui: &mut egui::Ui) {
+        let hint = self.i18n.t("cond-all-dest-hint");
+        let btn_apply = self.i18n.t("btn-apply-all-cond-dest");
+        let label_dest = self.i18n.t("label-destination");
+        let file_count: usize = self.ximod.conditional_files.iter().map(|s| s.files.len()).sum();
+        if file_count == 0 {
+            return;
+        }
+        ui.label(egui::RichText::new(&hint).small().color(ui.visuals().weak_text_color()));
+        ui.horizontal(|ui| {
+            ui.label(&label_dest);
+            ui.text_edit_singleline(&mut self.cond_all_dest_buf);
+            if ui.button(&btn_apply).clicked() {
+                let dest = self.cond_all_dest_buf.trim().to_string();
+                let n = self.ximod.set_all_conditional_destinations(&dest);
+                self.mark_modified();
+                self.notify_ok(self.i18n.t_num("status-dest-applied", n as i64));
+            }
+        });
     }
 }

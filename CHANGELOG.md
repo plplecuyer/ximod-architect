@@ -38,12 +38,26 @@ Krou705).
 - The "Created with…" comment at the top of info.xml and ModuleConfig.xml now
   carries the application's Nexus page, as the original FOMOD Creation Tool
   did.
+- Preset wizard, run again on a project it already transformed: the window
+  opens with the existing pages, names and presets loaded, and Apply rebuilds
+  the structure (one undoable edit) instead of stacking a second one on top of
+  the first; the flag names stay the same, so a mod update keeps working.
+- Conditional Installs tab: one destination for every file of every
+  conditional set at once. The group and page destination controls now also
+  reach the files the preset wizard moved to conditional installs (the sets
+  fed by the options of the group or page).
+
+### Fixed
+
+- Exported ZIP archives (and translation packages) dated every file
+  1980-01-01: each entry now keeps its file's modification date, so the files
+  a mod manager deploys show their real date. 7z archives already did.
 
 ### Changed
 
-- 33 interface languages: the 45 new strings are translated in every locale
-  (863 messages per locale); Chinese "Duplicate" becomes 创建副本 so that it
-  differs from the new "Copy" (复制). Test suite at 337 tests.
+- 33 interface languages: the 48 new strings are translated in every locale
+  (866 messages per locale); Chinese "Duplicate" becomes 创建副本 so that it
+  differs from the new "Copy" (复制). Test suite at 342 tests.
 - Interface labels reviewed in every language: 128 labels corrected (typos,
   incomplete phrases, a verb form out of line with the rest of its menu, one
   concept translated two ways, a space before "…", "..." instead of "…"),
@@ -52,6 +66,9 @@ Krou705).
 - One term per concept, in the interface and the manual: "flag" is drapeau
   (French), bandera (Spanish), bandeira (Portuguese) and pavilion (Romanian);
   an installation step is tappa (Italian); an option is opció (Hungarian).
+- Dependencies refreshed: arboard 3.7.0, combine 4.6.9, equivalent 1.0.3,
+  rustls 0.23.46, tokio 1.53.3, zerocopy 0.8.63; windows-sys 0.60 and its
+  target crates are no longer pulled in.
 - User manual (32 languages): § 1.1 now says that FOMOD is a mod-manager
   format — installers work with every Bethesda game and most other games that
   Vortex or Mod Organizer 2 can manage; the built-in game list only fills in

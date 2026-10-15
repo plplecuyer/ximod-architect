@@ -6,6 +6,7 @@
 #![allow(dead_code)]
 
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 
 /// Logical operator for combining conditions
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
@@ -1152,6 +1153,92 @@ impl Ximod {
         set_destinations(&mut self.required_files, dest)
     }
 
+    /// Assign `dest` to every file of every conditional set at once (the
+    /// "all conditional sets" control of the Conditional Installs tab — after
+    /// the preset wizard there can be one set per option). Returns how many
+    /// files were updated.
+    pub fn set_all_conditional_destinations(&mut self, dest: &str) -> usize {
+        self.conditional_files
+            .iter_mut()
+            .map(|set| set_destinations(&mut set.files, dest))
+            .sum()
+    }
+
+    /// Indices of the conditional sets "fed" by the options of a group (or a
+    /// whole step when `group` is `None`): sets whose condition is a single
+    /// flag test `flag == value` that one of those options sets. This is what
+    /// the preset wizard produces when it moves an option's files to
+    /// conditional installs, so the group / page destination controls can keep
+    /// working on those files.
+    pub fn sets_fed_by(&self, step: usize, group: Option<usize>) -> Vec<usize> {
+        let Some(s) = self.steps.get(step) else {
+            return Vec::new();
+        };
+        let set_by: HashSet<(&str, &str)> = s
+            .plugin_groups
+            .iter()
+            .enumerate()
+            .filter(|(gi, _)| group.is_none_or(|g| g == *gi))
+            .flat_map(|(_, g)| &g.plugins)
+            .flat_map(|p| &p.condition_flags)
+            .map(|f| (f.name.as_str(), f.value.as_str()))
+            .collect();
+        self.conditional_files
+            .iter()
+            .enumerate()
+            .filter(|(_, set)| {
+                set.condition.items.len() == 1
+                    && set.condition.items[0]
+                        .as_leaf()
+                        .is_some_and(|d| d.is_flag() && set_by.contains(&(d.name.as_str(), d.value.as_str())))
+            })
+            .map(|(i, _)| i)
+            .collect()
+    }
+
+    /// Number of files the group / page destination control would update:
+    /// the options' own files plus those of the conditional sets they feed.
+    pub fn destination_file_count(&self, step: usize, group: Option<usize>) -> usize {
+        let own: usize = self
+            .steps
+            .get(step)
+            .map(|s| {
+                s.plugin_groups
+                    .iter()
+                    .enumerate()
+                    .filter(|(gi, _)| group.is_none_or(|g| g == *gi))
+                    .flat_map(|(_, g)| &g.plugins)
+                    .map(|p| p.files.len())
+                    .sum()
+            })
+            .unwrap_or(0);
+        own + self
+            .sets_fed_by(step, group)
+            .iter()
+            .map(|&i| self.conditional_files[i].files.len())
+            .sum::<usize>()
+    }
+
+    /// Group / page destination: every file of the options of a group (or of
+    /// a whole step when `group` is `None`), and every file of the conditional
+    /// sets those options feed. Returns how many files were updated.
+    pub fn set_destinations_for(&mut self, step: usize, group: Option<usize>, dest: &str) -> usize {
+        let fed = self.sets_fed_by(step, group);
+        let mut n = match (self.steps.get_mut(step), group) {
+            (Some(s), Some(g)) => s
+                .plugin_groups
+                .get_mut(g)
+                .map(|g| g.set_all_destinations(dest))
+                .unwrap_or(0),
+            (Some(s), None) => s.set_all_destinations(dest),
+            (None, _) => 0,
+        };
+        for i in fed {
+            n += set_destinations(&mut self.conditional_files[i].files, dest);
+        }
+        n
+    }
+
     pub fn get_all_flags(&self) -> Vec<String> {
         let mut flags: indexmap::IndexSet<&str> = indexmap::IndexSet::new();
         for step in &self.steps {
@@ -1329,6 +1416,48 @@ mod tests {
         let ximod = Ximod::new("Test Mod");
         assert_eq!(ximod.name, "Test Mod");
         assert_eq!(ximod.version, "1.0.0");
+    }
+
+    #[test]
+    fn group_and_page_destinations_follow_files_moved_to_conditional_sets() {
+        use crate::models::presets::{self, GroupChoice, PresetDef, PresetPlan, PresetSettings};
+        let mut x = Ximod::default();
+        let mut step = Step::new("Textures");
+        let mut g = PluginGroup::new("Textures", SelectionType::SelectExactlyOne);
+        for v in ["2K", "4K"] {
+            let mut p = Plugin::new(v);
+            p.files.push(InstallFile::new_folder(format!("Tex/{v}")));
+            g.plugins.push(p);
+        }
+        step.plugin_groups.push(g);
+        x.steps.push(step);
+        let mut other = ConditionalFileSet::new();
+        other.condition.push_leaf(Dependency::new_flag("unrelated", "on"));
+        other.files.push(InstallFile::new_file("x.esp"));
+        x.conditional_files.push(other);
+        let plan = PresetPlan {
+            settings: PresetSettings::default(),
+            feature_steps: vec![0],
+            presets: vec![PresetDef {
+                name: "High".into(),
+                choices: vec![vec![GroupChoice::One(1)]],
+            }],
+        };
+        presets::apply(&mut x, &plan).unwrap();
+        // The options lost their files to two conditional sets…
+        assert_eq!(x.destination_file_count(1, Some(0)), 2);
+        // …which the group destination still reaches, but not the unrelated set.
+        assert_eq!(x.set_destinations_for(1, Some(0), "textures"), 2);
+        assert!(
+            x.conditional_files[1..]
+                .iter()
+                .all(|s| s.files[0].destination == "textures")
+        );
+        assert_eq!(x.conditional_files[0].files[0].destination, "");
+        assert_eq!(x.set_destinations_for(1, None, "tex"), 2);
+        // The all-sets control reaches every set.
+        assert_eq!(x.set_all_conditional_destinations("data"), 3);
+        assert!(x.conditional_files.iter().all(|s| s.files[0].destination == "data"));
     }
 
     #[test]

@@ -135,8 +135,8 @@ label-group-dest = Miejsce docelowe dla całej grupy
 label-page-dest = Miejsce docelowe instalacji (cała strona)
 btn-apply-group-dest = Zastosuj do wszystkich opcji w tej grupie
 btn-apply-page-dest = Zastosuj do wszystkich opcji na tej stronie
-group-dest-hint = Ustawia jedno miejsce docelowe instalacji dla każdego pliku każdej opcji w tej grupie.
-page-dest-hint = Ustawia jedno miejsce docelowe instalacji dla każdego pliku każdej opcji na tej stronie (wszystkie grupy).
+group-dest-hint = Ustawia jedno miejsce docelowe instalacji dla każdego pliku każdej opcji w tej grupie — w tym plików, które kreator presetów przeniósł do instalacji warunkowych.
+page-dest-hint = Ustawia jedno miejsce docelowe instalacji dla każdego pliku każdej opcji na tej stronie (wszystkie grupy) — w tym plików, które kreator presetów przeniósł do instalacji warunkowych.
 bulk-dest-nofiles = Brak plików do zaktualizowania — najpierw dodaj pliki do opcji.
 status-dest-applied = Zastosowano miejsce docelowe do { $num } plik(ów).
 preview-hidden-steps = { $num } krok(ów) ukrytych przez bieżące wybory.
@@ -978,3 +978,8 @@ msg-relinked = Zaktualizowane odwołania: { $num }.
 # --- 2.2.0: destination cell
 files-dest-hint = (katalog główny Data)
 files-dest-tooltip = Ścieżka instalacji względem folderu Data gry, na przykład SKSE\Plugins. Pozostaw puste, aby zainstalować w katalogu głównym Data. Kliknij komórkę, aby ją edytować.
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = Ustawia naraz jedno miejsce docelowe instalacji dla każdego pliku każdego zestawu warunkowego.
+btn-apply-all-cond-dest = Zastosuj do wszystkich zestawów warunkowych
+preset-rebuild-hint = Ten projekt zawiera już strukturę utworzoną przez kreator: jej strony, nazwy i presety są wczytane poniżej. Zastosuj przebudowuje ją z uwzględnieniem twoich zmian i zachowuje nazwy flag.

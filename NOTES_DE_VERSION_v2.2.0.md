@@ -34,5 +34,8 @@ corrections d'un coup.
 - Une cellule Destination vide affiche « (racine de Data) », avec une info-bulle : cliquez dans la cellule pour indiquer où installer un fichier ou un dossier.
 - Les fichiers XML générés sont signés avec le nom, la version et la page Nexus de l'application, comme le faisait FOMOD Creation Tool.
 - Libellés de l'interface corrigés dans toutes les langues, et manuels alignés dessus.
+- L'assistant preset peut être relancé pour ajouter ou modifier des presets : il reconstruit sa structure au lieu d'en empiler une seconde, et conserve les noms des drapeaux.
+- Une destination pour tous les ensembles conditionnels d'un coup ; les destinations de groupe et de page atteignent aussi les fichiers que l'assistant preset a déplacés vers les installations conditionnelles.
+- Corrigé : les archives ZIP exportées dataient tous les fichiers du 1er janvier 1980 ; ils gardent désormais leur date de modification.
 - Interface en 33 langues ; chaque nouvelle chaîne est traduite partout.
 - La compilation depuis les sources requiert Rust 1.99.0 ou ultérieur.

@@ -135,8 +135,8 @@ label-group-dest = Destinazzjoni għall-grupp kollu
 label-page-dest = Destinazzjoni tal-installazzjoni (il-paġna kollha)
 btn-apply-group-dest = Applika għall-għażliet kollha f'dan il-grupp
 btn-apply-page-dest = Applika għall-għażliet kollha f'din il-paġna
-group-dest-hint = Jissettja destinazzjoni waħda tal-installazzjoni għal kull fajl ta' kull għażla f'dan il-grupp.
-page-dest-hint = Jissettja destinazzjoni waħda tal-installazzjoni għal kull fajl ta' kull għażla f'din il-paġna (il-gruppi kollha).
+group-dest-hint = Jissettja destinazzjoni waħda tal-installazzjoni għal kull fajl ta' kull għażla f'dan il-grupp — inklużi l-fajls li l-assistent tal-presets ċaqlaq lejn l-installazzjonijiet kondizzjonali.
+page-dest-hint = Jissettja destinazzjoni waħda tal-installazzjoni għal kull fajl ta' kull għażla f'din il-paġna (il-gruppi kollha) — inklużi l-fajls li l-assistent tal-presets ċaqlaq lejn l-installazzjonijiet kondizzjonali.
 bulk-dest-nofiles = Għad m'hemm l-ebda fajl x'taġġorna — l-ewwel żid fajls mal-għażliet.
 status-dest-applied = Destinazzjoni applikata għal { $num } fajl.
 preview-hidden-steps = { $num } pass moħbija mill-għażliet attwali.
@@ -978,3 +978,8 @@ msg-relinked = { $num } referenza/i aġġornata/i.
 # --- 2.2.0: destination cell
 files-dest-hint = (ir-radika ta' Data)
 files-dest-tooltip = Mogħdija tal-installazzjoni relattiva għall-folder Data tal-logħba, pereżempju SKSE\Plugins. Ħalliha vojta biex tinstalla fir-radika ta' Data. Ikklikkja fuq iċ-ċellola biex teditjaha.
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = Jissettja f'daqqa destinazzjoni waħda tal-installazzjoni għal kull fajl ta' kull sett kundizzjonali.
+btn-apply-all-cond-dest = Applika għas-settijiet kundizzjonali kollha
+preset-rebuild-hint = Dan il-proġett diġà fih struttura maħluqa mill-assistent: il-paġni, l-ismijiet u l-presets tagħha huma mgħobbija hawn taħt. Applika jerġa' jibniha bil-bidliet tiegħek u jżomm l-ismijiet tal-flags.

@@ -135,8 +135,8 @@ label-group-dest = Destination for the whole group
 label-page-dest = Install destination (whole page)
 btn-apply-group-dest = Apply to all options in this group
 btn-apply-page-dest = Apply to all options on this page
-group-dest-hint = Set one install destination for every file of every option in this group.
-page-dest-hint = Set one install destination for every file of every option on this page (all groups).
+group-dest-hint = Set one install destination for every file of every option in this group — including the files the preset wizard moved to conditional installs.
+page-dest-hint = Set one install destination for every file of every option on this page (all groups) — including the files the preset wizard moved to conditional installs.
 bulk-dest-nofiles = No files to update yet — add files to the options first.
 status-dest-applied = Destination applied to { $num } file(s).
 preview-hidden-steps = { $num } step(s) hidden by current selections.
@@ -978,3 +978,8 @@ msg-relinked = { $num } reference(s) updated.
 # --- 2.2.0: destination cell
 files-dest-hint = (root of Data)
 files-dest-tooltip = Install path relative to the game's Data folder, for example SKSE\Plugins. Leave empty to install at the root of Data. Click the cell to edit it.
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = Set one install destination for every file of every conditional set at once.
+btn-apply-all-cond-dest = Apply to all conditional sets
+preset-rebuild-hint = This project already holds a structure made by the wizard: its pages, names and presets are loaded below. Apply rebuilds it with your changes and keeps the flag names.

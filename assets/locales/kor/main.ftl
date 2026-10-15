@@ -135,8 +135,8 @@ label-group-dest = 전체 그룹 대상 위치
 label-page-dest = 설치 대상 위치 (전체 페이지)
 btn-apply-group-dest = 이 그룹의 모든 옵션에 적용
 btn-apply-page-dest = 이 페이지의 모든 옵션에 적용
-group-dest-hint = 이 그룹의 각 옵션의 모든 파일에 단일 설치 대상을 설정합니다.
-page-dest-hint = 이 페이지의 각 옵션의 모든 파일에 단일 설치 대상을 설정합니다 (모든 그룹).
+group-dest-hint = 이 그룹의 각 옵션의 모든 파일에 단일 설치 대상을 설정합니다 — 프리셋 마법사가 조건부 설치로 옮긴 파일도 포함됩니다.
+page-dest-hint = 이 페이지의 각 옵션의 모든 파일에 단일 설치 대상을 설정합니다 (모든 그룹) — 프리셋 마법사가 조건부 설치로 옮긴 파일도 포함됩니다.
 bulk-dest-nofiles = 아직 업데이트할 파일이 없습니다 — 먼저 옵션에 파일을 추가하세요.
 status-dest-applied = { $num }개 파일에 대상을 적용했습니다.
 preview-hidden-steps = 현재 선택으로 { $num }개 단계가 숨겨졌습니다.
@@ -978,3 +978,8 @@ msg-relinked = 참조 { $num }개가 업데이트되었습니다.
 # --- 2.2.0: destination cell
 files-dest-hint = (Data 루트)
 files-dest-tooltip = 게임의 Data 폴더를 기준으로 한 설치 경로입니다(예: SKSE\Plugins). 비워 두면 Data 루트에 설치됩니다. 셀을 클릭하여 편집하세요.
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = 모든 조건부 세트의 모든 파일에 단일 설치 대상을 한 번에 설정합니다.
+btn-apply-all-cond-dest = 모든 조건부 세트에 적용
+preset-rebuild-hint = 이 프로젝트에는 마법사가 만든 구조가 이미 있습니다. 해당 페이지, 이름, 프리셋을 아래에 불러왔습니다. '적용'을 누르면 변경 사항을 반영해 구조를 다시 만들고 플래그 이름은 유지합니다.

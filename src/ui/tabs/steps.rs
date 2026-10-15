@@ -45,23 +45,14 @@ impl XimodApp {
     /// editing the destination on each option's Files table, the author assigns
     /// one install destination to the entire group at once.
     pub(crate) fn apply_dest_to_group(&mut self, step_idx: usize, group_idx: usize, dest: &str) -> usize {
-        self.ximod
-            .steps
-            .get_mut(step_idx)
-            .and_then(|s| s.plugin_groups.get_mut(group_idx))
-            .map(|g| g.set_all_destinations(dest))
-            .unwrap_or(0)
+        self.ximod.set_destinations_for(step_idx, Some(group_idx), dest)
     }
 
     /// Set `dest` as the destination of every file of every plugin on one
-    /// step/page (all its groups), in a single action. Returns the number of
-    /// files updated.
+    /// step/page (all its groups) — and of the conditional sets those options
+    /// feed — in a single action. Returns the number of files updated.
     pub(crate) fn apply_dest_to_step(&mut self, step_idx: usize, dest: &str) -> usize {
-        self.ximod
-            .steps
-            .get_mut(step_idx)
-            .map(|s| s.set_all_destinations(dest))
-            .unwrap_or(0)
+        self.ximod.set_destinations_for(step_idx, None, dest)
     }
 
     /// Panel: assign one install destination to every plugin on the current
@@ -72,18 +63,7 @@ impl XimodApp {
         let label_dest = self.i18n.t("label-destination");
         let nofiles = self.i18n.t("bulk-dest-nofiles");
 
-        let file_count: usize = self
-            .ximod
-            .steps
-            .get(step_idx)
-            .map(|s| {
-                s.plugin_groups
-                    .iter()
-                    .flat_map(|g| &g.plugins)
-                    .map(|p| p.files.len())
-                    .sum()
-            })
-            .unwrap_or(0);
+        let file_count = self.ximod.destination_file_count(step_idx, None);
 
         ui.label(egui::RichText::new(&hint).small().color(ui.visuals().weak_text_color()));
         ui.horizontal(|ui| {

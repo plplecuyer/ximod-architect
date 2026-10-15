@@ -135,8 +135,8 @@ label-group-dest = Sprioc don ghrúpa iomlán
 label-page-dest = Sprioc suiteála (an leathanach iomlán)
 btn-apply-group-dest = Cuir i bhfeidhm ar gach rogha sa ghrúpa seo
 btn-apply-page-dest = Cuir i bhfeidhm ar gach rogha ar an leathanach seo
-group-dest-hint = Socraíonn sé sprioc shuiteála amháin do gach comhad de gach rogha sa ghrúpa seo.
-page-dest-hint = Socraíonn sé sprioc shuiteála amháin do gach comhad de gach rogha ar an leathanach seo (gach grúpa).
+group-dest-hint = Socraíonn sé sprioc shuiteála amháin do gach comhad de gach rogha sa ghrúpa seo — lena n-áirítear na comhaid a d'aistrigh an treoraí réamhshocruithe chuig na suiteálacha coinníollacha.
+page-dest-hint = Socraíonn sé sprioc shuiteála amháin do gach comhad de gach rogha ar an leathanach seo (gach grúpa) — lena n-áirítear na comhaid a d'aistrigh an treoraí réamhshocruithe chuig na suiteálacha coinníollacha.
 bulk-dest-nofiles = Níl aon chomhad le nuashonrú fós — cuir comhaid leis na roghanna ar dtús.
 status-dest-applied = Sprioc curtha i bhfeidhm ar { $num } comhad.
 preview-hidden-steps = { $num } céim i bhfolach ag na roghnuithe reatha.
@@ -978,3 +978,8 @@ msg-relinked = Tagairtí nuashonraithe: { $num }.
 # --- 2.2.0: destination cell
 files-dest-hint = (fréamh Data)
 files-dest-tooltip = Conair suiteála coibhneasta le fillteán Data an chluiche, mar shampla SKSE\Plugins. Fág folamh chun suiteáil i bhfréamh Data. Cliceáil ar an gcill chun í a chur in eagar.
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = Socraíonn sé sprioc shuiteála amháin do gach comhad de gach tacar coinníollach d'aon iarraidh.
+btn-apply-all-cond-dest = Cuir i bhfeidhm ar gach tacar coinníollach
+preset-rebuild-hint = Tá struchtúr a chruthaigh an treoraí sa tionscadal seo cheana: tá a leathanaigh, a ainmneacha agus a réamhshocruithe luchtaithe thíos. Atógann “Cuir i bhfeidhm” é le d'athruithe agus coinníonn sé ainmneacha na mbratach.

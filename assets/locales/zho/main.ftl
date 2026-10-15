@@ -135,8 +135,8 @@ label-group-dest = 整个组的目标位置
 label-page-dest = 安装目标位置（整页）
 btn-apply-group-dest = 应用于此组中的所有选项
 btn-apply-page-dest = 应用于此页面上的所有选项
-group-dest-hint = 为此组中每个选项的每个文件设置单一安装目标位置。
-page-dest-hint = 为此页面上每个选项的每个文件设置单一安装目标位置（所有组）。
+group-dest-hint = 为此组中每个选项的每个文件设置单一安装目标位置 — 包括预设向导移到条件安装中的文件。
+page-dest-hint = 为此页面上每个选项的每个文件设置单一安装目标位置（所有组） — 包括预设向导移到条件安装中的文件。
 bulk-dest-nofiles = 暂无可更新的文件 — 请先为选项添加文件。
 status-dest-applied = 已将目标位置应用于 { $num } 个文件。
 preview-hidden-steps = 当前选择隐藏了 { $num } 个步骤。
@@ -978,3 +978,8 @@ msg-relinked = 已更新 { $num } 个引用。
 # --- 2.2.0: destination cell
 files-dest-hint = （Data 根目录）
 files-dest-tooltip = 相对于游戏 Data 文件夹的安装路径，例如 SKSE\Plugins。留空则安装到 Data 根目录。点击单元格即可编辑。
+
+# --- 2.2.0: destinations after the preset wizard
+cond-all-dest-hint = 一次性为每个条件集中的每个文件设置单一安装目标位置。
+btn-apply-all-cond-dest = 应用于所有条件集
+preset-rebuild-hint = 此项目已包含由向导创建的结构：其页面、名称和预设已加载到下方。“应用”会根据您的更改重建该结构，并保留标志名称。
