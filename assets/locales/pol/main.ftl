@@ -162,7 +162,7 @@ status-settings-saved = Pomyślnie zapisano ustawienia
 
 # About Dialog
 about-title = O programie XIMOD Architect
-about-description = Wieloplatformowe narzędzie do tworzenia instalatorów FOMOD dla modów gier Bethesdy.
+about-description = Wieloplatformowe narzędzie do tworzenia instalatorów FOMOD dla modów dowolnej gry, którą potrafi zarządzać Vortex lub Mod Organizer 2.
 about-license = Na licencji MIT
 about-copyright = © 2024 XIMOD Team
 about-credit = Port oryginalnego narzędzia autorstwa Wenderer na język Rust:
@@ -892,6 +892,7 @@ preset-customise-group = Grupa Dostosuj:
 preset-customise-label = Opcja Dostosuj ({ "{name}" } = nazwa strony):
 preset-flag = Flaga presetu:
 preset-none-name = Opcja „Brak”:
+preset-no-preset-name = Opcja „Bez presetu”:
 preset-add-none = Dodaj opcję „Brak” do grup z wyborem wyłącznym
 preset-presets = Presety
 preset-add = Dodaj preset
@@ -923,6 +924,7 @@ preset-default-group = Preset
 preset-default-customise = Dostosuj
 preset-default-customise-label = Dostosuj { "{name}" }
 preset-default-none = Brak
+preset-default-no-preset = Bez presetu (własna konfiguracja)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Ustawia jedno miejsce docelowe instalacji dla każdego pliku wymaganego.
@@ -979,7 +981,7 @@ msg-relinked = Zaktualizowane odwołania: { $num }.
 files-dest-hint = (katalog główny Data)
 files-dest-tooltip = Ścieżka instalacji względem folderu Data gry, na przykład SKSE\Plugins. Pozostaw puste, aby zainstalować w katalogu głównym Data. Kliknij komórkę, aby ją edytować.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Ustawia naraz jedno miejsce docelowe instalacji dla każdego pliku każdego zestawu warunkowego.
 btn-apply-all-cond-dest = Zastosuj do wszystkich zestawów warunkowych
 preset-rebuild-hint = Ten projekt zawiera już strukturę utworzoną przez kreator: jej strony, nazwy i presety są wczytane poniżej. Zastosuj przebudowuje ją z uwzględnieniem twoich zmian i zachowuje nazwy flag.

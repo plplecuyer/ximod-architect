@@ -162,7 +162,7 @@ status-settings-saved = 设置已成功保存
 
 # About Dialog
 about-title = 关于 XIMOD Architect
-about-description = 一款用于 Bethesda 游戏模组的跨平台 FOMOD 安装程序生成工具。
+about-description = 一款用于 Vortex 或 Mod Organizer 2 能够管理的任何游戏模组的跨平台 FOMOD 安装程序生成工具。
 about-license = 采用 MIT 许可证
 about-copyright = © 2025-2026 XIMOD 团队
 about-credit = Wenderer 原版工具的 Rust 移植版：
@@ -892,6 +892,7 @@ preset-customise-group = “自定义”组：
 preset-customise-label = “自定义”选项（{ "{name}" } = 页面名称）：
 preset-flag = 预设标志：
 preset-none-name = “无”选项：
+preset-no-preset-name = “无预设”选项：
 preset-add-none = 为单选组添加“无”选项
 preset-presets = 预设
 preset-add = 添加预设
@@ -923,6 +924,7 @@ preset-default-group = 预设
 preset-default-customise = 自定义
 preset-default-customise-label = 自定义 { "{name}" }
 preset-default-none = 无
+preset-default-no-preset = 无预设（自行搭配）
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = 为每个必需文件设置单一安装目标位置。
@@ -979,7 +981,7 @@ msg-relinked = 已更新 { $num } 个引用。
 files-dest-hint = （Data 根目录）
 files-dest-tooltip = 相对于游戏 Data 文件夹的安装路径，例如 SKSE\Plugins。留空则安装到 Data 根目录。点击单元格即可编辑。
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = 一次性为每个条件集中的每个文件设置单一安装目标位置。
 btn-apply-all-cond-dest = 应用于所有条件集
 preset-rebuild-hint = 此项目已包含由向导创建的结构：其页面、名称和预设已加载到下方。“应用”会根据您的更改重建该结构，并保留标志名称。

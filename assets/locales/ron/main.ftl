@@ -162,7 +162,7 @@ status-settings-saved = Setări salvate cu succes
 
 # About Dialog
 about-title = Despre XIMOD Architect
-about-description = Un instrument multiplatformă pentru crearea de instalatoare FOMOD pentru moduri de jocuri Bethesda.
+about-description = Un instrument multiplatformă pentru crearea de instalatoare FOMOD pentru modurile oricărui joc pe care Vortex sau Mod Organizer 2 îl pot gestiona.
 about-license = Licențiat sub licența MIT
 about-copyright = © 2024 XIMOD Team
 about-credit = Portare Rust a sculei originale de la Wenderer:
@@ -892,6 +892,7 @@ preset-customise-group = Grupul Personalizare:
 preset-customise-label = Opțiunea Personalizare ({ "{name}" } = numele paginii):
 preset-flag = Pavilionul presetării:
 preset-none-name = Opțiunea „Niciuna”:
+preset-no-preset-name = Opțiunea „Fără presetare”:
 preset-add-none = Adaugă o opțiune „Niciuna” la grupurile cu alegere exclusivă
 preset-presets = Presetări
 preset-add = Adaugă presetare
@@ -923,6 +924,7 @@ preset-default-group = Presetare
 preset-default-customise = Personalizare
 preset-default-customise-label = Personalizare { "{name}" }
 preset-default-none = Niciuna
+preset-default-no-preset = Fără presetare (aleg totul eu)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Setează o singură destinație de instalare pentru fiecare fișier obligatoriu.
@@ -979,7 +981,7 @@ msg-relinked = { $num } referință(e) actualizată(e).
 files-dest-hint = (rădăcina Data)
 files-dest-tooltip = Calea de instalare relativă la folderul Data al jocului, de exemplu SKSE\Plugins. Lăsați gol pentru a instala în rădăcina Data. Faceți clic pe celulă pentru a o edita.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Setează deodată o singură destinație de instalare pentru fiecare fișier al fiecărui set condiționat.
 btn-apply-all-cond-dest = Aplică la toate seturile condiționate
 preset-rebuild-hint = Acest proiect conține deja o structură creată de asistent: paginile, numele și presetările sale sunt încărcate mai jos. Aplică o reconstruiește cu modificările dumneavoastră și păstrează numele pavilioanelor.

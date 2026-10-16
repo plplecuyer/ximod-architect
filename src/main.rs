@@ -1,7 +1,8 @@
 //! XIMOD Architect - Cross-platform mod installer creation tool
 //!
 //! A Rust port of the original creation tool for building mod installers
-//! for Bethesda game mods (Skyrim, Fallout, Starfield, etc.)
+//! for the mods of any game that Vortex or Mod Organizer 2 can manage
+//! (Skyrim, Fallout, Starfield, Palworld…)
 //!
 //! # Features
 //!

@@ -162,7 +162,7 @@ status-settings-saved = Iestatījumi veiksmīgi saglabāti
 
 # About Dialog
 about-title = Par XIMOD Architect
-about-description = Daudzplatformu rīks FOMOD instalētāju izveidei Bethesda spēļu modifikācijām.
+about-description = Daudzplatformu rīks FOMOD instalētāju izveidei modifikācijām jebkurai spēlei, ko spēj pārvaldīt Vortex vai Mod Organizer 2.
 about-license = Licencēts saskaņā ar MIT licenci
 about-copyright = © 2025–2026 XIMOD Team
 about-credit = Wenderer oriģinālā instrumenta Rust ports:
@@ -892,6 +892,7 @@ preset-customise-group = Grupa Pielāgot:
 preset-customise-label = Opcija Pielāgot ({ "{name}" } = lapas nosaukums):
 preset-flag = Priekšiestatījuma karodziņš:
 preset-none-name = Opcija „Nav”:
+preset-no-preset-name = Opcija „Bez priekšiestatījuma”:
 preset-add-none = Pievienot opciju „Nav” grupām ar ekskluzīvu izvēli
 preset-presets = Priekšiestatījumi
 preset-add = Pievienot priekšiestatījumu
@@ -923,6 +924,7 @@ preset-default-group = Priekšiestatījums
 preset-default-customise = Pielāgot
 preset-default-customise-label = Pielāgot { "{name}" }
 preset-default-none = Nav
+preset-default-no-preset = Bez priekšiestatījuma (sava izvēle)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Iestata vienu instalēšanas galamērķi katram obligātajam failam.
@@ -979,7 +981,7 @@ msg-relinked = Atjaunināto atsauču skaits: { $num }.
 files-dest-hint = (Data sakne)
 files-dest-tooltip = Instalēšanas ceļš attiecībā pret spēles Data mapi, piemēram, SKSE\Plugins. Atstājiet tukšu, lai instalētu Data saknē. Noklikšķiniet uz šūnas, lai to rediģētu.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Uzreiz iestata vienu instalēšanas galamērķi katram katras nosacījumu kopas failam.
 btn-apply-all-cond-dest = Lietot visām nosacījumu kopām
 preset-rebuild-hint = Šajā projektā jau ir vedņa izveidota struktūra: tās lapas, nosaukumi un priekšiestatījumi ir ielādēti zemāk. Lietot to pārbūvē ar jūsu izmaiņām un saglabā karodziņu nosaukumus.

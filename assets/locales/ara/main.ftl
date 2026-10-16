@@ -162,7 +162,7 @@ status-settings-saved = تم حفظ الإعدادات بنجاح
 
 # About Dialog
 about-title = حول XIMOD Architect
-about-description = أداة إنشاء مُثبِّت FOMOD متعددة المنصات لتعديلات ألعاب Bethesda.
+about-description = أداة إنشاء مُثبِّت FOMOD متعددة المنصات لتعديلات أي لعبة يستطيع Vortex أو Mod Organizer 2 إدارتها.
 about-license = مرخصة بموجب ترخيص MIT
 about-copyright = © 2025-2026 فريق XIMOD
 about-credit = نسخة Rust من الأداة الأصلية بواسطة Wenderer:
@@ -892,6 +892,7 @@ preset-customise-group = مجموعة «تخصيص»:
 preset-customise-label = خيار «تخصيص» (اسم الصفحة = { "{name}" }):
 preset-flag = علامة الإعداد المسبق:
 preset-none-name = خيار «بلا»:
+preset-no-preset-name = خيار «بلا إعداد مسبق»:
 preset-add-none = إضافة خيار «بلا» إلى المجموعات ذات الاختيار الحصري
 preset-presets = الإعدادات المسبقة
 preset-add = إضافة إعداد مسبق
@@ -923,6 +924,7 @@ preset-default-group = إعداد مسبق
 preset-default-customise = تخصيص
 preset-default-customise-label = تخصيص { "{name}" }
 preset-default-none = بلا
+preset-default-no-preset = بلا إعداد مسبق (بناء يدوي)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = يحدد وجهة تثبيت واحدة لكل ملف مطلوب.
@@ -979,7 +981,7 @@ msg-relinked = عدد المراجع المحدَّثة: { $num }.
 files-dest-hint = (جذر Data)
 files-dest-tooltip = مسار التثبيت نسبةً إلى مجلد Data الخاص باللعبة، مثل SKSE\Plugins. اتركه فارغًا للتثبيت في جذر Data. انقر على الخلية لتعديلها.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = يحدد وجهة تثبيت واحدة لكل ملف في كل مجموعة شرطية دفعةً واحدة.
 btn-apply-all-cond-dest = تطبيق على جميع المجموعات الشرطية
 preset-rebuild-hint = يحتوي هذا المشروع بالفعل على بنية أنشأها المعالج: صفحاتها وأسماؤها وإعداداتها المسبقة محمَّلة أدناه. يعيد «تطبيق» بناءها مع تعديلاتك ويحتفظ بأسماء العلامات.

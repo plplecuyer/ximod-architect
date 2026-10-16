@@ -162,7 +162,7 @@ status-settings-saved = Настройките бяха запазени усп�
 
 # About Dialog
 about-title = За XIMOD Architect
-about-description = Мултиплатформен инструмент за създаване на FOMOD инсталатори за модификации на игри на Bethesda.
+about-description = Мултиплатформен инструмент за създаване на FOMOD инсталатори за модификации на всяка игра, която Vortex или Mod Organizer 2 могат да управляват.
 about-license = Лицензиран под лиценза MIT
 about-copyright = © 2025-2026 Екипът на XIMOD
 about-credit = Rust порт на оригиналния инструмент от Wenderer:
@@ -892,6 +892,7 @@ preset-customise-group = Група «Персонализиране»:
 preset-customise-label = Опция «Персонализиране» ({ "{name}" } = име на страницата):
 preset-flag = Флаг на пресета:
 preset-none-name = Опция «Няма»:
+preset-no-preset-name = Опция «Без пресет»:
 preset-add-none = Добавяне на опция «Няма» към групите с изключващ избор
 preset-presets = Пресети
 preset-add = Добавяне на пресет
@@ -923,6 +924,7 @@ preset-default-group = Пресет
 preset-default-customise = Персонализиране
 preset-default-customise-label = Персонализиране на { "{name}" }
 preset-default-none = Няма
+preset-default-no-preset = Без пресет (ръчен избор)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Задава едно местоназначение за инсталиране за всеки задължителен файл.
@@ -979,7 +981,7 @@ msg-relinked = Обновени препратки: { $num }.
 files-dest-hint = (корен на Data)
 files-dest-tooltip = Път за инсталиране спрямо папката Data на играта, например SKSE\Plugins. Оставете празно, за да се инсталира в корена на Data. Щракнете върху клетката, за да я редактирате.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Задава наведнъж едно местоназначение за инсталиране за всеки файл от всеки условен набор.
 btn-apply-all-cond-dest = Приложи към всички условни набори
 preset-rebuild-hint = Този проект вече съдържа структура, създадена от съветника: страниците, имената и пресетите ѝ са заредени по-долу. «Прилагане» я изгражда наново с вашите промени и запазва имената на флаговете.

@@ -162,7 +162,7 @@ status-settings-saved = Настройки успешно сохранены
 
 # About Dialog
 about-title = О программе XIMOD Architect
-about-description = Кроссплатформенный инструмент для создания установщиков FOMOD для модификаций игр Bethesda.
+about-description = Кроссплатформенный инструмент для создания установщиков FOMOD для модификаций любых игр, которыми могут управлять Vortex или Mod Organizer 2.
 about-license = Лицензировано по лицензии MIT
 about-copyright = © 2025-2026 Команда XIMOD
 about-credit = Порт оригинального инструмента от Wenderer на Rust:
@@ -892,6 +892,7 @@ preset-customise-group = Группа «Настроить»:
 preset-customise-label = Опция «Настроить» ({ "{name}" } = имя страницы):
 preset-flag = Флаг пресета:
 preset-none-name = Опция «Нет»:
+preset-no-preset-name = Опция «Без пресета»:
 preset-add-none = Добавлять опцию «Нет» в группы с исключающим выбором
 preset-presets = Пресеты
 preset-add = Добавить пресет
@@ -923,6 +924,7 @@ preset-default-group = Пресет
 preset-default-customise = Настроить
 preset-default-customise-label = Настроить { "{name}" }
 preset-default-none = Нет
+preset-default-no-preset = Без пресета (своя сборка)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Задаёт одно место установки для каждого обязательного файла.
@@ -979,7 +981,7 @@ msg-relinked = Обновлено ссылок: { $num }.
 files-dest-hint = (корень Data)
 files-dest-tooltip = Путь установки относительно папки Data игры, например SKSE\Plugins. Оставьте пустым, чтобы установить в корень Data. Нажмите на ячейку, чтобы изменить её.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Задаёт одно место установки сразу для каждого файла каждого условного набора.
 btn-apply-all-cond-dest = Применить ко всем условным наборам
 preset-rebuild-hint = Этот проект уже содержит структуру, созданную мастером: её страницы, имена и пресеты загружены ниже. «Применить» перестраивает её с вашими изменениями и сохраняет имена флагов.

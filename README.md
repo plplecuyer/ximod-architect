@@ -1,6 +1,6 @@
 # XIMOD Architect
 
-A cross-platform FOMOD installer creation tool for Bethesda game mods (Skyrim, Fallout 4, Starfield, etc.) — and, since FOMOD is a mod-manager format, for most other games that Vortex or Mod Organizer 2 can manage.
+A cross-platform FOMOD installer creation tool for mod authors, whatever the game: Skyrim, Fallout, Starfield, Palworld and any other game that Vortex or Mod Organizer 2 can manage — FOMOD is a mod-manager format, not a game format.
 
 This is a Rust port of Wenderer's original FOMOD Creation Tool, offering improved performance, cross-platform support, and a modern UI.
 
@@ -26,7 +26,7 @@ This is a Rust port of Wenderer's original FOMOD Creation Tool, offering improve
 - **Cross-Platform**: Works on Windows, Linux, and macOS
 - **Native Splash Screen**: Transparent splash screen with fade effect
 
-See [`CHANGELOG.md`](CHANGELOG.md) for the full list of changes in 2.2.0.
+See [`CHANGELOG.md`](CHANGELOG.md) for the full list of changes in 2.2.1.
 
 ## Building
 

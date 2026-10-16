@@ -162,7 +162,7 @@ status-settings-saved = Instellingen zijn opgeslagen
 
 # About Dialog
 about-title = Over XIMOD Architect
-about-description = Een platformonafhankelijk hulpmiddel om FOMOD-installatieprogramma’s voor mods van Bethesda-spellen te maken.
+about-description = Een platformonafhankelijk hulpmiddel om FOMOD-installatieprogramma’s te maken voor mods van elk spel dat Vortex of Mod Organizer 2 kan beheren.
 about-license = Gelicentieerd onder de MIT-licentie
 about-copyright = © 2024 XIMOD Team
 about-credit = Rust-port van de oorspronkelijke tool door Wenderer:
@@ -892,6 +892,7 @@ preset-customise-group = Groep “Aanpassen”:
 preset-customise-label = Optie “Aanpassen” ({ "{name}" } = paginanaam):
 preset-flag = Presetvlag:
 preset-none-name = Optie “Geen”:
+preset-no-preset-name = Optie “Geen preset”:
 preset-add-none = Een optie “Geen” toevoegen aan groepen met exclusieve keuze
 preset-presets = Presets
 preset-add = Preset toevoegen
@@ -923,6 +924,7 @@ preset-default-group = Preset
 preset-default-customise = Aanpassen
 preset-default-customise-label = { "{name}" } aanpassen
 preset-default-none = Geen
+preset-default-no-preset = Geen preset (zelf samenstellen)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Stelt één installatiebestemming in voor elk vereist bestand.
@@ -979,7 +981,7 @@ msg-relinked = { $num } verwijzing(en) bijgewerkt.
 files-dest-hint = (hoofdmap van Data)
 files-dest-tooltip = Installatiepad relatief aan de Data-map van het spel, bijvoorbeeld SKSE\Plugins. Laat leeg om in de hoofdmap van Data te installeren. Klik op de cel om deze te bewerken.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Stelt in één keer één installatiebestemming in voor elk bestand van elke voorwaardelijke set.
 btn-apply-all-cond-dest = Toepassen op alle voorwaardelijke sets
 preset-rebuild-hint = Dit project bevat al een structuur die door de wizard is gemaakt: de pagina’s, namen en presets ervan zijn hieronder geladen. “Toepassen” bouwt deze opnieuw op met uw wijzigingen en behoudt de vlagnamen.

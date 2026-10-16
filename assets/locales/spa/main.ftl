@@ -162,7 +162,7 @@ status-settings-saved = Configuración guardada correctamente
 
 # About Dialog
 about-title = Acerca de XIMOD Architect
-about-description = Una herramienta multiplataforma para crear instaladores FOMOD para mods de juegos de Bethesda.
+about-description = Una herramienta multiplataforma para crear instaladores FOMOD para mods de cualquier juego que Vortex o Mod Organizer 2 puedan gestionar.
 about-license = Con licencia MIT
 about-copyright = © 2024 XIMOD Team
 about-credit = Adaptación a Rust de la herramienta original de Wenderer:
@@ -892,6 +892,7 @@ preset-customise-group = Grupo Personalizar:
 preset-customise-label = Opción Personalizar ({ "{name}" } = nombre de la página):
 preset-flag = Bandera del preset:
 preset-none-name = Opción «Ninguna»:
+preset-no-preset-name = Opción «Sin preset»:
 preset-add-none = Añadir una opción «Ninguna» a los grupos de elección exclusiva
 preset-presets = Presets
 preset-add = Añadir preset
@@ -923,6 +924,7 @@ preset-default-group = Preset
 preset-default-customise = Personalizar
 preset-default-customise-label = Personalizar { "{name}" }
 preset-default-none = Ninguna
+preset-default-no-preset = Sin preset (lo elijo todo yo)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Establece un único destino de instalación para cada archivo obligatorio.
@@ -979,7 +981,7 @@ msg-relinked = { $num } referencia(s) actualizada(s).
 files-dest-hint = (raíz de Data)
 files-dest-tooltip = Ruta de instalación relativa a la carpeta Data del juego, por ejemplo SKSE\Plugins. Déjela vacía para instalar en la raíz de Data. Haga clic en la celda para editarla.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Establece de una vez un único destino de instalación para cada archivo de cada conjunto condicional.
 btn-apply-all-cond-dest = Aplicar a todos los conjuntos condicionales
 preset-rebuild-hint = Este proyecto ya contiene una estructura creada por el asistente: sus páginas, nombres y presets están cargados abajo. «Aplicar» la reconstruye con sus cambios y conserva los nombres de las banderas.

@@ -162,7 +162,7 @@ status-settings-saved = Configuraziuns memorisadas cun success
 
 # About Dialog
 about-title = Davart XIMOD Architect
-about-description = In instrument multiplattafurma per crear installaders FOMOD per mods da gieus Bethesda.
+about-description = In instrument multiplattafurma per crear installaders FOMOD per mods da mintga gieu che Vortex u Mod Organizer 2 san administrar.
 about-license = Licenzià tenor la licenza MIT
 about-copyright = © 2025-2026 XIMOD Team
 about-credit = Versiun en Rust da l'utensil original da Wenderer:
@@ -892,6 +892,7 @@ preset-customise-group = Gruppa Persunalisar:
 preset-customise-label = Opziun Persunalisar ({ "{name}" } = num da la pagina):
 preset-flag = Bandiera dal preset:
 preset-none-name = Opziun «Nagina»:
+preset-no-preset-name = Opziun «Nagin preset»:
 preset-add-none = Agiuntar in'opziun «Nagina» a las gruppas cun tscherna exclusiva
 preset-presets = Presets
 preset-add = Agiuntar in preset
@@ -923,6 +924,7 @@ preset-default-group = Preset
 preset-default-customise = Persunalisar
 preset-default-customise-label = Persunalisar { "{name}" }
 preset-default-none = Nagina
+preset-default-no-preset = Nagin preset (jau tschern tut sez)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Definescha ina destinaziun d'installaziun per mintga datoteca necessaria.
@@ -979,7 +981,7 @@ msg-relinked = { $num } referenza(s) actualisada(s).
 files-dest-hint = (ragisch da Data)
 files-dest-tooltip = Via d'installaziun relativa a l'ordinatur Data dal gieu, per exempel SKSE\Plugins. Laschar vid per installar en la ragisch da Data. Cliccar sin la cella per la modifitgar.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Definescha en ina giada ina destinaziun d'installaziun per mintga datoteca da mintga set cundiziunal.
 btn-apply-all-cond-dest = Applitgar a tut ils sets cundiziunals
 preset-rebuild-hint = Quest project cuntegna gia ina structura creada da l'assistent: sias paginas, ses nums e ses presets èn chargiads sutvart. «Applitgar» la reconstruescha cun vossas midadas e mantegna ils nums dals flags.

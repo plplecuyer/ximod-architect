@@ -162,7 +162,7 @@ status-settings-saved = Nustatymai sėkmingai išsaugoti
 
 # About Dialog
 about-title = Apie „XIMOD Architect“
-about-description = Daugiaplatformis „FOMOD“ diegimo programos kūrimo įrankis, skirtas „Bethesda“ žaidimų modams.
+about-description = Daugiaplatformis „FOMOD“ diegimo programos kūrimo įrankis, skirtas bet kurio žaidimo, kurį geba tvarkyti „Vortex“ ar „Mod Organizer 2“, modams.
 about-license = Licencijuota pagal MIT licenciją
 about-copyright = © 2025–2026 „XIMOD“ komanda
 about-credit = Originalaus įrankio Rust perkėlimas, atliktas Wenderer:
@@ -892,6 +892,7 @@ preset-customise-group = Grupė „Tinkinti“:
 preset-customise-label = Parinktis „Tinkinti“ ({ "{name}" } = puslapio pavadinimas):
 preset-flag = Išankstinio nustatymo vėliavėlė:
 preset-none-name = Parinktis „Nieko“:
+preset-no-preset-name = Parinktis „Be išankstinio nustatymo“:
 preset-add-none = Pridėti parinktį „Nieko“ į išskirtinio pasirinkimo grupes
 preset-presets = Išankstiniai nustatymai
 preset-add = Pridėti išankstinį nustatymą
@@ -923,6 +924,7 @@ preset-default-group = Išankstinis nustatymas
 preset-default-customise = Tinkinti
 preset-default-customise-label = Tinkinti { "{name}" }
 preset-default-none = Nieko
+preset-default-no-preset = Be išankstinio nustatymo (savo pasirinkimas)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Nustato vieną diegimo paskirties vietą kiekvienam privalomam failui.
@@ -979,7 +981,7 @@ msg-relinked = Atnaujinta nuorodų: { $num }.
 files-dest-hint = (Data aplanko šaknis)
 files-dest-tooltip = Įdiegimo kelias žaidimo Data aplanko atžvilgiu, pavyzdžiui, SKSE\Plugins. Palikite tuščią, kad būtų įdiegta Data aplanko šaknyje. Spustelėkite langelį, kad jį redaguotumėte.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Iškart nustato vieną diegimo paskirties vietą kiekvienam kiekvieno sąlyginio rinkinio failui.
 btn-apply-all-cond-dest = Taikyti visiems sąlyginiams rinkiniams
 preset-rebuild-hint = Šiame projekte jau yra vediklio sukurta struktūra: jos puslapiai, pavadinimai ir išankstiniai nustatymai įkelti žemiau. „Taikyti“ ją perkuria su jūsų pakeitimais ir išsaugo vėliavėlių pavadinimus.

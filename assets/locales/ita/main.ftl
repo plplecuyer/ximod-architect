@@ -162,7 +162,7 @@ status-settings-saved = Impostazioni salvate correttamente
 
 # About Dialog
 about-title = Informazioni su XIMOD Architect
-about-description = Uno strumento multipiattaforma per creare installer FOMOD per le mod dei giochi Bethesda.
+about-description = Uno strumento multipiattaforma per creare installer FOMOD per le mod di qualsiasi gioco che Vortex o Mod Organizer 2 siano in grado di gestire.
 about-license = Concesso in licenza con licenza MIT
 about-copyright = © 2024 XIMOD Team
 about-credit = Porting in Rust dello strumento originale di Wenderer:
@@ -892,6 +892,7 @@ preset-customise-group = Gruppo Personalizza:
 preset-customise-label = Opzione Personalizza ({ "{name}" } = nome della pagina):
 preset-flag = Flag del preset:
 preset-none-name = Opzione «Nessuna»:
+preset-no-preset-name = Opzione «Nessun preset»:
 preset-add-none = Aggiungi un'opzione «Nessuna» ai gruppi a scelta esclusiva
 preset-presets = Preset
 preset-add = Aggiungi preset
@@ -923,6 +924,7 @@ preset-default-group = Preset
 preset-default-customise = Personalizza
 preset-default-customise-label = Personalizza { "{name}" }
 preset-default-none = Nessuna
+preset-default-no-preset = Nessun preset (scelgo tutto io)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Imposta un'unica destinazione di installazione per ogni file richiesto.
@@ -979,7 +981,7 @@ msg-relinked = Riferimenti aggiornati: { $num }.
 files-dest-hint = (radice di Data)
 files-dest-tooltip = Percorso di installazione relativo alla cartella Data del gioco, ad esempio SKSE\Plugins. Lascia vuoto per installare nella radice di Data. Fai clic sulla cella per modificarla.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Imposta in una volta sola un'unica destinazione di installazione per ogni file di ogni insieme condizionale.
 btn-apply-all-cond-dest = Applica a tutti gli insiemi condizionali
 preset-rebuild-hint = Questo progetto contiene già una struttura creata dalla procedura guidata: le sue pagine, i nomi e i preset sono caricati qui sotto. Applica la ricostruisce con le tue modifiche e mantiene i nomi dei flag.

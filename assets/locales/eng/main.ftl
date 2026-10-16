@@ -162,7 +162,7 @@ status-settings-saved = Settings saved successfully
 
 # About Dialog
 about-title = About XIMOD Architect
-about-description = A cross-platform FOMOD installer creation tool for Bethesda game mods.
+about-description = A cross-platform FOMOD installer creation tool for mods of any game that Vortex or Mod Organizer 2 can manage.
 about-license = Licensed under MIT License
 about-copyright = © 2025-2026 XIMOD Team
 about-credit = Rust port of the original tool by Wenderer:
@@ -892,6 +892,7 @@ preset-customise-group = Customise group:
 preset-customise-label = Customise option ({ "{name}" } = page name):
 preset-flag = Preset flag:
 preset-none-name = "None" option:
+preset-no-preset-name = "No preset" option:
 preset-add-none = Add a "None" option to exclusive groups
 preset-presets = Presets
 preset-add = Add preset
@@ -923,6 +924,7 @@ preset-default-group = Preset
 preset-default-customise = Customise
 preset-default-customise-label = Customise { "{name}" }
 preset-default-none = None
+preset-default-no-preset = No preset (build my own)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Set one install destination for every required file.
@@ -979,7 +981,7 @@ msg-relinked = { $num } reference(s) updated.
 files-dest-hint = (root of Data)
 files-dest-tooltip = Install path relative to the game's Data folder, for example SKSE\Plugins. Leave empty to install at the root of Data. Click the cell to edit it.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Set one install destination for every file of every conditional set at once.
 btn-apply-all-cond-dest = Apply to all conditional sets
 preset-rebuild-hint = This project already holds a structure made by the wizard: its pages, names and presets are loaded below. Apply rebuilds it with your changes and keeps the flag names.

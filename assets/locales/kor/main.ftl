@@ -162,7 +162,7 @@ status-settings-saved = 설정이 성공적으로 저장되었습니다
 
 # About Dialog
 about-title = XIMOD Architect 정보
-about-description = 베데스다 게임 모드용 크로스 플랫폼 FOMOD 설치 프로그램 생성 도구입니다.
+about-description = Vortex 또는 Mod Organizer 2가 관리할 수 있는 모든 게임의 모드용 크로스 플랫폼 FOMOD 설치 프로그램 생성 도구입니다.
 about-license = MIT 라이선스 하에 배포됩니다
 about-copyright = © 2025-2026 XIMOD Team
 about-credit = Wenderer의 원본 도구를 Rust로 포팅한 버전:
@@ -892,6 +892,7 @@ preset-customise-group = '사용자 지정' 그룹:
 preset-customise-label = '사용자 지정' 옵션({ "{name}" } = 페이지 이름):
 preset-flag = 프리셋 플래그:
 preset-none-name = '없음' 옵션:
+preset-no-preset-name = '프리셋 없음' 옵션:
 preset-add-none = 배타적 선택 그룹에 '없음' 옵션 추가
 preset-presets = 프리셋
 preset-add = 프리셋 추가
@@ -923,6 +924,7 @@ preset-default-group = 프리셋
 preset-default-customise = 사용자 지정
 preset-default-customise-label = { "{name}" } 사용자 지정
 preset-default-none = 없음
+preset-default-no-preset = 프리셋 없음(직접 구성)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = 모든 필수 파일에 단일 설치 대상을 설정합니다.
@@ -979,7 +981,7 @@ msg-relinked = 참조 { $num }개가 업데이트되었습니다.
 files-dest-hint = (Data 루트)
 files-dest-tooltip = 게임의 Data 폴더를 기준으로 한 설치 경로입니다(예: SKSE\Plugins). 비워 두면 Data 루트에 설치됩니다. 셀을 클릭하여 편집하세요.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = 모든 조건부 세트의 모든 파일에 단일 설치 대상을 한 번에 설정합니다.
 btn-apply-all-cond-dest = 모든 조건부 세트에 적용
 preset-rebuild-hint = 이 프로젝트에는 마법사가 만든 구조가 이미 있습니다. 해당 페이지, 이름, 프리셋을 아래에 불러왔습니다. '적용'을 누르면 변경 사항을 반영해 구조를 다시 만들고 플래그 이름은 유지합니다.

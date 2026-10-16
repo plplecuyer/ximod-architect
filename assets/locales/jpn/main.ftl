@@ -162,7 +162,7 @@ status-settings-saved = 設定が正常に保存されました
 
 # About Dialog
 about-title = XIMOD Architect について
-about-description = Bethesda 社のゲームMOD用クロスプラットフォーム FOMOD インストーラ作成ツールです。
+about-description = Vortex または Mod Organizer 2 で管理できるあらゆるゲームのMOD用クロスプラットフォーム FOMOD インストーラ作成ツールです。
 about-license = MIT ライセンスの下で提供されています
 about-copyright = © 2025-2026 XIMOD Team
 about-credit = Wenderer氏によるオリジナルツールのRust移植版：
@@ -892,6 +892,7 @@ preset-customise-group = 「カスタマイズ」グループ：
 preset-customise-label = 「カスタマイズ」オプション（{ "{name}" } = ページ名）：
 preset-flag = プリセットフラグ：
 preset-none-name = 「なし」オプション：
+preset-no-preset-name = 「プリセットなし」オプション：
 preset-add-none = 排他選択グループに「なし」オプションを追加する
 preset-presets = プリセット
 preset-add = プリセットを追加
@@ -923,6 +924,7 @@ preset-default-group = プリセット
 preset-default-customise = カスタマイズ
 preset-default-customise-label = { "{name}" } をカスタマイズ
 preset-default-none = なし
+preset-default-no-preset = プリセットなし（自分で構成）
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = すべての必須ファイルに単一のインストール先を設定します。
@@ -979,7 +981,7 @@ msg-relinked = { $num } 件の参照を更新しました。
 files-dest-hint = （Dataのルート）
 files-dest-tooltip = ゲームのDataフォルダを基準としたインストール先のパスです（例：SKSE\Plugins）。空のままにするとDataのルートにインストールされます。セルをクリックして編集します。
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = すべての条件セットのすべてのファイルに単一のインストール先を一度に設定します。
 btn-apply-all-cond-dest = すべての条件セットに適用
 preset-rebuild-hint = このプロジェクトにはウィザードで作成された構造がすでにあります。そのページ、名前、プリセットを下に読み込みました。「適用」を押すと変更を反映して構造を再構築し、フラグ名は維持されます。

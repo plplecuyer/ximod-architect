@@ -263,7 +263,7 @@ fn extract_zip(archive: &Path, dest: &Path, only_fomod: bool, progress: Progress
     let mut written = 0usize;
     for i in 0..total {
         let mut entry = zip.by_index(i).map_err(|e| ArchiveError::Io(e.to_string()))?;
-        let name = entry.name().to_string();
+        let name = entry.name().map_err(|e| ArchiveError::Io(e.to_string()))?.into_owned();
         let Some(rel) = safe_relative(&name) else {
             if entry.is_dir() && name.trim_matches('/').is_empty() {
                 continue;

@@ -162,7 +162,7 @@ status-settings-saved = Asetukset tallennettu onnistuneesti
 
 # About Dialog
 about-title = Tietoja XIMOD Architectista
-about-description = Alustariippumaton työkalu FOMOD-asennusohjelmien luomiseen Bethesda-pelien modeille.
+about-description = Alustariippumaton työkalu FOMOD-asennusohjelmien luomiseen kaikkien sellaisten pelien modeille, joita Vortex tai Mod Organizer 2 osaa hallita.
 about-license = Lisensoitu MIT-lisenssillä
 about-copyright = © 2024 XIMOD Team
 about-credit = Wenderer alkuperäisen työkalun Rust-portti:
@@ -892,6 +892,7 @@ preset-customise-group = Mukauta-ryhmä:
 preset-customise-label = Mukauta-vaihtoehto ({ "{name}" } = sivun nimi):
 preset-flag = Esiasetuksen lippu:
 preset-none-name = ”Ei mitään” -vaihtoehto:
+preset-no-preset-name = ”Ei esiasetusta” -vaihtoehto:
 preset-add-none = Lisää ”Ei mitään” -vaihtoehto yksinomaisen valinnan ryhmiin
 preset-presets = Esiasetukset
 preset-add = Lisää esiasetus
@@ -923,6 +924,7 @@ preset-default-group = Esiasetus
 preset-default-customise = Mukauta
 preset-default-customise-label = Mukauta: { "{name}" }
 preset-default-none = Ei mitään
+preset-default-no-preset = Ei esiasetusta (kokoa itse)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Asettaa yhden asennuskohteen jokaiselle pakolliselle tiedostolle.
@@ -979,7 +981,7 @@ msg-relinked = Päivitettyjä viittauksia: { $num }.
 files-dest-hint = (Data-kansion juuri)
 files-dest-tooltip = Asennuspolku suhteessa pelin Data-kansioon, esimerkiksi SKSE\Plugins. Jätä tyhjäksi, jos haluat asentaa Data-kansion juureen. Muokkaa solua napsauttamalla sitä.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Asettaa kerralla yhden asennuskohteen jokaisen ehdollisen joukon jokaiselle tiedostolle.
 btn-apply-all-cond-dest = Käytä kaikkiin ehdollisiin joukkoihin
 preset-rebuild-hint = Tässä projektissa on jo ohjatun toiminnon luoma rakenne: sen sivut, nimet ja esiasetukset on ladattu alle. ”Käytä” rakentaa sen uudelleen muutoksillasi ja säilyttää lippujen nimet.

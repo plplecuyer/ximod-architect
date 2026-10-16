@@ -162,7 +162,7 @@ status-settings-saved = Nastavitve so bile uspešno shranjene
 
 # About Dialog
 about-title = O programu XIMOD Architect
-about-description = Večplatformsko orodje za ustvarjanje namestitvenih datotek FOMOD za modifikacije iger Bethesda.
+about-description = Večplatformsko orodje za ustvarjanje namestitvenih datotek FOMOD za modifikacije katere koli igre, ki jo znata upravljati Vortex ali Mod Organizer 2.
 about-license = Licencirano pod licenco MIT
 about-copyright = © 2025–2026 Ekipa XIMOD
 about-credit = Rust-port originalnega orodja podjetja Wenderer:
@@ -892,6 +892,7 @@ preset-customise-group = Skupina Prilagodi:
 preset-customise-label = Možnost Prilagodi ({ "{name}" } = ime strani):
 preset-flag = Zastavica prednastavitve:
 preset-none-name = Možnost „Brez“:
+preset-no-preset-name = Možnost „Brez prednastavitve“:
 preset-add-none = Dodaj možnost „Brez“ v skupine z izključno izbiro
 preset-presets = Prednastavitve
 preset-add = Dodaj prednastavitev
@@ -923,6 +924,7 @@ preset-default-group = Prednastavitev
 preset-default-customise = Prilagodi
 preset-default-customise-label = Prilagodi { "{name}" }
 preset-default-none = Brez
+preset-default-no-preset = Brez prednastavitve (lastna izbira)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Nastavi en cilj namestitve za vsako obvezno datoteko.
@@ -979,7 +981,7 @@ msg-relinked = Posodobljenih sklicev: { $num }.
 files-dest-hint = (koren mape Data)
 files-dest-tooltip = Namestitvena pot glede na mapo Data igre, na primer SKSE\Plugins. Pustite prazno, da namestite v koren mape Data. Kliknite celico, da jo uredite.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Naenkrat nastavi en cilj namestitve za vsako datoteko vsakega pogojnega nabora.
 btn-apply-all-cond-dest = Uporabi za vse pogojne nabore
 preset-rebuild-hint = Ta projekt že vsebuje strukturo, ki jo je ustvaril čarovnik: njene strani, imena in prednastavitve so naložene spodaj. „Uporabi“ jo ponovno zgradi z vašimi spremembami in ohrani imena zastavic.

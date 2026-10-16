@@ -162,7 +162,7 @@ status-settings-saved = A beállítások sikeresen mentve
 
 # About Dialog
 about-title = A XIMOD Architect névjegye
-about-description = Platformfüggetlen eszköz FOMOD-telepítők készítéséhez Bethesda-játékok modjaihoz.
+about-description = Platformfüggetlen eszköz FOMOD-telepítők készítéséhez bármely olyan játék modjaihoz, amelyet a Vortex vagy a Mod Organizer 2 kezelni tud.
 about-license = MIT licenc alatt licencelve
 about-copyright = © 2024 XIMOD Team
 about-credit = Az eredeti eszköz Rust portolása Wenderer:
@@ -892,6 +892,7 @@ preset-customise-group = „Testreszabás” csoport:
 preset-customise-label = „Testreszabás” opció ({ "{name}" } = oldalnév):
 preset-flag = Előbeállítás-jelző:
 preset-none-name = „Nincs” opció:
+preset-no-preset-name = „Nincs előbeállítás” opció:
 preset-add-none = „Nincs” opció hozzáadása a kizárólagos választású csoportokhoz
 preset-presets = Előbeállítások
 preset-add = Előbeállítás hozzáadása
@@ -923,6 +924,7 @@ preset-default-group = Előbeállítás
 preset-default-customise = Testreszabás
 preset-default-customise-label = { "{name}" } testreszabása
 preset-default-none = Nincs
+preset-default-no-preset = Nincs előbeállítás (saját összeállítás)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Egyetlen telepítési célt állít be minden kötelező fájlhoz.
@@ -979,7 +981,7 @@ msg-relinked = { $num } hivatkozás frissítve.
 files-dest-hint = (a Data gyökere)
 files-dest-tooltip = Telepítési útvonal a játék Data mappájához képest, például SKSE\Plugins. Hagyja üresen a Data gyökerébe történő telepítéshez. Kattintson a cellára a szerkesztéséhez.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Egyszerre egyetlen telepítési célt állít be minden feltételes készlet minden fájljához.
 btn-apply-all-cond-dest = Alkalmazás az összes feltételes készletre
 preset-rebuild-hint = Ez a projekt már tartalmaz egy, a varázsló által létrehozott struktúrát: az oldalai, nevei és előbeállításai alább be vannak töltve. Az „Alkalmaz“ a módosításaival újraépíti, és megtartja a jelzők nevét.

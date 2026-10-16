@@ -1,7 +1,8 @@
 # XIMOD Architect 2.2.0
 
-XIMOD Architect builds FOMOD installers for Bethesda mods (Skyrim, Fallout,
-Starfield, Oblivion, Morrowind) on Windows, Linux and macOS. Version 2.2.0
+XIMOD Architect builds FOMOD installers — the format read by Vortex and Mod
+Organizer 2, for Skyrim, Fallout, Starfield and many other games — on Windows,
+Linux and macOS. Version 2.2.0
 makes it easier to reuse installer pieces across mods and to keep file
 references right when files are renamed or moved — ideas from Wenderer, author
 of the original FOMOD Creation Tool, and from one of its users.
@@ -30,8 +31,5 @@ right one, or browse, then apply all the fixes in one go.
 - An empty Destination cell now reads "(root of Data)", with a tooltip: click the cell to type where a file or folder goes.
 - The generated XML files are signed with the application's name, version and Nexus page, as FOMOD Creation Tool did.
 - Interface labels corrected in every language, and the user manuals aligned on them.
-- The preset wizard can be run again to add or change presets: it rebuilds its structure instead of stacking a second one, and keeps the flag names.
-- One destination for all conditional sets at once; the group and page destinations also reach the files the preset wizard moved to conditional installs.
-- Fixed: exported ZIP archives dated every file 1980-01-01; files now keep their modification date.
 - Interface in 33 languages; every new string is translated in every locale.
 - Building from source requires Rust 1.99.0 or later.

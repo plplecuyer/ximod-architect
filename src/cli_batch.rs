@@ -616,7 +616,7 @@ mod tests {
         assert!(main.is_file(), "the mod itself is packaged first");
         // Patch package, at the default location next to the mod folder.
         let zip = zip::ZipArchive::new(fs::File::open(&patch).unwrap()).unwrap();
-        let mut names: Vec<&str> = zip.file_names().collect();
+        let mut names: Vec<String> = zip.file_names().map(|n| n.unwrap().into_owned()).collect();
         names.sort();
         assert_eq!(names, vec!["README_FR.txt", "fomod/ModuleConfig.xml", "fomod/info.xml"]);
         // Full package: the mod files and the translated XML, not the archive

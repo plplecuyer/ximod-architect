@@ -1325,7 +1325,7 @@ mod tests {
     /// Names of the files of a ZIP archive, sorted.
     fn zip_names(path: &Path) -> Vec<String> {
         let zip = zip::ZipArchive::new(std::fs::File::open(path).unwrap()).unwrap();
-        let mut names: Vec<String> = zip.file_names().map(str::to_string).collect();
+        let mut names: Vec<String> = zip.file_names().map(|n| n.unwrap().into_owned()).collect();
         names.sort();
         names
     }

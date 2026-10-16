@@ -162,7 +162,7 @@ status-settings-saved = Nastavenia boli úspešne uložené
 
 # About Dialog
 about-title = O aplikácii XIMOD Architect
-about-description = Multiplatformový nástroj na tvorbu inštalátorov FOMOD pre módy hier Bethesda.
+about-description = Multiplatformový nástroj na tvorbu inštalátorov FOMOD pre módy akejkoľvek hry, ktorú dokáže spravovať Vortex alebo Mod Organizer 2.
 about-license = Licencované pod licenciou MIT
 about-copyright = © 2024 XIMOD Team
 about-credit = Port pôvodného nástroja od Wenderera na Rust:
@@ -892,6 +892,7 @@ preset-customise-group = Skupina Prispôsobiť:
 preset-customise-label = Možnosť Prispôsobiť ({ "{name}" } = názov stránky):
 preset-flag = Príznak predvoľby:
 preset-none-name = Možnosť „Žiadna“:
+preset-no-preset-name = Možnosť „Bez predvoľby“:
 preset-add-none = Pridať možnosť „Žiadna“ do skupín s výhradnou voľbou
 preset-presets = Predvoľby
 preset-add = Pridať predvoľbu
@@ -923,6 +924,7 @@ preset-default-group = Predvoľba
 preset-default-customise = Prispôsobiť
 preset-default-customise-label = Prispôsobiť { "{name}" }
 preset-default-none = Žiadna
+preset-default-no-preset = Bez predvoľby (vlastné zostavenie)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Nastaví jeden cieľ inštalácie pre každý povinný súbor.
@@ -979,7 +981,7 @@ msg-relinked = Aktualizovaných odkazov: { $num }.
 files-dest-hint = (koreň priečinka Data)
 files-dest-tooltip = Inštalačná cesta relatívna k priečinku Data hry, napríklad SKSE\Plugins. Ak chcete inštalovať do koreňa priečinka Data, nechajte prázdne. Kliknutím na bunku ju upravíte.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Nastaví naraz jeden cieľ inštalácie pre každý súbor každej podmienenej sady.
 btn-apply-all-cond-dest = Použiť na všetky podmienené sady
 preset-rebuild-hint = Tento projekt už obsahuje štruktúru vytvorenú sprievodcom: jej stránky, názvy a predvoľby sú načítané nižšie. Použiť ju znova zostaví s vašimi zmenami a zachová názvy príznakov.

@@ -162,7 +162,7 @@ status-settings-saved = Indstillingerne blev gemt
 
 # About Dialog
 about-title = Om XIMOD Architect
-about-description = Et tværplatformsværktøj til oprettelse af FOMOD-installationsprogrammer til Bethesda-spilmods.
+about-description = Et tværplatformsværktøj til oprettelse af FOMOD-installationsprogrammer til mods til ethvert spil, som Vortex eller Mod Organizer 2 kan håndtere.
 about-license = Licenseret under MIT-licensen
 about-copyright = © 2024 XIMOD Team
 about-credit = Rust port af det originale værktøj af Wenderer:
@@ -892,6 +892,7 @@ preset-customise-group = Tilpas-gruppe:
 preset-customise-label = Tilpas-valgmulighed ({ "{name}" } = sidenavn):
 preset-flag = Forudindstillingsflag:
 preset-none-name = Valgmuligheden »Ingen«:
+preset-no-preset-name = Valgmuligheden »Ingen forudindstilling«:
 preset-add-none = Tilføj en »Ingen«-valgmulighed til grupper med eksklusivt valg
 preset-presets = Forudindstillinger
 preset-add = Tilføj forudindstilling
@@ -923,6 +924,7 @@ preset-default-group = Forudindstilling
 preset-default-customise = Tilpas
 preset-default-customise-label = Tilpas { "{name}" }
 preset-default-none = Ingen
+preset-default-no-preset = Ingen forudindstilling (sammensæt selv)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Angiver én installationsdestination for hver påkrævet fil.
@@ -979,7 +981,7 @@ msg-relinked = { $num } reference(r) opdateret.
 files-dest-hint = (roden af Data)
 files-dest-tooltip = Installationssti i forhold til spillets Data-mappe, for eksempel SKSE\Plugins. Lad stå tomt for at installere i roden af Data. Klik på cellen for at redigere den.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Angiver én installationsdestination for hver fil i hvert betinget sæt på én gang.
 btn-apply-all-cond-dest = Anvend på alle betingede sæt
 preset-rebuild-hint = Dette projekt indeholder allerede en struktur, som guiden har oprettet: dens sider, navne og forudindstillinger er indlæst nedenfor. Anvend genopbygger den med dine ændringer og bevarer flagnavnene.

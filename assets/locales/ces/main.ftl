@@ -162,7 +162,7 @@ status-settings-saved = Nastavení bylo úspěšně uloženo
 
 # About Dialog
 about-title = O aplikaci XIMOD Architect
-about-description = Multiplatformní nástroj pro tvorbu instalátorů FOMOD pro mody her Bethesda.
+about-description = Multiplatformní nástroj pro tvorbu instalátorů FOMOD pro mody jakékoli hry, kterou dokáže spravovat Vortex nebo Mod Organizer 2.
 about-license = Licencováno pod licencí MIT
 about-copyright = © 2024 XIMOD Team
 about-credit = Port původního nástroje od Wenderer ve verzi Rust:
@@ -892,6 +892,7 @@ preset-customise-group = Skupina Přizpůsobit:
 preset-customise-label = Možnost Přizpůsobit ({ "{name}" } = název stránky):
 preset-flag = Příznak předvolby:
 preset-none-name = Možnost „Žádná“:
+preset-no-preset-name = Možnost „Bez předvolby“:
 preset-add-none = Přidat možnost „Žádná“ do skupin s výhradní volbou
 preset-presets = Předvolby
 preset-add = Přidat předvolbu
@@ -923,6 +924,7 @@ preset-default-group = Předvolba
 preset-default-customise = Přizpůsobit
 preset-default-customise-label = Přizpůsobit { "{name}" }
 preset-default-none = Žádná
+preset-default-no-preset = Bez předvolby (vlastní sestavení)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Nastaví jeden cíl instalace pro každý povinný soubor.
@@ -979,7 +981,7 @@ msg-relinked = Aktualizováno odkazů: { $num }.
 files-dest-hint = (kořen složky Data)
 files-dest-tooltip = Instalační cesta relativní ke složce Data hry, například SKSE\Plugins. Ponechte prázdné, chcete-li instalovat do kořene složky Data. Kliknutím na buňku ji upravíte.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Nastaví najednou jeden cíl instalace pro každý soubor každé podmíněné sady.
 btn-apply-all-cond-dest = Použít na všechny podmíněné sady
 preset-rebuild-hint = Tento projekt již obsahuje strukturu vytvořenou průvodcem: její stránky, názvy a předvolby jsou načteny níže. Použít ji znovu sestaví s vašimi změnami a zachová názvy příznaků.

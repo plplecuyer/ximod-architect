@@ -162,7 +162,7 @@ status-settings-saved = Ayarlar başarıyla kaydedildi
 
 # About Dialog
 about-title = XIMOD Architect Hakkında
-about-description = Bethesda oyun modları için platformlar arası bir FOMOD yükleyici oluşturma aracı.
+about-description = Vortex ya da Mod Organizer 2'nin yönetebildiği her oyunun modları için platformlar arası bir FOMOD yükleyici oluşturma aracı.
 about-license = MIT Lisansı altında lisanslanmıştır
 about-copyright = © 2025-2026 XIMOD Ekibi
 about-credit = Wenderer'in orijinal aracının Rust portu:
@@ -892,6 +892,7 @@ preset-customise-group = “Özelleştir” grubu:
 preset-customise-label = “Özelleştir” seçeneği ({ "{name}" } = sayfa adı):
 preset-flag = Ön ayar bayrağı:
 preset-none-name = “Hiçbiri” seçeneği:
+preset-no-preset-name = “Ön ayar yok” seçeneği:
 preset-add-none = Tek seçimli gruplara bir “Hiçbiri” seçeneği ekle
 preset-presets = Ön ayarlar
 preset-add = Ön ayar ekle
@@ -923,6 +924,7 @@ preset-default-group = Ön ayar
 preset-default-customise = Özelleştir
 preset-default-customise-label = Özelleştir: { "{name}" }
 preset-default-none = Hiçbiri
+preset-default-no-preset = Ön ayar yok (kendim seçeceğim)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Her gerekli dosya için tek bir kurulum hedefi ayarlar.
@@ -979,7 +981,7 @@ msg-relinked = { $num } başvuru güncellendi.
 files-dest-hint = (Data'nın kökü)
 files-dest-tooltip = Oyunun Data klasörüne göre kurulum yolu, örneğin SKSE\Plugins. Data'nın köküne kurmak için boş bırakın. Düzenlemek için hücreye tıklayın.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Her koşullu kümenin her dosyası için tek bir kurulum hedefini bir kerede ayarlar.
 btn-apply-all-cond-dest = Tüm koşullu kümelere uygula
 preset-rebuild-hint = Bu proje, sihirbazın oluşturduğu bir yapıyı zaten içeriyor: sayfaları, adları ve ön ayarları aşağıda yüklü. “Uygula” onu değişikliklerinizle yeniden oluşturur ve bayrak adlarını korur.

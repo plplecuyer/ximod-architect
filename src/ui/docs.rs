@@ -580,7 +580,7 @@ impl XimodApp {
     }
 
     /// Keep the OS window title in sync with the active document:
-    /// "● MyMod — XIMOD Architect v2.2.0" (the dot marks unsaved changes).
+    /// "● MyMod — XIMOD Architect v2.2.1" (the dot marks unsaved changes).
     pub(crate) fn sync_window_title(&mut self, ctx: &egui::Context) {
         let name = Self::display_name(&self.root_directory, &self.ximod.name);
         let mut title = String::new();

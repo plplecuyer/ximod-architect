@@ -162,7 +162,7 @@ status-settings-saved = Οι ρυθμίσεις αποθηκεύτηκαν με 
 
 # About Dialog
 about-title = Σχετικά με το XIMOD Architect
-about-description = Ένα εργαλείο δημιουργίας εγκαταστατών FOMOD για mods παιχνιδιών της Bethesda, συμβατό με όλες τις πλατφόρμες.
+about-description = Ένα εργαλείο δημιουργίας εγκαταστατών FOMOD για mods οποιουδήποτε παιχνιδιού που μπορούν να διαχειριστούν το Vortex ή το Mod Organizer 2, συμβατό με όλες τις πλατφόρμες.
 about-license = Υπό την άδεια MIT
 about-copyright = © 2025-2026 Ομάδα XIMOD
 about-credit = Rust θύρα του αρχικού εργαλείου από την Wenderer:
@@ -892,6 +892,7 @@ preset-customise-group = Ομάδα «Προσαρμογή»:
 preset-customise-label = Επιλογή «Προσαρμογή» ({ "{name}" } = όνομα σελίδας):
 preset-flag = Σημαία προεπιλογής:
 preset-none-name = Επιλογή «Καμία»:
+preset-no-preset-name = Επιλογή «Καμία προεπιλογή»:
 preset-add-none = Προσθήκη επιλογής «Καμία» στις ομάδες αποκλειστικής επιλογής
 preset-presets = Προεπιλογές
 preset-add = Προσθήκη προεπιλογής
@@ -923,6 +924,7 @@ preset-default-group = Προεπιλογή
 preset-default-customise = Προσαρμογή
 preset-default-customise-label = Προσαρμογή { "{name}" }
 preset-default-none = Καμία
+preset-default-no-preset = Καμία προεπιλογή (δική μου σύνθεση)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Ορίζει έναν προορισμό εγκατάστασης για κάθε απαιτούμενο αρχείο.
@@ -979,7 +981,7 @@ msg-relinked = Ενημερώθηκαν { $num } αναφορά(-ές).
 files-dest-hint = (ρίζα του Data)
 files-dest-tooltip = Διαδρομή εγκατάστασης σχετική με τον φάκελο Data του παιχνιδιού, για παράδειγμα SKSE\Plugins. Αφήστε το κενό για εγκατάσταση στη ρίζα του Data. Κάντε κλικ στο κελί για να το επεξεργαστείτε.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Ορίζει με μία κίνηση έναν προορισμό εγκατάστασης για κάθε αρχείο κάθε συνόλου υπό συνθήκη.
 btn-apply-all-cond-dest = Εφαρμογή σε όλα τα σύνολα υπό συνθήκη
 preset-rebuild-hint = Αυτό το έργο περιέχει ήδη μια δομή που δημιούργησε ο οδηγός: οι σελίδες, τα ονόματα και οι προεπιλογές της έχουν φορτωθεί παρακάτω. Η «Εφαρμογή» την ανακατασκευάζει με τις αλλαγές σας και διατηρεί τα ονόματα των σημαιών.

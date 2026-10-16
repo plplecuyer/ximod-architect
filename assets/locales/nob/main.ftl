@@ -162,7 +162,7 @@ status-settings-saved = Innstillingene ble lagret
 
 # About Dialog
 about-title = Om XIMOD Architect
-about-description = Et plattformuavhengig verktøy for å lage FOMOD-installatører for Bethesda-spillmodder.
+about-description = Et plattformuavhengig verktøy for å lage FOMOD-installatører for modder til alle spill som Vortex eller Mod Organizer 2 kan håndtere.
 about-license = Lisensiert under MIT-lisensen
 about-copyright = © 2024 XIMOD Team
 about-credit = Rust-portering av det originale verktøyet av Wenderer:
@@ -892,6 +892,7 @@ preset-customise-group = Gruppen «Tilpass»:
 preset-customise-label = Alternativet «Tilpass» ({ "{name}" } = sidenavn):
 preset-flag = Forhåndsinnstillingsflagg:
 preset-none-name = Alternativet «Ingen»:
+preset-no-preset-name = Alternativet «Ingen forhåndsinnstilling»:
 preset-add-none = Legg til et «Ingen»-alternativ i grupper med eksklusivt valg
 preset-presets = Forhåndsinnstillinger
 preset-add = Legg til forhåndsinnstilling
@@ -923,6 +924,7 @@ preset-default-group = Forhåndsinnstilling
 preset-default-customise = Tilpass
 preset-default-customise-label = Tilpass { "{name}" }
 preset-default-none = Ingen
+preset-default-no-preset = Ingen forhåndsinnstilling (sett sammen selv)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Angir ett installasjonsmål for hver påkrevde fil.
@@ -979,7 +981,7 @@ msg-relinked = { $num } referanse(r) oppdatert.
 files-dest-hint = (roten av Data)
 files-dest-tooltip = Installasjonsbane relativt til spillets Data-mappe, for eksempel SKSE\Plugins. La stå tomt for å installere i roten av Data. Klikk på cellen for å redigere den.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Angir ett installasjonsmål for hver fil i hvert betinget sett på én gang.
 btn-apply-all-cond-dest = Bruk på alle betingede sett
 preset-rebuild-hint = Dette prosjektet inneholder allerede en struktur laget av veiviseren: sidene, navnene og forhåndsinnstillingene er lastet inn nedenfor. «Bruk» bygger den opp på nytt med endringene dine og beholder flaggnavnene.

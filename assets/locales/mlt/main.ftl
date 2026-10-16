@@ -162,7 +162,7 @@ status-settings-saved = Is-settings ġew salvati b'suċċess
 
 # About Dialog
 about-title = Dwar XIMOD Architect
-about-description = Għodda ta' ħolqien ta' installatur FOMOD multiplatform għall-mods tal-logħob ta' Bethesda.
+about-description = Għodda ta' ħolqien ta' installatur FOMOD multiplatform għall-mods ta' kwalunkwe logħba li Vortex jew Mod Organizer 2 jistgħu jimmaniġġjaw.
 about-license = Liċenzjat taħt il-Liċenzja MIT
 about-copyright = © 2025-2026 Tim XIMOD
 about-credit = Rust port tal-għodda oriġinali minn Wenderer:
@@ -892,6 +892,7 @@ preset-customise-group = Grupp Ippersonalizza:
 preset-customise-label = Għażla Ippersonalizza ({ "{name}" } = isem il-paġna):
 preset-flag = Flag tal-preset:
 preset-none-name = Għażla "Xejn":
+preset-no-preset-name = Għażla "L-ebda preset":
 preset-add-none = Żid għażla "Xejn" mal-gruppi ta' għażla esklussiva
 preset-presets = Presets
 preset-add = Żid preset
@@ -923,6 +924,7 @@ preset-default-group = Preset
 preset-default-customise = Ippersonalizza
 preset-default-customise-label = Ippersonalizza { "{name}" }
 preset-default-none = Xejn
+preset-default-no-preset = L-ebda preset (nagħżel kollox jien)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Jissettja destinazzjoni waħda tal-installazzjoni għal kull fajl meħtieġ.
@@ -979,7 +981,7 @@ msg-relinked = { $num } referenza/i aġġornata/i.
 files-dest-hint = (ir-radika ta' Data)
 files-dest-tooltip = Mogħdija tal-installazzjoni relattiva għall-folder Data tal-logħba, pereżempju SKSE\Plugins. Ħalliha vojta biex tinstalla fir-radika ta' Data. Ikklikkja fuq iċ-ċellola biex teditjaha.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Jissettja f'daqqa destinazzjoni waħda tal-installazzjoni għal kull fajl ta' kull sett kundizzjonali.
 btn-apply-all-cond-dest = Applika għas-settijiet kundizzjonali kollha
 preset-rebuild-hint = Dan il-proġett diġà fih struttura maħluqa mill-assistent: il-paġni, l-ismijiet u l-presets tagħha huma mgħobbija hawn taħt. Applika jerġa' jibniha bil-bidliet tiegħek u jżomm l-ismijiet tal-flags.

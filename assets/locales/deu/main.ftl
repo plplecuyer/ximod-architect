@@ -162,7 +162,7 @@ status-settings-saved = Einstellungen erfolgreich gespeichert
 
 # About Dialog
 about-title = Über XIMOD Architect
-about-description = Ein plattformübergreifendes Werkzeug zur Erstellung von FOMOD-Installern für Bethesda-Spielmods.
+about-description = Ein plattformübergreifendes Werkzeug zur Erstellung von FOMOD-Installern für Mods jedes Spiels, das Vortex oder Mod Organizer 2 verwalten kann.
 about-license = Lizenziert unter der MIT-Lizenz
 about-copyright = © 2024 XIMOD-Team
 about-credit = Rust-Portierung des Original-Tools von Wenderer:
@@ -892,6 +892,7 @@ preset-customise-group = Gruppe „Anpassen“:
 preset-customise-label = Option „Anpassen“ ({ "{name}" } = Seitenname):
 preset-flag = Preset-Flag:
 preset-none-name = Option „Keine“:
+preset-no-preset-name = Option „Kein Preset“:
 preset-add-none = Option „Keine“ zu Gruppen mit exklusiver Auswahl hinzufügen
 preset-presets = Presets
 preset-add = Preset hinzufügen
@@ -923,6 +924,7 @@ preset-default-group = Preset
 preset-default-customise = Anpassen
 preset-default-customise-label = { "{name}" } anpassen
 preset-default-none = Keine
+preset-default-no-preset = Kein Preset (selbst zusammenstellen)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Legt ein Installationsziel für jede erforderliche Datei fest.
@@ -979,7 +981,7 @@ msg-relinked = { $num } Verweis(e) aktualisiert.
 files-dest-hint = (Stammordner von Data)
 files-dest-tooltip = Installationspfad relativ zum Data-Ordner des Spiels, zum Beispiel SKSE\Plugins. Leer lassen, um im Stammordner von Data zu installieren. Klicken Sie auf die Zelle, um sie zu bearbeiten.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Legt auf einmal ein Installationsziel für jede Datei jedes bedingten Satzes fest.
 btn-apply-all-cond-dest = Auf alle bedingten Sätze anwenden
 preset-rebuild-hint = Dieses Projekt enthält bereits eine vom Assistenten erstellte Struktur: Ihre Seiten, Namen und Presets sind unten geladen. „Anwenden“ baut sie mit Ihren Änderungen neu auf und behält die Flag-Namen bei.

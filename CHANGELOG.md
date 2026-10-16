@@ -4,6 +4,61 @@ All notable changes to XIMOD Architect are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [2.2.1] — 2026-10-16
+
+Bug fixes and three additions for the preset wizard and for installers built
+with it, after testing by TheRealDoctorNormal on a real installer of more
+than 40 pages.
+
+### Added
+
+- Preset wizard, run again on a project it already transformed: the window
+  opens with the existing pages, names and presets loaded, and Apply rebuilds
+  the structure (one undoable edit) instead of stacking a second one on top of
+  the first; the flag names stay the same, so a mod update keeps working.
+- Conditional Installs tab: one destination for every file of every
+  conditional set at once. The group and page destination controls now also
+  reach the files the preset wizard moved to conditional installs (the sets
+  fed by the options of the group or page).
+- Preset wizard: the Preset group is a single choice ending with a "No preset
+  (build my own)" option, for users who want to pick everything from the
+  Customise pages; its name is set in the wizard.
+
+### Fixed
+
+- Exported ZIP archives (and translation packages) dated every file
+  1980-01-01: each entry now keeps its file's modification date, so the files
+  a mod manager deploys show their real date. 7z archives already did.
+- Preset wizard — installers it generated could install the files a preset
+  chose on a feature page the user had opened and then hidden again by going
+  back to the first page (the mod manager keeps that page's flags). Every
+  Customise flag is now set explicitly on the first page — off by the chosen
+  preset or by the new "No preset (build my own)" option, on by the Customise
+  option — and each file is installed only when its page is customised and
+  the option is ticked there, or when the page is not customised and the
+  chosen preset picked it. The Preset group becomes a single choice.
+- Preset wizard — exclusive groups of type SelectAtMostOne showed two "None"
+  options in Vortex (the wizard's and the manager's own): a group that
+  receives the wizard's None becomes SelectExactlyOne.
+
+### Changed
+
+- 33 interface languages: the 5 new strings are translated in every locale
+  (868 messages per locale). Test suite at 344 tests.
+- Dependencies refreshed: zip 9.0.4 (every 2.x release of the crate has
+  been withdrawn from crates.io, which made `cargo update` fail), arboard
+  3.7.0, combine 4.6.9, equivalent 1.0.3, rustls 0.23.46, tokio 1.53.3,
+  zerocopy 0.8.63; windows-sys 0.60 and its target crates are no longer
+  pulled in.
+- XIMOD is described as a tool for the mods of any game that Vortex or Mod
+  Organizer 2 can manage, no longer for Bethesda games only: About window (33
+  languages), package description, Linux desktop entry, README, manual cover
+  and § 1.1 (32 languages), release notes.
+- User manual (32 languages): § 4.2, § 4.4 and § 8.29 document the new
+  destination controls and running the wizard again; § 7.5 explains what
+  happens when the user goes back in the installer, and § 8.29 describes
+  the No preset option and how the files follow the first page.
+
 ## [2.2.0] — 2026-10-14
 
 Three additions suggested by Wenderer, author of the original FOMOD Creation
@@ -38,26 +93,12 @@ Krou705).
 - The "Created with…" comment at the top of info.xml and ModuleConfig.xml now
   carries the application's Nexus page, as the original FOMOD Creation Tool
   did.
-- Preset wizard, run again on a project it already transformed: the window
-  opens with the existing pages, names and presets loaded, and Apply rebuilds
-  the structure (one undoable edit) instead of stacking a second one on top of
-  the first; the flag names stay the same, so a mod update keeps working.
-- Conditional Installs tab: one destination for every file of every
-  conditional set at once. The group and page destination controls now also
-  reach the files the preset wizard moved to conditional installs (the sets
-  fed by the options of the group or page).
-
-### Fixed
-
-- Exported ZIP archives (and translation packages) dated every file
-  1980-01-01: each entry now keeps its file's modification date, so the files
-  a mod manager deploys show their real date. 7z archives already did.
 
 ### Changed
 
-- 33 interface languages: the 48 new strings are translated in every locale
-  (866 messages per locale); Chinese "Duplicate" becomes 创建副本 so that it
-  differs from the new "Copy" (复制). Test suite at 342 tests.
+- 33 interface languages: the 45 new strings are translated in every locale
+  (863 messages per locale); Chinese "Duplicate" becomes 创建副本 so that it
+  differs from the new "Copy" (复制).
 - Interface labels reviewed in every language: 128 labels corrected (typos,
   incomplete phrases, a verb form out of line with the rest of its menu, one
   concept translated two ways, a space before "…", "..." instead of "…"),
@@ -66,9 +107,6 @@ Krou705).
 - One term per concept, in the interface and the manual: "flag" is drapeau
   (French), bandera (Spanish), bandeira (Portuguese) and pavilion (Romanian);
   an installation step is tappa (Italian); an option is opció (Hungarian).
-- Dependencies refreshed: arboard 3.7.0, combine 4.6.9, equivalent 1.0.3,
-  rustls 0.23.46, tokio 1.53.3, zerocopy 0.8.63; windows-sys 0.60 and its
-  target crates are no longer pulled in.
 - User manual (32 languages): § 1.1 now says that FOMOD is a mod-manager
   format — installers work with every Bethesda game and most other games that
   Vortex or Mod Organizer 2 can manage; the built-in game list only fills in

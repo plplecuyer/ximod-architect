@@ -162,7 +162,7 @@ status-settings-saved = Sábháilte na socruithe go rathúil
 
 # About Dialog
 about-title = Faoi XIMOD Architect
-about-description = Uirlis tras-ardáin chun suiteálaithe FOMOD a chruthú do mhodhnuithe ar chluichí Bethesda.
+about-description = Uirlis tras-ardáin chun suiteálaithe FOMOD a chruthú do mhodhnuithe ar aon chluiche is féidir le Vortex nó Mod Organizer 2 a bhainistiú.
 about-license = Ceadúnaithe faoin gCeadúnas MIT
 about-copyright = © 2025-2026 Foireann XIMOD
 about-credit = Port Rust den uirlis bhunaidh ag Wenderer:
@@ -892,6 +892,7 @@ preset-customise-group = Grúpa Saincheap:
 preset-customise-label = Rogha Saincheap ({ "{name}" } = ainm an leathanaigh):
 preset-flag = Bratach an réamhshocraithe:
 preset-none-name = Rogha “Ceann ar bith”:
+preset-no-preset-name = Rogha “Gan réamhshocrú”:
 preset-add-none = Cuir rogha “Ceann ar bith” le grúpaí rogha eisiaí
 preset-presets = Réamhshocruithe
 preset-add = Cuir réamhshocrú leis
@@ -923,6 +924,7 @@ preset-default-group = Réamhshocrú
 preset-default-customise = Saincheap
 preset-default-customise-label = Saincheap { "{name}" }
 preset-default-none = Ceann ar bith
+preset-default-no-preset = Gan réamhshocrú (mo rogha féin)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Socraíonn sé sprioc shuiteála amháin do gach comhad riachtanach.
@@ -979,7 +981,7 @@ msg-relinked = Tagairtí nuashonraithe: { $num }.
 files-dest-hint = (fréamh Data)
 files-dest-tooltip = Conair suiteála coibhneasta le fillteán Data an chluiche, mar shampla SKSE\Plugins. Fág folamh chun suiteáil i bhfréamh Data. Cliceáil ar an gcill chun í a chur in eagar.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Socraíonn sé sprioc shuiteála amháin do gach comhad de gach tacar coinníollach d'aon iarraidh.
 btn-apply-all-cond-dest = Cuir i bhfeidhm ar gach tacar coinníollach
 preset-rebuild-hint = Tá struchtúr a chruthaigh an treoraí sa tionscadal seo cheana: tá a leathanaigh, a ainmneacha agus a réamhshocruithe luchtaithe thíos. Atógann “Cuir i bhfeidhm” é le d'athruithe agus coinníonn sé ainmneacha na mbratach.

@@ -80,6 +80,7 @@ impl PresetWizardState {
             customise_label: i18n.t("preset-default-customise-label"),
             preset_flag: "preset".to_string(),
             none_name: i18n.t("preset-default-none"),
+            no_preset_name: i18n.t("preset-default-no-preset"),
             add_none: true,
         };
         self.selected = vec![false; step_count];
@@ -210,6 +211,7 @@ struct Texts {
     customise_label: String,
     flag: String,
     none_name: String,
+    no_preset_name: String,
     add_none: String,
     presets: String,
     add: String,
@@ -253,6 +255,7 @@ impl Texts {
             customise_label: i.t("preset-customise-label"),
             flag: i.t("preset-flag"),
             none_name: i.t("preset-none-name"),
+            no_preset_name: i.t("preset-no-preset-name"),
             add_none: i.t("preset-add-none"),
             presets: i.t("preset-presets"),
             add: i.t("preset-add"),
@@ -480,6 +483,9 @@ impl XimodApp {
                                         ui.end_row();
                                         ui.label(&t.none_name);
                                         ui.text_edit_singleline(&mut st.settings.none_name);
+                                        ui.end_row();
+                                        ui.label(&t.no_preset_name);
+                                        ui.text_edit_singleline(&mut st.settings.no_preset_name);
                                         ui.end_row();
                                     });
                                 ui.checkbox(&mut st.settings.add_none, &t.add_none);
@@ -815,6 +821,10 @@ mod tests {
         presets::unapply(&mut work);
         presets::apply(&mut work, &plan).unwrap();
         assert_eq!(work.steps.len(), 2, "still one installation-mode step");
-        assert_eq!(work.steps[0].plugin_groups[0].plugins.len(), 2);
+        assert_eq!(
+            work.steps[0].plugin_groups[0].plugins.len(),
+            3,
+            "two presets + No preset"
+        );
     }
 }

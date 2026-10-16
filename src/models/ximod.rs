@@ -1165,8 +1165,8 @@ impl Ximod {
     }
 
     /// Indices of the conditional sets "fed" by the options of a group (or a
-    /// whole step when `group` is `None`): sets whose condition is a single
-    /// flag test `flag == value` that one of those options sets. This is what
+    /// whole step when `group` is `None`): sets whose files install on a
+    /// flag `flag == value` that one of those options sets. This is what
     /// the preset wizard produces when it moves an option's files to
     /// conditional installs, so the group / page destination controls can keep
     /// working on those files.
@@ -1186,12 +1186,7 @@ impl Ximod {
         self.conditional_files
             .iter()
             .enumerate()
-            .filter(|(_, set)| {
-                set.condition.items.len() == 1
-                    && set.condition.items[0]
-                        .as_leaf()
-                        .is_some_and(|d| d.is_flag() && set_by.contains(&(d.name.as_str(), d.value.as_str())))
-            })
+            .filter(|(_, set)| crate::models::presets::wizard_key(&set.condition).is_some_and(|k| set_by.contains(&k)))
             .map(|(i, _)| i)
             .collect()
     }

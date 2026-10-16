@@ -162,7 +162,7 @@ status-settings-saved = Seaded salvestati edukalt
 
 # About Dialog
 about-title = Teave XIMOD Architecti kohta
-about-description = Platvormiülene FOMOD-installeri loomise tööriist Bethesda mängude modifikatsioonidele.
+about-description = Platvormiülene FOMOD-installeri loomise tööriist kõigi selliste mängude modifikatsioonidele, mida Vortex või Mod Organizer 2 suudab hallata.
 about-license = Litsentsitud MIT-litsentsi alusel
 about-copyright = © 2025–2026 XIMOD Team
 about-credit = Wenderer originaaltööriista Rust port:
@@ -892,6 +892,7 @@ preset-customise-group = Rühm „Kohanda“:
 preset-customise-label = Valik „Kohanda“ ({ "{name}" } = lehe nimi):
 preset-flag = Eelseadistuse lipp:
 preset-none-name = Valik „Mitte ükski“:
+preset-no-preset-name = Valik „Eelseadistuseta“:
 preset-add-none = Lisa valik „Mitte ükski“ ainuvaliku rühmadesse
 preset-presets = Eelseadistused
 preset-add = Lisa eelseadistus
@@ -923,6 +924,7 @@ preset-default-group = Eelseadistus
 preset-default-customise = Kohanda
 preset-default-customise-label = Kohanda: { "{name}" }
 preset-default-none = Mitte ükski
+preset-default-no-preset = Eelseadistuseta (koosta ise)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Määrab ühe paigalduse sihtkoha igale nõutavale failile.
@@ -979,7 +981,7 @@ msg-relinked = Uuendatud viiteid: { $num }.
 files-dest-hint = (Data juurkaust)
 files-dest-tooltip = Paigaldustee mängu Data-kausta suhtes, näiteks SKSE\Plugins. Jätke tühjaks, et paigaldada Data juurkausta. Klõpsake lahtril, et seda muuta.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Määrab korraga ühe paigalduse sihtkoha iga tingimusliku komplekti igale failile.
 btn-apply-all-cond-dest = Rakenda kõigile tingimuslikele komplektidele
 preset-rebuild-hint = Selles projektis on juba viisardi loodud struktuur: selle lehed, nimed ja eelseadistused on allpool laaditud. „Rakenda“ ehitab selle teie muudatustega uuesti üles ja säilitab lippude nimed.

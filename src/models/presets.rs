@@ -4,15 +4,18 @@
 //! The idea is to separate deciding from installing:
 //!
 //! * a new first step, the *installation mode*, holds a **Preset** group (one
-//!   option per preset, which only sets flags) and a **Customise** group (one
-//!   option per feature page, which opens that page and resets its flags);
+//!   option per preset plus "No preset", exactly one to choose, which only
+//!   set flags) and a **Customise** group (one option per feature page, which
+//!   opens that page and resets its flags);
 //! * every feature page becomes visible only when its Customise option is
 //!   ticked; each of its options sets the feature's flag and is marked
 //!   *Recommended* — pre-ticked — when a preset that chose it is active;
-//! * the files of those options move to conditional installs keyed on the
-//!   final flag values, so one flag per feature (or per option in a
-//!   multi-selection group) is the single source of truth and nothing is ever
-//!   installed twice.
+//! * the files of those options move to conditional installs: installed
+//!   when the page is customised and the option is ticked there, or when the
+//!   page is not customised and the chosen preset picked the option — so
+//!   nothing is ever installed twice, and a page the user opened and then
+//!   hid again by going back (its flags may linger in the mod manager) can
+//!   no longer install anything.
 //!
 //! Exclusive groups (*SelectExactlyOne* / *SelectAtMostOne*) get one flag with
 //! one value per option (plus `none`); multi-selection groups get one `on/off`
@@ -42,6 +45,9 @@ pub struct PresetSettings {
     pub preset_flag: String,
     /// Name of the "None" option added to exclusive groups.
     pub none_name: String,
+    /// Name of the option of the Preset group that picks no preset (the user
+    /// builds everything from the Customise pages).
+    pub no_preset_name: String,
     /// Whether to add that "None" option to exclusive groups.
     pub add_none: bool,
 }
@@ -55,6 +61,7 @@ impl Default for PresetSettings {
             customise_label: "Customise {name}".into(),
             preset_flag: "preset".into(),
             none_name: "None".into(),
+            no_preset_name: "No preset (build my own)".into(),
             add_none: true,
         }
     }
@@ -161,9 +168,55 @@ fn is_exclusive(t: SelectionType) -> bool {
     matches!(t, SelectionType::SelectExactlyOne | SelectionType::SelectAtMostOne)
 }
 
-/// `flag == value` as a one-leaf And group.
-fn flag_is(flag: &str, value: &str) -> DependencyGroup {
-    DependencyGroup::from_leaves(LogicalOperator::And, vec![Dependency::new_flag(flag, value)])
+/// Value of the preset flag set by the "No preset" option.
+const NO_PRESET: &str = "none";
+
+/// When the files of an option are installed (see the module docs):
+/// `(cust == on AND flag == value) OR (cust == off AND preset ∈ choosers)`.
+///
+/// The Customise flag is set explicitly on the first page every time (`off`
+/// by the chosen preset or "No preset", `on` by the Customise option, which
+/// comes later on the same page), so it always reflects the user's current
+/// choice. A feature page the user visited and then hid again by going back
+/// may keep its flags in the mod manager; keying the files on the Customise
+/// flag makes those stale flags harmless — the preset decides again.
+fn install_condition(cust: &str, flag: &str, value: &str, preset_flag: &str, choosers: &[&str]) -> DependencyGroup {
+    let customised = DependencyGroup::from_leaves(
+        LogicalOperator::And,
+        vec![Dependency::new_flag(cust, "on"), Dependency::new_flag(flag, value)],
+    );
+    if choosers.is_empty() {
+        return customised;
+    }
+    let mut from_preset = DependencyGroup::new(LogicalOperator::And);
+    from_preset.push_leaf(Dependency::new_flag(cust, "off"));
+    if choosers.len() == 1 {
+        from_preset.push_leaf(Dependency::new_flag(preset_flag, choosers[0]));
+    } else {
+        from_preset.push_group(preset_in(preset_flag, choosers));
+    }
+    let mut root = DependencyGroup::new(LogicalOperator::Or);
+    root.push_group(customised);
+    root.push_group(from_preset);
+    root
+}
+
+/// The option flag a conditional set built by the wizard installs on:
+/// `flag == value` alone (structures made before 2.2.1) or the customised
+/// branch `cust == on AND flag == value` of [`install_condition`].
+pub(crate) fn wizard_key(cond: &DependencyGroup) -> Option<(&str, &str)> {
+    if let Some(k) = single_flag(cond) {
+        return Some(k);
+    }
+    let branch = match cond.operator {
+        LogicalOperator::Or => cond.items.first()?.as_group()?,
+        LogicalOperator::And => cond,
+    };
+    if branch.operator != LogicalOperator::And || branch.items.len() != 2 {
+        return None;
+    }
+    let (a, b) = (branch.items[0].as_leaf()?, branch.items[1].as_leaf()?);
+    (a.is_flag() && a.value == "on" && b.is_flag()).then_some((b.name.as_str(), b.value.as_str()))
 }
 
 /// `preset == v1 OR preset == v2 …` (a single leaf when there is one value).
@@ -208,6 +261,7 @@ pub fn validate(ximod: &Ximod, plan: &PresetPlan) -> Result<(), PresetError> {
         &s.customise_label,
         &s.preset_flag,
         &s.none_name,
+        &s.no_preset_name,
     ]
     .iter()
     .any(|t| t.trim().is_empty())
@@ -256,7 +310,8 @@ pub fn apply(ximod: &mut Ximod, plan: &PresetPlan) -> Result<PresetSummary, Pres
     let mut taken: HashSet<String> = ximod.get_all_flags().into_iter().collect();
     let preset_flag = unique(&s.preset_flag, &mut taken);
     let preset_values: Vec<String> = {
-        let mut vals = HashSet::new();
+        // "none" is the value of the "No preset" option.
+        let mut vals = HashSet::from([NO_PRESET.to_string()]);
         plan.presets
             .iter()
             .map(|p| unique(&sanitize(&p.name), &mut vals))
@@ -343,13 +398,7 @@ pub fn apply(ximod: &mut Ximod, plan: &PresetPlan) -> Result<PresetSummary, Pres
                     (gf.option_flags[pi].as_str(), "on")
                 };
                 plugin.condition_flags.push(ConditionFlag::new(flag, value));
-                if !plugin.files.is_empty() {
-                    new_sets.push(ConditionalFileSet {
-                        condition: flag_is(flag, value),
-                        files: std::mem::take(&mut plugin.files),
-                    });
-                }
-                // Recommended under every preset that chose this option.
+                // The presets that chose this option.
                 let choosers: Vec<&str> = plan
                     .presets
                     .iter()
@@ -361,6 +410,13 @@ pub fn apply(ximod: &mut Ximod, plan: &PresetPlan) -> Result<PresetSummary, Pres
                     } && *k < preset_values.len())
                     .map(|(k, _)| preset_values[k].as_str())
                     .collect();
+                if !plugin.files.is_empty() {
+                    new_sets.push(ConditionalFileSet {
+                        condition: install_condition(&ff.cust_flag, flag, value, &preset_flag, &choosers),
+                        files: std::mem::take(&mut plugin.files),
+                    });
+                }
+                // Recommended under every preset that chose it.
                 if !choosers.is_empty() {
                     plugin.dependency_patterns.push(DependencyPattern {
                         pattern_type: PluginType::Recommended.as_str().to_string(),
@@ -369,6 +425,12 @@ pub fn apply(ximod: &mut Ximod, plan: &PresetPlan) -> Result<PresetSummary, Pres
                 }
             }
             if gf.exclusive && s.add_none {
+                // Mod managers add their own "None" to SelectAtMostOne groups;
+                // with an explicit one, SelectExactlyOne means the same choice
+                // without a second "None".
+                if group.selection_type == SelectionType::SelectAtMostOne {
+                    group.selection_type = SelectionType::SelectExactlyOne;
+                }
                 // "None": recommended by default, optional under the presets
                 // that pick something in this group.
                 let mut none = Plugin::new(s.none_name.clone());
@@ -396,11 +458,20 @@ pub fn apply(ximod: &mut Ximod, plan: &PresetPlan) -> Result<PresetSummary, Pres
     ximod.conditional_files.extend(new_sets);
 
     // ---- 2) The installation-mode step
-    let mut preset_group = PluginGroup::new(s.preset_group_name.clone(), SelectionType::SelectAtMostOne);
+    // Exactly one choice on the Preset group — a preset or "No preset" — so
+    // the first page always sets the preset flag and every Customise flag
+    // explicitly (`off`; the Customise options, later on the same page, turn
+    // theirs `on`). See `install_condition`.
+    let mut preset_group = PluginGroup::new(s.preset_group_name.clone(), SelectionType::SelectExactlyOne);
+    let cust_off: Vec<ConditionFlag> = features
+        .iter()
+        .map(|ff| ConditionFlag::new(&ff.cust_flag, "off"))
+        .collect();
     for (k, p) in plan.presets.iter().enumerate() {
         let mut opt = Plugin::new(p.name.clone());
         opt.condition_flags
             .push(ConditionFlag::new(&preset_flag, &preset_values[k]));
+        opt.condition_flags.extend(cust_off.iter().cloned());
         let mut described: Vec<String> = Vec::new();
         for (f, &si) in plan.feature_steps.iter().enumerate() {
             let step = &ximod.steps[si];
@@ -443,6 +514,12 @@ pub fn apply(ximod: &mut Ximod, plan: &PresetPlan) -> Result<PresetSummary, Pres
         opt.description = described.join(" · ");
         preset_group.plugins.push(opt);
     }
+    let mut no_preset = Plugin::new(s.no_preset_name.clone());
+    no_preset
+        .condition_flags
+        .push(ConditionFlag::new(&preset_flag, NO_PRESET));
+    no_preset.condition_flags.extend(cust_off.iter().cloned());
+    preset_group.plugins.push(no_preset);
     let mut customise_group = PluginGroup::new(s.customise_group_name.clone(), SelectionType::SelectAny);
     for (f, &si) in plan.feature_steps.iter().enumerate() {
         let ff = &features[f];
@@ -589,8 +666,12 @@ pub fn unapply(ximod: &mut Ximod) -> Option<PresetPlan> {
         customise_label: "{name}".into(),
         preset_flag: preset_flag.clone(),
         none_name: PresetSettings::default().none_name,
+        no_preset_name: PresetSettings::default().no_preset_name,
         add_none: false,
     };
+    if let Some(np) = pg.plugins.iter().find(|p| p.condition_flags[0].value == NO_PRESET) {
+        settings.no_preset_name = np.name.clone();
+    }
     if let (Some(f), Some(o)) = (features.first(), cg.plugins.first()) {
         let page = &ximod.steps[f.step].name;
         if !page.is_empty() && o.name.contains(page.as_str()) {
@@ -661,7 +742,7 @@ pub fn unapply(ximod: &mut Ximod) -> Option<PresetPlan> {
                     continue;
                 }
                 for (ci, set) in ximod.conditional_files.iter().enumerate() {
-                    if moved[ci] || single_flag(&set.condition) != Some((flag.as_str(), value.as_str())) {
+                    if moved[ci] || wizard_key(&set.condition) != Some((flag.as_str(), value.as_str())) {
                         continue;
                     }
                     moved[ci] = true;
@@ -682,6 +763,7 @@ pub fn unapply(ximod: &mut Ximod) -> Option<PresetPlan> {
     let presets = pg
         .plugins
         .iter()
+        .filter(|p| p.condition_flags[0].value != NO_PRESET)
         .map(|p| {
             let set: Vec<(&str, &str)> = p
                 .condition_flags
@@ -879,7 +961,18 @@ mod tests {
         let mode = &x.steps[0];
         assert_eq!(mode.name, "Installation mode");
         assert_eq!(mode.plugin_groups[0].name, "Preset");
-        assert_eq!(mode.plugin_groups[0].selection_type, SelectionType::SelectAtMostOne);
+        assert_eq!(mode.plugin_groups[0].selection_type, SelectionType::SelectExactlyOne);
+        assert_eq!(mode.plugin_groups[0].plugins.len(), 3, "two presets + No preset");
+        let np = &mode.plugin_groups[0].plugins[2];
+        assert_eq!(np.name, "No preset (build my own)");
+        assert_eq!(
+            np.condition_flags,
+            vec![
+                ConditionFlag::new("preset", "none"),
+                ConditionFlag::new("cust_Feature_A", "off"),
+                ConditionFlag::new("cust_Feature_B", "off"),
+            ]
+        );
         assert_eq!(mode.plugin_groups[1].name, "Customise");
         let full = &mode.plugin_groups[0].plugins[0];
         assert_eq!(full.name, "Full");
@@ -893,6 +986,8 @@ mod tests {
             flags,
             vec![
                 ("preset", "Full"),
+                ("cust_Feature_A", "off"),
+                ("cust_Feature_B", "off"),
                 ("feat_Feature_A", "Version_2"),
                 ("opt_Feature_B_Extra_meshes", "on"),
                 ("opt_Feature_B_Extra_sounds", "on"),
@@ -963,7 +1058,8 @@ mod tests {
         );
         assert_eq!(x.conditional_files.len(), 3);
         let set = &x.conditional_files[2];
-        assert_eq!(leaves(&set.condition)[0].name, "opt_Feature_B_Extra_meshes");
+        assert_eq!(wizard_key(&set.condition), Some(("opt_Feature_B_Extra_meshes", "on")));
+        assert_eq!(set.condition.operator, LogicalOperator::Or);
         assert_eq!(set.files[0].source, "FeatureB/meshes");
     }
 
@@ -985,7 +1081,7 @@ mod tests {
         let mut back = Ximod::new("Back");
         crate::xml::parse_module_config_xml(&xml, &mut back).unwrap();
         assert_eq!(back.steps.len(), 3);
-        assert_eq!(back.steps[0].plugin_groups[0].plugins.len(), 2);
+        assert_eq!(back.steps[0].plugin_groups[0].plugins.len(), 3);
         assert_eq!(back.steps[1].plugin_groups[0].plugins.len(), 3);
         assert_eq!(back.conditional_files.len(), 3);
         assert_eq!(back.steps[1].plugin_groups[0].plugins[2].dependency_patterns.len(), 1);
@@ -1101,7 +1197,11 @@ mod tests {
         apply(&mut x, &again).unwrap();
         // Still one installation-mode step, the same page and flag names.
         assert_eq!(x.steps.len(), first.steps.len());
-        assert_eq!(x.steps[0].plugin_groups[0].plugins.len(), 3);
+        assert_eq!(
+            x.steps[0].plugin_groups[0].plugins.len(),
+            4,
+            "three presets + No preset"
+        );
         let mut a = first.get_all_flags();
         let mut b = x.get_all_flags();
         a.sort();
@@ -1115,5 +1215,68 @@ mod tests {
             .filter(|p| p.name == "None")
             .count();
         assert_eq!(nones, 1);
+    }
+
+    /// The files follow the user's current choice on the first page, even
+    /// when a feature page visited earlier keeps stale flags in the manager.
+    #[test]
+    fn files_follow_the_current_first_page_choice() {
+        use crate::models::simulate::group_satisfied;
+        use std::collections::{BTreeMap, HashMap};
+        let mut x = sample();
+        apply(&mut x, &plan()).unwrap();
+        let set_of = |flag: &str, value: &str| {
+            x.conditional_files
+                .iter()
+                .find(|s| wizard_key(&s.condition) == Some((flag, value)))
+                .unwrap()
+                .condition
+                .clone()
+        };
+        let v1 = set_of("feat_Feature_A", "Version_1");
+        let v2 = set_of("feat_Feature_A", "Version_2");
+        let meshes = set_of("opt_Feature_B_Extra_meshes", "on");
+        let files = BTreeMap::new();
+        let flags = |pairs: &[(&str, &str)]| -> HashMap<String, String> {
+            pairs.iter().map(|(k, v)| (k.to_string(), v.to_string())).collect()
+        };
+        // "Full" alone: its choices.
+        let f = flags(&[("preset", "Full"), ("cust_Feature_A", "off"), ("cust_Feature_B", "off")]);
+        assert!(group_satisfied(&v2, &f, &files) && !group_satisfied(&v1, &f, &files));
+        assert!(group_satisfied(&meshes, &f, &files));
+        // "Full" + Customise A, Version 1 ticked on the page: the page wins.
+        let f = flags(&[
+            ("preset", "Full"),
+            ("cust_Feature_A", "on"),
+            ("cust_Feature_B", "off"),
+            ("feat_Feature_A", "Version_1"),
+        ]);
+        assert!(group_satisfied(&v1, &f, &files) && !group_satisfied(&v2, &f, &files));
+        // Noel's case: Full + Customise A + B visited, then back to page 1,
+        // "No preset" and only Customise A. Page B's flags linger in the
+        // manager, but nothing of page B is installed any more.
+        let f = flags(&[
+            ("preset", "none"),
+            ("cust_Feature_A", "on"),
+            ("cust_Feature_B", "off"),
+            ("feat_Feature_A", "Version_1"),
+            ("opt_Feature_B_Extra_meshes", "on"),
+        ]);
+        assert!(!group_satisfied(&meshes, &f, &files));
+        assert!(group_satisfied(&v1, &f, &files));
+    }
+
+    #[test]
+    fn at_most_one_groups_get_a_single_none() {
+        let mut x = sample();
+        x.steps[0].plugin_groups[0].selection_type = SelectionType::SelectAtMostOne;
+        apply(&mut x, &plan()).unwrap();
+        let g = &x.steps[1].plugin_groups[0];
+        assert_eq!(
+            g.selection_type,
+            SelectionType::SelectExactlyOne,
+            "no extra None from the manager"
+        );
+        assert_eq!(g.plugins.iter().filter(|p| p.name == "None").count(), 1);
     }
 }

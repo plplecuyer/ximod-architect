@@ -162,7 +162,7 @@ status-settings-saved = Inställningarna sparades
 
 # About Dialog
 about-title = Om XIMOD Architect
-about-description = Ett plattformsoberoende verktyg för att skapa FOMOD-installationsprogram för Bethesda-spelmoddar.
+about-description = Ett plattformsoberoende verktyg för att skapa FOMOD-installationsprogram för moddar till alla spel som Vortex eller Mod Organizer 2 kan hantera.
 about-license = Licensierad under MIT-licensen
 about-copyright = © 2024 XIMOD Team
 about-credit = Rust-port av originalverktyget av Wenderer:
@@ -892,6 +892,7 @@ preset-customise-group = Anpassa-grupp:
 preset-customise-label = Anpassa-alternativ ({ "{name}" } = sidnamn):
 preset-flag = Förinställningsflagga:
 preset-none-name = Alternativet ”Ingen”:
+preset-no-preset-name = Alternativet ”Ingen förinställning”:
 preset-add-none = Lägg till ett ”Ingen”-alternativ i grupper med exklusivt val
 preset-presets = Förinställningar
 preset-add = Lägg till förinställning
@@ -923,6 +924,7 @@ preset-default-group = Förinställning
 preset-default-customise = Anpassa
 preset-default-customise-label = Anpassa { "{name}" }
 preset-default-none = Ingen
+preset-default-no-preset = Ingen förinställning (sätt ihop själv)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Anger ett installationsmål för varje obligatorisk fil.
@@ -979,7 +981,7 @@ msg-relinked = { $num } referens(er) uppdaterade.
 files-dest-hint = (roten av Data)
 files-dest-tooltip = Installationssökväg relativt spelets Data-mapp, till exempel SKSE\Plugins. Lämna tomt för att installera i roten av Data. Klicka på cellen för att redigera den.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Anger ett installationsmål för varje fil i varje villkorlig uppsättning på en gång.
 btn-apply-all-cond-dest = Tillämpa på alla villkorliga uppsättningar
 preset-rebuild-hint = Det här projektet innehåller redan en struktur som skapats av guiden: dess sidor, namn och förinställningar har lästs in nedan. Tillämpa bygger om den med dina ändringar och behåller flaggnamnen.

@@ -162,7 +162,7 @@ status-settings-saved = Definições guardadas com sucesso
 
 # About Dialog
 about-title = Acerca do XIMOD Architect
-about-description = Uma ferramenta multiplataforma para criar instaladores FOMOD para mods de jogos da Bethesda.
+about-description = Uma ferramenta multiplataforma para criar instaladores FOMOD para mods de qualquer jogo que o Vortex ou o Mod Organizer 2 consigam gerir.
 about-license = Licenciado sob a licença MIT
 about-copyright = © 2024 XIMOD Team
 about-credit = Portabilidade para Rust da ferramenta original de Wenderer:
@@ -892,6 +892,7 @@ preset-customise-group = Grupo Personalizar:
 preset-customise-label = Opção Personalizar ({ "{name}" } = nome da página):
 preset-flag = Bandeira da predefinição:
 preset-none-name = Opção «Nenhuma»:
+preset-no-preset-name = Opção «Sem predefinição»:
 preset-add-none = Adicionar uma opção «Nenhuma» aos grupos de escolha exclusiva
 preset-presets = Predefinições
 preset-add = Adicionar predefinição
@@ -923,6 +924,7 @@ preset-default-group = Predefinição
 preset-default-customise = Personalizar
 preset-default-customise-label = Personalizar { "{name}" }
 preset-default-none = Nenhuma
+preset-default-no-preset = Sem predefinição (escolho tudo eu)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Define um único destino de instalação para cada ficheiro obrigatório.
@@ -979,7 +981,7 @@ msg-relinked = { $num } referência(s) atualizada(s).
 files-dest-hint = (raiz de Data)
 files-dest-tooltip = Caminho de instalação relativo à pasta Data do jogo, por exemplo SKSE\Plugins. Deixe vazio para instalar na raiz de Data. Clique na célula para a editar.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Define de uma só vez um único destino de instalação para cada ficheiro de cada conjunto condicional.
 btn-apply-all-cond-dest = Aplicar a todos os conjuntos condicionais
 preset-rebuild-hint = Este projeto já contém uma estrutura criada pelo assistente: as suas páginas, nomes e predefinições estão carregados abaixo. Aplicar reconstrói-a com as suas alterações e mantém os nomes das bandeiras.

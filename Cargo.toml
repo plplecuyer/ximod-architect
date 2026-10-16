@@ -1,10 +1,10 @@
 [package]
 name = "ximod-architect"
-version = "2.2.0"
+version = "2.2.1"
 edition = "2024"
 rust-version = "1.99.0"
 authors = ["XIMOD Team"]
-description = "Cross-platform FOMOD installer creation tool for Bethesda game mods"
+description = "Cross-platform FOMOD installer creation tool for mods of any game that Vortex or Mod Organizer 2 can manage"
 license = "MIT"
 repository = "https://github.com/ximod/ximod-architect"
 keywords = ["fomod", "modding", "skyrim", "fallout", "starfield"]
@@ -43,7 +43,7 @@ chrono = "0.4"
 ureq = { version = "2", default-features = false, features = ["tls", "json"] }
 
 # Packaging translations for submission
-zip = { version = "2", default-features = false, features = ["deflate"] }
+zip = { version = "9", default-features = false, features = ["deflate-flate2-zlib-rs"] }
 # 7z export (V2): pure-Rust 7-Zip writer/reader (LZMA2)
 sevenz-rust = "0.6"
 walkdir = "2.5"

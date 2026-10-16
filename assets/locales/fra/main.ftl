@@ -162,7 +162,7 @@ status-settings-saved = Paramètres sauvegardés avec succès
 
 # About Dialog
 about-title = À propos de XIMOD Architect
-about-description = Un outil multiplateforme de création d'installeurs FOMOD pour les mods de jeux Bethesda.
+about-description = Un outil multiplateforme de création d’installeurs FOMOD pour les mods de tout jeu géré par Vortex ou Mod Organizer 2.
 about-license = Sous licence MIT
 about-copyright = © 2025-2026 Équipe XIMOD
 about-credit = Portage Rust de l’outil original de Wenderer :
@@ -892,6 +892,7 @@ preset-customise-group = Groupe Personnaliser :
 preset-customise-label = Option Personnaliser ({ "{name}" } = nom de la page) :
 preset-flag = Drapeau du preset :
 preset-none-name = Option « Aucune » :
+preset-no-preset-name = Option « Aucun preset » :
 preset-add-none = Ajouter une option « Aucune » aux groupes à choix exclusif
 preset-presets = Presets
 preset-add = Ajouter un preset
@@ -923,6 +924,7 @@ preset-default-group = Preset
 preset-default-customise = Personnaliser
 preset-default-customise-label = Personnaliser { "{name}" }
 preset-default-none = Aucune
+preset-default-no-preset = Aucun preset (tout composer)
 
 # --- Destination groupée dans les onglets Fichiers requis / Installations conditionnelles
 req-dest-hint = Définit une seule destination d'installation pour tous les fichiers requis.
@@ -979,7 +981,7 @@ msg-relinked = { $num } référence(s) mise(s) à jour.
 files-dest-hint = (racine de Data)
 files-dest-tooltip = Chemin d'installation relatif au dossier Data du jeu, par exemple SKSE\Plugins. Laissez vide pour installer à la racine de Data. Cliquez dans la cellule pour la modifier.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Définit d'un coup une destination d'installation pour tous les fichiers de tous les ensembles conditionnels.
 btn-apply-all-cond-dest = Appliquer à tous les ensembles conditionnels
 preset-rebuild-hint = Ce projet contient déjà une structure créée par l'assistant : ses pages, ses noms et ses presets sont chargés ci-dessous. Appliquer la reconstruit avec vos modifications et conserve les noms des drapeaux.

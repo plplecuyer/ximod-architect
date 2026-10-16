@@ -505,7 +505,7 @@ mod tests {
     fn zip_names(path: &Path) -> Vec<String> {
         let zip = zip::ZipArchive::new(std::fs::File::open(path).unwrap()).unwrap();
         (0..zip.len())
-            .map(|i| zip.name_for_index(i).unwrap().to_string())
+            .map(|i| zip.name_for_index(i).unwrap().unwrap().into_owned())
             .collect()
     }
 

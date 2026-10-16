@@ -162,7 +162,7 @@ status-settings-saved = Postavke su uspješno spremljene
 
 # About Dialog
 about-title = O programu XIMOD Architect
-about-description = Višeplatformski alat za izradu FOMOD instalatera za modove za igre tvrtke Bethesda.
+about-description = Višeplatformski alat za izradu FOMOD instalatera za modove za bilo koju igru kojom mogu upravljati Vortex ili Mod Organizer 2.
 about-license = Pod MIT licencom
 about-copyright = © 2025-2026 XIMOD Team
 about-credit = Rust port originalnog alata od Wenderer:
@@ -892,6 +892,7 @@ preset-customise-group = Grupa Prilagodi:
 preset-customise-label = Opcija Prilagodi ({ "{name}" } = naziv stranice):
 preset-flag = Zastavica preseta:
 preset-none-name = Opcija „Ništa“:
+preset-no-preset-name = Opcija „Bez preseta“:
 preset-add-none = Dodaj opciju „Ništa“ u grupe s isključivim izborom
 preset-presets = Preseti
 preset-add = Dodaj preset
@@ -923,6 +924,7 @@ preset-default-group = Preset
 preset-default-customise = Prilagodi
 preset-default-customise-label = Prilagodi { "{name}" }
 preset-default-none = Ništa
+preset-default-no-preset = Bez preseta (vlastiti odabir)
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Postavlja jedno odredište instalacije za svaku obaveznu datoteku.
@@ -979,7 +981,7 @@ msg-relinked = Ažurirano referenci: { $num }.
 files-dest-hint = (korijen mape Data)
 files-dest-tooltip = Putanja instalacije u odnosu na mapu Data igre, na primjer SKSE\Plugins. Ostavite prazno za instalaciju u korijen mape Data. Kliknite ćeliju da biste je uredili.
 
-# --- 2.2.0: destinations after the preset wizard
+# --- 2.2.1: destinations after the preset wizard
 cond-all-dest-hint = Postavlja jedno odredište instalacije za svaku datoteku svakog uvjetnog skupa odjednom.
 btn-apply-all-cond-dest = Primijeni na sve uvjetne skupove
 preset-rebuild-hint = Ovaj projekt već sadrži strukturu koju je stvorio čarobnjak: njezine stranice, nazivi i preseti učitani su u nastavku. „Primijeni“ je ponovno gradi s vašim izmjenama i zadržava nazive zastavica.
