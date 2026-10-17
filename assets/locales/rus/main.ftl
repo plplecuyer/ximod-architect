@@ -888,8 +888,8 @@ preset-no-steps = В проекте пока нет ни одного шага: 
 preset-names = Генерируемые имена
 preset-mode-step = Шаг «Режим установки»:
 preset-group = Группа пресетов:
-preset-customise-group = Группа «Настроить»:
-preset-customise-label = Опция «Настроить» ({ "{name}" } = имя страницы):
+preset-use-preset-name = Опция «По пресету»:
+preset-customise-label = Опция «Настроить» ({ "{name}" } = имя страницы, необязательно):
 preset-flag = Флаг пресета:
 preset-none-name = Опция «Нет»:
 preset-no-preset-name = Опция «Без пресета»:
@@ -922,9 +922,9 @@ preset-skel-none = Введите хотя бы одну функцию с им�
 preset-default-mode-step = Режим установки
 preset-default-group = Пресет
 preset-default-customise = Настроить
-preset-default-customise-label = Настроить { "{name}" }
 preset-default-none = Нет
 preset-default-no-preset = Без пресета (своя сборка)
+preset-default-use-preset = Следовать выбору пресета
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Задаёт одно место установки для каждого обязательного файла.

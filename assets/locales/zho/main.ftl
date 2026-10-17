@@ -888,8 +888,8 @@ preset-no-steps = 项目尚无任何步骤：请使用“新建骨架”选项�
 preset-names = 生成的名称
 preset-mode-step = “安装模式”步骤：
 preset-group = 预设组：
-preset-customise-group = “自定义”组：
-preset-customise-label = “自定义”选项（{ "{name}" } = 页面名称）：
+preset-use-preset-name = “沿用预设”选项：
+preset-customise-label = “自定义”选项（{ "{name}" } = 页面名称，可选）：
 preset-flag = 预设标志：
 preset-none-name = “无”选项：
 preset-no-preset-name = “无预设”选项：
@@ -922,9 +922,9 @@ preset-skel-none = 请至少输入一个带有名称和变体的功能。
 preset-default-mode-step = 安装模式
 preset-default-group = 预设
 preset-default-customise = 自定义
-preset-default-customise-label = 自定义 { "{name}" }
 preset-default-none = 无
 preset-default-no-preset = 无预设（自行搭配）
+preset-default-use-preset = 沿用预设的选择
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = 为每个必需文件设置单一安装目标位置。

@@ -888,8 +888,8 @@ preset-no-steps = Projekt još nema nijedan korak: pomoću kartice „Novi kostu
 preset-names = Generirani nazivi
 preset-mode-step = Korak načina instalacije:
 preset-group = Grupa preseta:
-preset-customise-group = Grupa Prilagodi:
-preset-customise-label = Opcija Prilagodi ({ "{name}" } = naziv stranice):
+preset-use-preset-name = Opcija „Koristi preset“:
+preset-customise-label = Opcija Prilagodi ({ "{name}" } = naziv stranice, neobavezno):
 preset-flag = Zastavica preseta:
 preset-none-name = Opcija „Ništa“:
 preset-no-preset-name = Opcija „Bez preseta“:
@@ -922,9 +922,9 @@ preset-skel-none = Unesite barem jednu značajku s nazivom i varijantom.
 preset-default-mode-step = Način instalacije
 preset-default-group = Preset
 preset-default-customise = Prilagodi
-preset-default-customise-label = Prilagodi { "{name}" }
 preset-default-none = Ništa
 preset-default-no-preset = Bez preseta (vlastiti odabir)
+preset-default-use-preset = Koristi izbore preseta
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Postavlja jedno odredište instalacije za svaku obaveznu datoteku.

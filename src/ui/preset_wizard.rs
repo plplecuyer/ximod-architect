@@ -67,6 +67,8 @@ pub struct PresetWizardState {
     /// detected: the page list and the matrix refer to it, and Apply rebuilds
     /// the structure instead of stacking a second one on top of the first.
     pub base: Option<crate::models::Ximod>,
+    /// Where the installation-mode step goes (kept from an earlier run).
+    pub mode_step_at: usize,
 }
 
 impl PresetWizardState {
@@ -76,13 +78,14 @@ impl PresetWizardState {
         self.settings = PresetSettings {
             mode_step_name: i18n.t("preset-default-mode-step"),
             preset_group_name: i18n.t("preset-default-group"),
-            customise_group_name: i18n.t("preset-default-customise"),
-            customise_label: i18n.t("preset-default-customise-label"),
+            use_preset_name: i18n.t("preset-default-use-preset"),
+            customise_label: i18n.t("preset-default-customise"),
             preset_flag: "preset".to_string(),
             none_name: i18n.t("preset-default-none"),
             no_preset_name: i18n.t("preset-default-no-preset"),
             add_none: true,
         };
+        self.mode_step_at = 0;
         self.selected = vec![false; step_count];
         if self.presets.is_empty() {
             self.presets.push(PresetRow {
@@ -107,6 +110,7 @@ impl PresetWizardState {
     /// pages and its presets with their choices.
     pub fn load_existing(&mut self, plan: &PresetPlan, step_count: usize) {
         self.settings = plan.settings.clone();
+        self.mode_step_at = plan.mode_step_at;
         self.selected = vec![false; step_count];
         for &si in &plan.feature_steps {
             if si < step_count {
@@ -173,6 +177,7 @@ impl PresetWizardState {
             settings: self.settings.clone(),
             feature_steps,
             presets,
+            mode_step_at: self.mode_step_at,
         }
     }
 
@@ -207,7 +212,7 @@ struct Texts {
     names: String,
     mode_step: String,
     group: String,
-    customise_group: String,
+    use_preset_name: String,
     customise_label: String,
     flag: String,
     none_name: String,
@@ -251,7 +256,7 @@ impl Texts {
             names: i.t("preset-names"),
             mode_step: i.t("preset-mode-step"),
             group: i.t("preset-group"),
-            customise_group: i.t("preset-customise-group"),
+            use_preset_name: i.t("preset-use-preset-name"),
             customise_label: i.t("preset-customise-label"),
             flag: i.t("preset-flag"),
             none_name: i.t("preset-none-name"),
@@ -472,8 +477,8 @@ impl XimodApp {
                                         ui.label(&t.group);
                                         ui.text_edit_singleline(&mut st.settings.preset_group_name);
                                         ui.end_row();
-                                        ui.label(&t.customise_group);
-                                        ui.text_edit_singleline(&mut st.settings.customise_group_name);
+                                        ui.label(&t.use_preset_name);
+                                        ui.text_edit_singleline(&mut st.settings.use_preset_name);
                                         ui.end_row();
                                         ui.label(&t.customise_label);
                                         ui.text_edit_singleline(&mut st.settings.customise_label);
@@ -793,6 +798,7 @@ mod tests {
         let plan = PresetPlan {
             settings: PresetSettings::default(),
             feature_steps: vec![0],
+            mode_step_at: 0,
             presets: vec![PresetDef {
                 name: "Cosy".into(),
                 choices: vec![vec![GroupChoice::One(0)]],

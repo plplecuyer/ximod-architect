@@ -888,8 +888,8 @@ preset-no-steps = Il progetto non ha ancora alcuna tappa: usa la scheda «Nuovo 
 preset-names = Nomi generati
 preset-mode-step = Tappa «modalità di installazione»:
 preset-group = Gruppo dei preset:
-preset-customise-group = Gruppo Personalizza:
-preset-customise-label = Opzione Personalizza ({ "{name}" } = nome della pagina):
+preset-use-preset-name = Opzione «Segui il preset»:
+preset-customise-label = Opzione Personalizza ({ "{name}" } = nome della pagina, facoltativo):
 preset-flag = Flag del preset:
 preset-none-name = Opzione «Nessuna»:
 preset-no-preset-name = Opzione «Nessun preset»:
@@ -922,9 +922,9 @@ preset-skel-none = Inserisci almeno una funzionalità con un nome e una variante
 preset-default-mode-step = Modalità di installazione
 preset-default-group = Preset
 preset-default-customise = Personalizza
-preset-default-customise-label = Personalizza { "{name}" }
 preset-default-none = Nessuna
 preset-default-no-preset = Nessun preset (scelgo tutto io)
+preset-default-use-preset = Segui le scelte del preset
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Imposta un'unica destinazione di installazione per ogni file richiesto.

@@ -888,8 +888,8 @@ preset-no-steps = Projektā vēl nav neviena soļa: izmantojiet cilni „Jauns s
 preset-names = Ģenerētie nosaukumi
 preset-mode-step = Solis „instalācijas režīms”:
 preset-group = Priekšiestatījumu grupa:
-preset-customise-group = Grupa Pielāgot:
-preset-customise-label = Opcija Pielāgot ({ "{name}" } = lapas nosaukums):
+preset-use-preset-name = Opcija „Izmantot priekšiestatījumu”:
+preset-customise-label = Opcija Pielāgot ({ "{name}" } = lapas nosaukums, neobligāts):
 preset-flag = Priekšiestatījuma karodziņš:
 preset-none-name = Opcija „Nav”:
 preset-no-preset-name = Opcija „Bez priekšiestatījuma”:
@@ -922,9 +922,9 @@ preset-skel-none = Ievadiet vismaz vienu funkciju ar nosaukumu un variantu.
 preset-default-mode-step = Instalācijas režīms
 preset-default-group = Priekšiestatījums
 preset-default-customise = Pielāgot
-preset-default-customise-label = Pielāgot { "{name}" }
 preset-default-none = Nav
 preset-default-no-preset = Bez priekšiestatījuma (sava izvēle)
+preset-default-use-preset = Izmantot priekšiestatījuma izvēles
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Iestata vienu instalēšanas galamērķi katram obligātajam failam.

@@ -888,8 +888,8 @@ preset-no-steps = A projektnek még nincs lépése: az „Új váz” lapon hozh
 preset-names = Generált nevek
 preset-mode-step = „Telepítési mód” lépés:
 preset-group = Előbeállítás-csoport:
-preset-customise-group = „Testreszabás” csoport:
-preset-customise-label = „Testreszabás” opció ({ "{name}" } = oldalnév):
+preset-use-preset-name = „Előbeállítás használata” opció:
+preset-customise-label = „Testreszabás” opció ({ "{name}" } = oldalnév, nem kötelező):
 preset-flag = Előbeállítás-jelző:
 preset-none-name = „Nincs” opció:
 preset-no-preset-name = „Nincs előbeállítás” opció:
@@ -922,9 +922,9 @@ preset-skel-none = Adjon meg legalább egy funkciót névvel és változattal.
 preset-default-mode-step = Telepítési mód
 preset-default-group = Előbeállítás
 preset-default-customise = Testreszabás
-preset-default-customise-label = { "{name}" } testreszabása
 preset-default-none = Nincs
 preset-default-no-preset = Nincs előbeállítás (saját összeállítás)
+preset-default-use-preset = Az előbeállítás választásai
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Egyetlen telepítési célt állít be minden kötelező fájlhoz.

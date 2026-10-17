@@ -888,8 +888,8 @@ preset-no-steps = Projektet har inga steg ännu: använd fliken ”Nytt skelett�
 preset-names = Genererade namn
 preset-mode-step = Steget ”installationsläge”:
 preset-group = Förinställningsgrupp:
-preset-customise-group = Anpassa-grupp:
-preset-customise-label = Anpassa-alternativ ({ "{name}" } = sidnamn):
+preset-use-preset-name = Alternativet ”Följ förinställningen”:
+preset-customise-label = Anpassa-alternativ ({ "{name}" } = sidnamn, valfritt):
 preset-flag = Förinställningsflagga:
 preset-none-name = Alternativet ”Ingen”:
 preset-no-preset-name = Alternativet ”Ingen förinställning”:
@@ -922,9 +922,9 @@ preset-skel-none = Ange minst en funktion med ett namn och en variant.
 preset-default-mode-step = Installationsläge
 preset-default-group = Förinställning
 preset-default-customise = Anpassa
-preset-default-customise-label = Anpassa { "{name}" }
 preset-default-none = Ingen
 preset-default-no-preset = Ingen förinställning (sätt ihop själv)
+preset-default-use-preset = Följ förinställningens val
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Anger ett installationsmål för varje obligatorisk fil.

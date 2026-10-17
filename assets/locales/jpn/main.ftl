@@ -888,8 +888,8 @@ preset-no-steps = プロジェクトにはまだステップがありません�
 preset-names = 生成される名前
 preset-mode-step = 「インストールモード」ステップ：
 preset-group = プリセットグループ：
-preset-customise-group = 「カスタマイズ」グループ：
-preset-customise-label = 「カスタマイズ」オプション（{ "{name}" } = ページ名）：
+preset-use-preset-name = 「プリセットに従う」オプション：
+preset-customise-label = 「カスタマイズ」オプション（{ "{name}" } = ページ名、省略可）：
 preset-flag = プリセットフラグ：
 preset-none-name = 「なし」オプション：
 preset-no-preset-name = 「プリセットなし」オプション：
@@ -922,9 +922,9 @@ preset-skel-none = 名前とバリアントを持つ機能を少なくとも 1 �
 preset-default-mode-step = インストールモード
 preset-default-group = プリセット
 preset-default-customise = カスタマイズ
-preset-default-customise-label = { "{name}" } をカスタマイズ
 preset-default-none = なし
 preset-default-no-preset = プリセットなし（自分で構成）
+preset-default-use-preset = プリセットの選択に従う
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = すべての必須ファイルに単一のインストール先を設定します。

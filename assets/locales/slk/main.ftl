@@ -888,8 +888,8 @@ preset-no-steps = Projekt zatiaľ nemá žiadny krok: na vytvorenie stránok fun
 preset-names = Generované názvy
 preset-mode-step = Krok „režim inštalácie“:
 preset-group = Skupina predvolieb:
-preset-customise-group = Skupina Prispôsobiť:
-preset-customise-label = Možnosť Prispôsobiť ({ "{name}" } = názov stránky):
+preset-use-preset-name = Možnosť „Použiť predvoľbu“:
+preset-customise-label = Možnosť Prispôsobiť ({ "{name}" } = názov stránky, nepovinné):
 preset-flag = Príznak predvoľby:
 preset-none-name = Možnosť „Žiadna“:
 preset-no-preset-name = Možnosť „Bez predvoľby“:
@@ -922,9 +922,9 @@ preset-skel-none = Zadajte aspoň jednu funkciu s názvom a variantom.
 preset-default-mode-step = Režim inštalácie
 preset-default-group = Predvoľba
 preset-default-customise = Prispôsobiť
-preset-default-customise-label = Prispôsobiť { "{name}" }
 preset-default-none = Žiadna
 preset-default-no-preset = Bez predvoľby (vlastné zostavenie)
+preset-default-use-preset = Použiť voľby predvoľby
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Nastaví jeden cieľ inštalácie pre každý povinný súbor.

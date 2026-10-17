@@ -888,8 +888,8 @@ preset-no-steps = Le projet n'a encore aucune étape : utilisez l'onglet « Nouv
 preset-names = Noms générés
 preset-mode-step = Étape « mode d'installation » :
 preset-group = Groupe des presets :
-preset-customise-group = Groupe Personnaliser :
-preset-customise-label = Option Personnaliser ({ "{name}" } = nom de la page) :
+preset-use-preset-name = Option « Suivre le preset » :
+preset-customise-label = Option Personnaliser ({ "{name}" } = nom de la page, facultatif) :
 preset-flag = Drapeau du preset :
 preset-none-name = Option « Aucune » :
 preset-no-preset-name = Option « Aucun preset » :
@@ -922,9 +922,9 @@ preset-skel-none = Saisissez au moins une fonctionnalité avec un nom et une var
 preset-default-mode-step = Mode d'installation
 preset-default-group = Preset
 preset-default-customise = Personnaliser
-preset-default-customise-label = Personnaliser { "{name}" }
 preset-default-none = Aucune
 preset-default-no-preset = Aucun preset (tout composer)
+preset-default-use-preset = Suivre les choix du preset
 
 # --- Destination groupée dans les onglets Fichiers requis / Installations conditionnelles
 req-dest-hint = Définit une seule destination d'installation pour tous les fichiers requis.

@@ -888,8 +888,8 @@ preset-no-steps = Projede henüz adım yok: özellik sayfaları oluşturmak içi
 preset-names = Oluşturulan adlar
 preset-mode-step = “Kurulum modu” adımı:
 preset-group = Ön ayar grubu:
-preset-customise-group = “Özelleştir” grubu:
-preset-customise-label = “Özelleştir” seçeneği ({ "{name}" } = sayfa adı):
+preset-use-preset-name = “Ön ayarı kullan” seçeneği:
+preset-customise-label = “Özelleştir” seçeneği ({ "{name}" } = sayfa adı, isteğe bağlı):
 preset-flag = Ön ayar bayrağı:
 preset-none-name = “Hiçbiri” seçeneği:
 preset-no-preset-name = “Ön ayar yok” seçeneği:
@@ -922,9 +922,9 @@ preset-skel-none = Adı ve varyantı olan en az bir özellik girin.
 preset-default-mode-step = Kurulum modu
 preset-default-group = Ön ayar
 preset-default-customise = Özelleştir
-preset-default-customise-label = Özelleştir: { "{name}" }
 preset-default-none = Hiçbiri
 preset-default-no-preset = Ön ayar yok (kendim seçeceğim)
+preset-default-use-preset = Ön ayarın seçimlerini kullan
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Her gerekli dosya için tek bir kurulum hedefi ayarlar.

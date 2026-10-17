@@ -888,8 +888,8 @@ preset-no-steps = Níl céim ar bith sa tionscadal fós: úsáid an táb “Crea
 preset-names = Ainmneacha ginte
 preset-mode-step = Céim “mód suiteála”:
 preset-group = Grúpa na réamhshocruithe:
-preset-customise-group = Grúpa Saincheap:
-preset-customise-label = Rogha Saincheap ({ "{name}" } = ainm an leathanaigh):
+preset-use-preset-name = Rogha “Lean an réamhshocrú”:
+preset-customise-label = Rogha Saincheap ({ "{name}" } = ainm an leathanaigh, roghnach):
 preset-flag = Bratach an réamhshocraithe:
 preset-none-name = Rogha “Ceann ar bith”:
 preset-no-preset-name = Rogha “Gan réamhshocrú”:
@@ -922,9 +922,9 @@ preset-skel-none = Iontráil gné amháin ar a laghad a bhfuil ainm agus leagan 
 preset-default-mode-step = Mód suiteála
 preset-default-group = Réamhshocrú
 preset-default-customise = Saincheap
-preset-default-customise-label = Saincheap { "{name}" }
 preset-default-none = Ceann ar bith
 preset-default-no-preset = Gan réamhshocrú (mo rogha féin)
+preset-default-use-preset = Lean roghnuithe an réamhshocraithe
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Socraíonn sé sprioc shuiteála amháin do gach comhad riachtanach.

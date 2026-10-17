@@ -888,8 +888,8 @@ preset-no-steps = Proiectul nu are încă niciun pas: folosiți fila „Schelet 
 preset-names = Nume generate
 preset-mode-step = Pasul „mod de instalare”:
 preset-group = Grupul presetărilor:
-preset-customise-group = Grupul Personalizare:
-preset-customise-label = Opțiunea Personalizare ({ "{name}" } = numele paginii):
+preset-use-preset-name = Opțiunea „Urmează presetarea”:
+preset-customise-label = Opțiunea Personalizare ({ "{name}" } = numele paginii, opțional):
 preset-flag = Pavilionul presetării:
 preset-none-name = Opțiunea „Niciuna”:
 preset-no-preset-name = Opțiunea „Fără presetare”:
@@ -922,9 +922,9 @@ preset-skel-none = Introduceți cel puțin o funcționalitate cu un nume și o v
 preset-default-mode-step = Mod de instalare
 preset-default-group = Presetare
 preset-default-customise = Personalizare
-preset-default-customise-label = Personalizare { "{name}" }
 preset-default-none = Niciuna
 preset-default-no-preset = Fără presetare (aleg totul eu)
+preset-default-use-preset = Urmează alegerile presetării
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Setează o singură destinație de instalare pentru fiecare fișier obligatoriu.

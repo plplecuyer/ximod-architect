@@ -888,8 +888,8 @@ preset-no-steps = O projeto ainda não tem nenhum passo: use o separador «Novo 
 preset-names = Nomes gerados
 preset-mode-step = Passo «modo de instalação»:
 preset-group = Grupo das predefinições:
-preset-customise-group = Grupo Personalizar:
-preset-customise-label = Opção Personalizar ({ "{name}" } = nome da página):
+preset-use-preset-name = Opção «Seguir a predefinição»:
+preset-customise-label = Opção Personalizar ({ "{name}" } = nome da página, opcional):
 preset-flag = Bandeira da predefinição:
 preset-none-name = Opção «Nenhuma»:
 preset-no-preset-name = Opção «Sem predefinição»:
@@ -922,9 +922,9 @@ preset-skel-none = Introduza pelo menos uma funcionalidade com um nome e uma var
 preset-default-mode-step = Modo de instalação
 preset-default-group = Predefinição
 preset-default-customise = Personalizar
-preset-default-customise-label = Personalizar { "{name}" }
 preset-default-none = Nenhuma
 preset-default-no-preset = Sem predefinição (escolho tudo eu)
+preset-default-use-preset = Seguir as escolhas da predefinição
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Define um único destino de instalação para cada ficheiro obrigatório.

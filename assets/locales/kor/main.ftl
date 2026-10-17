@@ -888,8 +888,8 @@ preset-no-steps = 프로젝트에 아직 단계가 없습니다. '새 스켈레�
 preset-names = 생성되는 이름
 preset-mode-step = '설치 모드' 단계:
 preset-group = 프리셋 그룹:
-preset-customise-group = '사용자 지정' 그룹:
-preset-customise-label = '사용자 지정' 옵션({ "{name}" } = 페이지 이름):
+preset-use-preset-name = '프리셋 따르기' 옵션:
+preset-customise-label = '사용자 지정' 옵션({ "{name}" } = 페이지 이름, 선택 사항):
 preset-flag = 프리셋 플래그:
 preset-none-name = '없음' 옵션:
 preset-no-preset-name = '프리셋 없음' 옵션:
@@ -922,9 +922,9 @@ preset-skel-none = 이름과 변형이 있는 기능을 하나 이상 입력하�
 preset-default-mode-step = 설치 모드
 preset-default-group = 프리셋
 preset-default-customise = 사용자 지정
-preset-default-customise-label = { "{name}" } 사용자 지정
 preset-default-none = 없음
 preset-default-no-preset = 프리셋 없음(직접 구성)
+preset-default-use-preset = 프리셋의 선택 따르기
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = 모든 필수 파일에 단일 설치 대상을 설정합니다.

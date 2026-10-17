@@ -888,8 +888,8 @@ preset-no-steps = Das Projekt hat noch keinen Schritt: Verwenden Sie die Registe
 preset-names = Generierte Namen
 preset-mode-step = Schritt „Installationsmodus“:
 preset-group = Preset-Gruppe:
-preset-customise-group = Gruppe „Anpassen“:
-preset-customise-label = Option „Anpassen“ ({ "{name}" } = Seitenname):
+preset-use-preset-name = Option „Preset übernehmen“:
+preset-customise-label = Option „Anpassen“ ({ "{name}" } = Seitenname, optional):
 preset-flag = Preset-Flag:
 preset-none-name = Option „Keine“:
 preset-no-preset-name = Option „Kein Preset“:
@@ -922,9 +922,9 @@ preset-skel-none = Geben Sie mindestens eine Funktion mit einem Namen und einer 
 preset-default-mode-step = Installationsmodus
 preset-default-group = Preset
 preset-default-customise = Anpassen
-preset-default-customise-label = { "{name}" } anpassen
 preset-default-none = Keine
 preset-default-no-preset = Kein Preset (selbst zusammenstellen)
+preset-default-use-preset = Auswahl des Presets übernehmen
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Legt ein Installationsziel für jede erforderliche Datei fest.

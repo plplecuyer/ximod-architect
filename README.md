@@ -26,7 +26,7 @@ This is a Rust port of Wenderer's original FOMOD Creation Tool, offering improve
 - **Cross-Platform**: Works on Windows, Linux, and macOS
 - **Native Splash Screen**: Transparent splash screen with fade effect
 
-See [`CHANGELOG.md`](CHANGELOG.md) for the full list of changes in 2.2.1.
+See [`CHANGELOG.md`](CHANGELOG.md) for the full list of changes in 2.2.2.
 
 ## Building
 

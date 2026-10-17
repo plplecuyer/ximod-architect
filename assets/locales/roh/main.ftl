@@ -888,8 +888,8 @@ preset-no-steps = Il project n'ha anc nagin pass: utilisai il register «Nov ske
 preset-names = Nums generads
 preset-mode-step = Pass «modus d'installaziun»:
 preset-group = Gruppa dals presets:
-preset-customise-group = Gruppa Persunalisar:
-preset-customise-label = Opziun Persunalisar ({ "{name}" } = num da la pagina):
+preset-use-preset-name = Opziun «Suandar il preset»:
+preset-customise-label = Opziun Persunalisar ({ "{name}" } = num da la pagina, facultativ):
 preset-flag = Bandiera dal preset:
 preset-none-name = Opziun «Nagina»:
 preset-no-preset-name = Opziun «Nagin preset»:
@@ -922,9 +922,9 @@ preset-skel-none = Endatai almain ina funcziun cun in num ed ina varianta.
 preset-default-mode-step = Modus d'installaziun
 preset-default-group = Preset
 preset-default-customise = Persunalisar
-preset-default-customise-label = Persunalisar { "{name}" }
 preset-default-none = Nagina
 preset-default-no-preset = Nagin preset (jau tschern tut sez)
+preset-default-use-preset = Suandar las tschernas dal preset
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Definescha ina destinaziun d'installaziun per mintga datoteca necessaria.

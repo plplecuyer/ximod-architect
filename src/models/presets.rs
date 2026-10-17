@@ -4,24 +4,40 @@
 //! The idea is to separate deciding from installing:
 //!
 //! * a new first step, the *installation mode*, holds a **Preset** group (one
-//!   option per preset plus "No preset", exactly one to choose, which only
-//!   set flags) and a **Customise** group (one option per feature page, which
-//!   opens that page and resets its flags);
+//!   option per preset plus "No preset", exactly one to choose) and, for every
+//!   feature page, a two-option group — *Use the preset's choices* or
+//!   *Customise* — that decides whether that page is shown;
 //! * every feature page becomes visible only when its Customise option is
-//!   ticked; each of its options sets the feature's flag and is marked
+//!   chosen; each of its options sets the feature's flag and is marked
 //!   *Recommended* — pre-ticked — when a preset that chose it is active;
 //! * the files of those options move to conditional installs: installed
 //!   when the page is customised and the option is ticked there, or when the
 //!   page is not customised and the chosen preset picked the option — so
-//!   nothing is ever installed twice, and a page the user opened and then
-//!   hid again by going back (its flags may linger in the mod manager) can
-//!   no longer install anything.
+//!   nothing is ever installed twice.
 //!
-//! Exclusive groups (*SelectExactlyOne* / *SelectAtMostOne*) get one flag with
-//! one value per option (plus `none`); multi-selection groups get one `on/off`
-//! flag per option. Flag assignments are evaluated page after page by the mod
-//! managers, so the preset (first page) sets the defaults and a feature page
-//! shown later overrides them.
+//! # One flag, one writer
+//!
+//! Mod managers keep the flags in a table that is updated at every click:
+//! selecting an option writes its flags, deselecting it removes the flags it
+//! wrote, and the last writer wins. If two options that can be selected at
+//! the same time write the same flag, going back and clicking one of them
+//! again silently overrides what the other one shows as selected (that was
+//! the 2.2.1 structure: the presets and the Customise checkboxes both wrote
+//! the Customise and feature flags). So the rule here is that **every flag is
+//! written by exactly one group of mutually exclusive options**:
+//!
+//! * `preset` — by the Preset group only;
+//! * `cust_X` — `off` / `on` by the two options of page X's mode group;
+//! * `feat_…` (exclusive groups: one value per option, plus `none`) and
+//!   `opt_…` (multi-selection groups: one `on` flag per option) — by the
+//!   options of the feature page only.
+//!
+//! The state of the flags is then a pure function of what the user sees
+//! selected, whatever the order of the clicks, and the conditional installs
+//! (`cust == on AND flag == value`, or `cust == off AND preset == …`) install
+//! exactly that. A feature page the user opened and then hid again by going
+//! back keeps its flags in the manager, but its files are keyed on
+//! `cust == on`, so they are not installed.
 
 use crate::models::{
     ConditionFlag, ConditionalFileSet, Dependency, DependencyGroup, DependencyPattern, LogicalOperator, Plugin,
@@ -37,9 +53,11 @@ pub struct PresetSettings {
     pub mode_step_name: String,
     /// Name of the group holding the presets ("Preset").
     pub preset_group_name: String,
-    /// Name of the group holding the "Customise …" options ("Customise").
-    pub customise_group_name: String,
-    /// Label of a Customise option; `{name}` is replaced by the page name.
+    /// Name of the option, in a page's mode group, that leaves the page to
+    /// the chosen preset ("Use the preset's choices").
+    pub use_preset_name: String,
+    /// Label of the Customise option of a page's mode group; `{name}`, if
+    /// present, is replaced by the page name.
     pub customise_label: String,
     /// Name of the flag that records the chosen preset ("preset").
     pub preset_flag: String,
@@ -57,8 +75,8 @@ impl Default for PresetSettings {
         Self {
             mode_step_name: "Installation mode".into(),
             preset_group_name: "Preset".into(),
-            customise_group_name: "Customise".into(),
-            customise_label: "Customise {name}".into(),
+            use_preset_name: "Use the preset's choices".into(),
+            customise_label: "Customise".into(),
             preset_flag: "preset".into(),
             none_name: "None".into(),
             no_preset_name: "No preset (build my own)".into(),
@@ -95,6 +113,9 @@ pub struct PresetPlan {
     /// Indices of the steps that are feature pages, in the project's order.
     pub feature_steps: Vec<usize>,
     pub presets: Vec<PresetDef>,
+    /// Where the installation-mode step goes (0 = first; a rebuild puts it
+    /// back where the author had moved it, e.g. after a welcome page).
+    pub mode_step_at: usize,
 }
 
 /// Why a plan cannot be applied.
@@ -174,12 +195,12 @@ const NO_PRESET: &str = "none";
 /// When the files of an option are installed (see the module docs):
 /// `(cust == on AND flag == value) OR (cust == off AND preset ∈ choosers)`.
 ///
-/// The Customise flag is set explicitly on the first page every time (`off`
-/// by the chosen preset or "No preset", `on` by the Customise option, which
-/// comes later on the same page), so it always reflects the user's current
-/// choice. A feature page the user visited and then hid again by going back
-/// may keep its flags in the mod manager; keying the files on the Customise
-/// flag makes those stale flags harmless — the preset decides again.
+/// The Customise flag is written by the page's mode group on the first page
+/// (`off` by "Use the preset's choices", `on` by "Customise"), so it always
+/// reflects the user's current choice. A feature page the user visited and
+/// then hid again by going back may keep its flags in the mod manager;
+/// keying the files on the Customise flag makes those stale flags harmless —
+/// the preset decides again.
 fn install_condition(cust: &str, flag: &str, value: &str, preset_flag: &str, choosers: &[&str]) -> DependencyGroup {
     let customised = DependencyGroup::from_leaves(
         LogicalOperator::And,
@@ -257,7 +278,7 @@ pub fn validate(ximod: &Ximod, plan: &PresetPlan) -> Result<(), PresetError> {
     if [
         &s.mode_step_name,
         &s.preset_group_name,
-        &s.customise_group_name,
+        &s.use_preset_name,
         &s.customise_label,
         &s.preset_flag,
         &s.none_name,
@@ -458,56 +479,29 @@ pub fn apply(ximod: &mut Ximod, plan: &PresetPlan) -> Result<PresetSummary, Pres
     ximod.conditional_files.extend(new_sets);
 
     // ---- 2) The installation-mode step
-    // Exactly one choice on the Preset group — a preset or "No preset" — so
-    // the first page always sets the preset flag and every Customise flag
-    // explicitly (`off`; the Customise options, later on the same page, turn
-    // theirs `on`). See `install_condition`.
+    // Exactly one choice on the Preset group — a preset or "No preset" —
+    // which writes the preset flag and nothing else, then one two-option
+    // group per feature page that writes that page's Customise flag `off`
+    // or `on`. No flag has two writers (see the module docs).
     let mut preset_group = PluginGroup::new(s.preset_group_name.clone(), SelectionType::SelectExactlyOne);
-    let cust_off: Vec<ConditionFlag> = features
-        .iter()
-        .map(|ff| ConditionFlag::new(&ff.cust_flag, "off"))
-        .collect();
     for (k, p) in plan.presets.iter().enumerate() {
         let mut opt = Plugin::new(p.name.clone());
         opt.condition_flags
             .push(ConditionFlag::new(&preset_flag, &preset_values[k]));
-        opt.condition_flags.extend(cust_off.iter().cloned());
         let mut described: Vec<String> = Vec::new();
         for (f, &si) in plan.feature_steps.iter().enumerate() {
             let step = &ximod.steps[si];
             let ff = &features[f];
             for (g, group) in step.plugin_groups.iter().enumerate() {
-                let gf = &ff.groups[g];
                 // Option indices refer to the page before "None" was inserted.
-                let shift = usize::from(gf.exclusive && s.add_none);
-                match choice(p, f, g) {
-                    GroupChoice::None => {
-                        if gf.exclusive {
-                            opt.condition_flags.push(ConditionFlag::new(&gf.flag, "none"));
-                        }
-                    }
-                    GroupChoice::One(pi) => {
-                        if gf.exclusive {
-                            opt.condition_flags.push(ConditionFlag::new(&gf.flag, &gf.values[pi]));
-                        } else {
-                            opt.condition_flags.push(ConditionFlag::new(&gf.option_flags[pi], "on"));
-                        }
-                        described.push(format!("{}: {}", step.name, group.plugins[pi + shift].name));
-                    }
-                    GroupChoice::Many(v) => {
-                        let mut names = Vec::new();
-                        for pi in v {
-                            if gf.exclusive {
-                                opt.condition_flags.push(ConditionFlag::new(&gf.flag, &gf.values[pi]));
-                            } else {
-                                opt.condition_flags.push(ConditionFlag::new(&gf.option_flags[pi], "on"));
-                            }
-                            names.push(group.plugins[pi + shift].name.clone());
-                        }
-                        if !names.is_empty() {
-                            described.push(format!("{}: {}", step.name, names.join(", ")));
-                        }
-                    }
+                let shift = usize::from(ff.groups[g].exclusive && s.add_none);
+                let names: Vec<&str> = match choice(p, f, g) {
+                    GroupChoice::None => Vec::new(),
+                    GroupChoice::One(pi) => vec![group.plugins[pi + shift].name.as_str()],
+                    GroupChoice::Many(v) => v.iter().map(|pi| group.plugins[pi + shift].name.as_str()).collect(),
+                };
+                if !names.is_empty() {
+                    described.push(format!("{}: {}", step.name, names.join(", ")));
                 }
             }
         }
@@ -518,31 +512,37 @@ pub fn apply(ximod: &mut Ximod, plan: &PresetPlan) -> Result<PresetSummary, Pres
     no_preset
         .condition_flags
         .push(ConditionFlag::new(&preset_flag, NO_PRESET));
-    no_preset.condition_flags.extend(cust_off.iter().cloned());
     preset_group.plugins.push(no_preset);
-    let mut customise_group = PluginGroup::new(s.customise_group_name.clone(), SelectionType::SelectAny);
+    let mut mode = Step::new(s.mode_step_name.clone());
+    mode.plugin_groups.push(preset_group);
+    let no_preset_chosen = || preset_in(&preset_flag, &[NO_PRESET]);
     for (f, &si) in plan.feature_steps.iter().enumerate() {
         let ff = &features[f];
         let step_name = ximod.steps[si].name.clone();
-        let mut opt = Plugin::new(s.customise_label.replace("{name}", &step_name));
-        opt.condition_flags.push(ConditionFlag::new(&ff.cust_flag, "on"));
-        // Reset the page's flags so that what the user ticks there is the
-        // whole truth (an unticked multi option must not keep the preset's "on").
-        for gf in &ff.groups {
-            if gf.exclusive {
-                opt.condition_flags.push(ConditionFlag::new(&gf.flag, "none"));
-            } else {
-                for of in &gf.option_flags {
-                    opt.condition_flags.push(ConditionFlag::new(of, "off"));
-                }
-            }
-        }
-        customise_group.plugins.push(opt);
+        let mut group = PluginGroup::new(step_name.clone(), SelectionType::SelectExactlyOne);
+        // "Use the preset's choices": the default, except under "No preset".
+        let mut use_preset = Plugin::new(s.use_preset_name.clone());
+        use_preset
+            .condition_flags
+            .push(ConditionFlag::new(&ff.cust_flag, "off"));
+        use_preset.default_type = PluginType::Recommended;
+        use_preset.dependency_patterns.push(DependencyPattern {
+            pattern_type: PluginType::Optional.as_str().to_string(),
+            condition: no_preset_chosen(),
+        });
+        // "Customise": opens the page; the default under "No preset".
+        let mut customise = Plugin::new(s.customise_label.replace("{name}", &step_name));
+        customise.condition_flags.push(ConditionFlag::new(&ff.cust_flag, "on"));
+        customise.default_type = PluginType::Optional;
+        customise.dependency_patterns.push(DependencyPattern {
+            pattern_type: PluginType::Recommended.as_str().to_string(),
+            condition: no_preset_chosen(),
+        });
+        group.plugins.push(use_preset);
+        group.plugins.push(customise);
+        mode.plugin_groups.push(group);
     }
-    let mut mode = Step::new(s.mode_step_name.clone());
-    mode.plugin_groups.push(preset_group);
-    mode.plugin_groups.push(customise_group);
-    ximod.steps.insert(0, mode);
+    ximod.steps.insert(plan.mode_step_at.min(ximod.steps.len()), mode);
 
     Ok(summary)
 }
@@ -569,40 +569,67 @@ fn release_visibility(vis: &mut DependencyGroup, flag: &str, value: &str) {
     }
 }
 
+/// How the installation-mode step of an existing structure is laid out.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum ModeLayout {
+    /// Up to 2.2.1: a Preset group then one *Customise* group of checkboxes,
+    /// each setting a page's Customise flag to `on` (and resetting the
+    /// page's flags).
+    Legacy,
+    /// Since 2.2.2: a Preset group then one two-option group per page
+    /// (`cust == off` / `cust == on`).
+    PerPage,
+}
+
+/// Whether some step needs `flag == on` to be visible.
+fn opens_a_step(ximod: &Ximod, flag: &str) -> bool {
+    ximod.steps.iter().any(|s| {
+        s.visibility
+            .items
+            .iter()
+            .filter_map(|it| it.as_leaf())
+            .any(|d| d.is_flag() && d.name == flag && d.value == "on")
+    })
+}
+
 /// The installation-mode step built by an earlier run of the wizard, if any:
 /// a step whose first group holds options that all set the same flag to
-/// distinct values (the presets) and whose second group holds options that
-/// each set a flag to "on" which some other step needs to be visible (the
-/// Customise options).
-fn find_mode_step(ximod: &Ximod) -> Option<usize> {
-    ximod.steps.iter().position(|step| {
-        if step.plugin_groups.len() != 2 {
-            return false;
+/// distinct values (the presets), followed either by one group of options
+/// that each set a flag to "on" which some other step needs to be visible
+/// (the Customise checkboxes of 2.1.0 / 2.2.1) or by two-option groups that
+/// set such a flag to "off" and "on" (one per page, since 2.2.2).
+fn find_mode_step(ximod: &Ximod) -> Option<(usize, ModeLayout)> {
+    ximod.steps.iter().enumerate().find_map(|(si, step)| {
+        let (pg, rest) = step.plugin_groups.split_first()?;
+        if rest.is_empty() || pg.plugins.is_empty() {
+            return None;
         }
-        let (pg, cg) = (&step.plugin_groups[0], &step.plugin_groups[1]);
-        if pg.plugins.is_empty() || cg.plugins.is_empty() {
-            return false;
-        }
-        let pf = match pg.plugins[0].condition_flags.first() {
-            Some(f) => f.name.clone(),
-            None => return false,
-        };
+        let pf = &pg.plugins[0].condition_flags.first()?.name;
         let mut values = HashSet::new();
         let presets_ok = pg
             .plugins
             .iter()
-            .all(|p| matches!(p.condition_flags.first(), Some(f) if f.name == pf && values.insert(f.value.clone())));
-        let customise_ok = cg.plugins.iter().all(|o| match o.condition_flags.first() {
-            Some(f) if f.value == "on" => ximod.steps.iter().any(|s| {
-                s.visibility
-                    .items
-                    .iter()
-                    .filter_map(|it| it.as_leaf())
-                    .any(|d| d.is_flag() && d.name == f.name && d.value == "on")
-            }),
-            _ => false,
+            .all(|p| matches!(p.condition_flags.first(), Some(f) if &f.name == pf && values.insert(f.value.clone())));
+        if !presets_ok {
+            return None;
+        }
+        let per_page = rest.iter().all(|g| {
+            g.plugins.len() == 2
+                && matches!(
+                    (g.plugins[0].condition_flags.first(), g.plugins[1].condition_flags.first()),
+                    (Some(off), Some(on)) if off.value == "off" && on.value == "on" && off.name == on.name
+                        && opens_a_step(ximod, &on.name)
+                )
         });
-        presets_ok && customise_ok
+        if per_page {
+            return Some((si, ModeLayout::PerPage));
+        }
+        let legacy = rest.len() == 1
+            && !rest[0].plugins.is_empty()
+            && rest[0].plugins.iter().all(
+                |o| matches!(o.condition_flags.first(), Some(f) if f.value == "on" && opens_a_step(ximod, &f.name)),
+            );
+        legacy.then_some((si, ModeLayout::Legacy))
     })
 }
 
@@ -613,79 +640,148 @@ pub fn has_structure(ximod: &Ximod) -> bool {
     find_mode_step(ximod).is_some()
 }
 
+/// The wizard's flag on every option of a feature page, when the structure
+/// does not say which they are (per-page layout): in an exclusive group the
+/// flag every option of the group writes (the last one, if several), in a
+/// multi-selection group the last `on` flag of each option (an `opt_…` one
+/// when there is one).
+fn page_flags(step: &Step) -> HashSet<String> {
+    let mut out = HashSet::new();
+    for group in &step.plugin_groups {
+        if is_exclusive(group.selection_type) {
+            let Some(first) = group.plugins.first() else { continue };
+            let shared = first.condition_flags.iter().rev().find(|c| {
+                group
+                    .plugins
+                    .iter()
+                    .all(|p| p.condition_flags.iter().any(|d| d.name == c.name))
+            });
+            match shared {
+                Some(c) => {
+                    out.insert(c.name.clone());
+                }
+                None => out.extend(
+                    group
+                        .plugins
+                        .iter()
+                        .filter_map(|p| p.condition_flags.last().map(|c| c.name.clone())),
+                ),
+            }
+        } else {
+            for p in &group.plugins {
+                let on = p.condition_flags.iter().rev().filter(|c| c.value == "on");
+                let pick = on
+                    .clone()
+                    .find(|c| c.name.starts_with("opt_"))
+                    .or_else(|| on.clone().next());
+                if let Some(c) = pick {
+                    out.insert(c.name.clone());
+                }
+            }
+        }
+    }
+    out
+}
+
 /// Undo an earlier run of the wizard and return the plan that would rebuild
 /// it: the installation-mode step is removed, the feature pages lose their
 /// visibility condition, their "None" options and the flags and Recommended
 /// patterns the wizard added, and the files the wizard moved to conditional
 /// installs go back to their options. `None` when the project holds no such
-/// structure (nothing is changed then).
+/// structure (nothing is changed then). Structures made by 2.1.0 and 2.2.1
+/// are recognised too, so that Apply rebuilds them the current way.
 ///
 /// Running the wizard again therefore never stacks a second structure on the
 /// first: the caller unapplies, lets the author add or change presets, and
 /// applies the new plan — which regenerates the same flag names, so a mod
 /// update keeps working with the flags of the previous release.
 pub fn unapply(ximod: &mut Ximod) -> Option<PresetPlan> {
-    let mi = find_mode_step(ximod)?;
+    let (mi, layout) = find_mode_step(ximod)?;
     let mode = ximod.steps[mi].clone();
-    let (pg, cg) = (&mode.plugin_groups[0], &mode.plugin_groups[1]);
+    let pg = &mode.plugin_groups[0];
     let preset_flag = pg.plugins[0].condition_flags[0].name.clone();
-
-    // Feature pages, in the order of their Customise options.
-    struct Feature {
-        step: usize,
-        cust_flag: String,
-        /// Flags the Customise option resets: the wizard's flags of the page.
-        reset: HashSet<String>,
-    }
-    let mut features: Vec<Feature> = Vec::new();
-    for o in &cg.plugins {
-        let cust = &o.condition_flags[0].name;
-        let Some(si) = ximod.steps.iter().position(|s| {
+    let step_opened_by = |cust: &str| {
+        ximod.steps.iter().position(|s| {
             s.visibility
                 .items
                 .iter()
                 .filter_map(|it| it.as_leaf())
-                .any(|d| d.is_flag() && &d.name == cust && d.value == "on")
-        }) else {
-            continue;
-        };
-        if si == mi || features.iter().any(|f| f.step == si) {
-            continue;
-        }
-        features.push(Feature {
-            step: si,
-            cust_flag: cust.clone(),
-            reset: o.condition_flags.iter().skip(1).map(|f| f.name.clone()).collect(),
-        });
-    }
+                .any(|d| d.is_flag() && d.name == cust && d.value == "on")
+        })
+    };
 
+    // Feature pages, in the order of their mode options.
+    struct Feature {
+        step: usize,
+        cust_flag: String,
+        /// The wizard's flags on the page's options.
+        reset: HashSet<String>,
+    }
+    let mut features: Vec<Feature> = Vec::new();
     let mut settings = PresetSettings {
         mode_step_name: mode.name.clone(),
         preset_group_name: pg.name.clone(),
-        customise_group_name: cg.name.clone(),
-        customise_label: "{name}".into(),
         preset_flag: preset_flag.clone(),
-        none_name: PresetSettings::default().none_name,
-        no_preset_name: PresetSettings::default().no_preset_name,
         add_none: false,
+        ..PresetSettings::default()
     };
     if let Some(np) = pg.plugins.iter().find(|p| p.condition_flags[0].value == NO_PRESET) {
         settings.no_preset_name = np.name.clone();
     }
-    if let (Some(f), Some(o)) = (features.first(), cg.plugins.first()) {
-        let page = &ximod.steps[f.step].name;
-        if !page.is_empty() && o.name.contains(page.as_str()) {
-            settings.customise_label = o.name.replacen(page.as_str(), "{name}", 1);
+    let mut label_from = |option: &Plugin, page: &str| {
+        if !page.is_empty() && option.name.contains(page) {
+            settings.customise_label = option.name.replacen(page, "{name}", 1);
+        } else {
+            settings.customise_label = option.name.clone();
+        }
+    };
+    match layout {
+        ModeLayout::Legacy => {
+            for o in &mode.plugin_groups[1].plugins {
+                let cust = &o.condition_flags[0].name;
+                let Some(si) = step_opened_by(cust) else { continue };
+                if si == mi || features.iter().any(|f| f.step == si) {
+                    continue;
+                }
+                if features.is_empty() {
+                    label_from(o, &ximod.steps[si].name);
+                }
+                features.push(Feature {
+                    step: si,
+                    cust_flag: cust.clone(),
+                    reset: o.condition_flags.iter().skip(1).map(|f| f.name.clone()).collect(),
+                });
+            }
+        }
+        ModeLayout::PerPage => {
+            for g in &mode.plugin_groups[1..] {
+                let cust = &g.plugins[1].condition_flags[0].name;
+                let Some(si) = step_opened_by(cust) else { continue };
+                if si == mi || features.iter().any(|f| f.step == si) {
+                    continue;
+                }
+                if features.is_empty() {
+                    settings.use_preset_name = g.plugins[0].name.clone();
+                    label_from(&g.plugins[1], &ximod.steps[si].name);
+                }
+                features.push(Feature {
+                    step: si,
+                    cust_flag: cust.clone(),
+                    reset: page_flags(&ximod.steps[si]),
+                });
+            }
         }
     }
 
     // Per feature / group: the wizard flag and value of every remaining
-    // option, to read the presets' choices back.
+    // option, and the presets that chose it (its Recommended patterns on
+    // the preset flag), to read the presets' choices back.
     #[derive(Clone)]
     struct GroupInfo {
         exclusive: bool,
         flag: Option<String>,
         option_flags: Vec<(String, String)>,
+        choosers: Vec<Vec<String>>,
     }
     let mut infos: Vec<Vec<GroupInfo>> = Vec::new();
     let all_preset =
@@ -713,11 +809,22 @@ pub fn unapply(ximod: &mut Ximod) -> Option<PresetPlan> {
                 exclusive,
                 flag: None,
                 option_flags: Vec::new(),
+                choosers: Vec::new(),
             };
             for plugin in &mut group.plugins {
                 let pos = plugin.condition_flags.iter().rposition(|c| f.reset.contains(&c.name));
                 let wf = pos.map(|i| plugin.condition_flags.remove(i));
-                plugin.dependency_patterns.retain(|pat| !all_preset(&pat.condition));
+                let mut chosen_by = Vec::new();
+                plugin.dependency_patterns.retain(|pat| {
+                    if !all_preset(&pat.condition) {
+                        return true;
+                    }
+                    if pat.pattern_type == PluginType::Recommended.as_str() {
+                        chosen_by.extend(pat.condition.leaves().map(|d| d.value.clone()));
+                    }
+                    false
+                });
+                info.choosers.push(chosen_by);
                 match wf {
                     Some(c) => {
                         if exclusive {
@@ -759,48 +866,30 @@ pub fn unapply(ximod: &mut Ximod) -> Option<PresetPlan> {
         keep
     });
 
-    // The presets' choices, read from their flags.
+    // The presets' choices: the options they are recorded as choosing.
     let presets = pg
         .plugins
         .iter()
         .filter(|p| p.condition_flags[0].value != NO_PRESET)
         .map(|p| {
-            let set: Vec<(&str, &str)> = p
-                .condition_flags
-                .iter()
-                .skip(1)
-                .map(|c| (c.name.as_str(), c.value.as_str()))
-                .collect();
+            let v = p.condition_flags[0].value.as_str();
             let choices = infos
                 .iter()
                 .map(|groups| {
                     groups
                         .iter()
                         .map(|g| {
-                            if g.exclusive {
-                                let Some(flag) = &g.flag else { return GroupChoice::None };
-                                match set.iter().find(|(n, _)| n == flag) {
-                                    Some((_, v)) if *v != "none" => g
-                                        .option_flags
-                                        .iter()
-                                        .position(|(n, val)| n == flag && val == v)
-                                        .map(GroupChoice::One)
-                                        .unwrap_or_default(),
-                                    _ => GroupChoice::None,
-                                }
-                            } else {
-                                let on: Vec<usize> = g
-                                    .option_flags
-                                    .iter()
-                                    .enumerate()
-                                    .filter(|(_, (n, _))| !n.is_empty() && set.contains(&(n.as_str(), "on")))
-                                    .map(|(i, _)| i)
-                                    .collect();
-                                if on.is_empty() {
-                                    GroupChoice::None
-                                } else {
-                                    GroupChoice::Many(on)
-                                }
+                            let chosen: Vec<usize> = g
+                                .choosers
+                                .iter()
+                                .enumerate()
+                                .filter(|(_, c)| c.iter().any(|x| x == v))
+                                .map(|(i, _)| i)
+                                .collect();
+                            match (g.exclusive, chosen.first()) {
+                                (_, None) => GroupChoice::None,
+                                (true, Some(&i)) => GroupChoice::One(i),
+                                (false, _) => GroupChoice::Many(chosen),
                             }
                         })
                         .collect()
@@ -822,6 +911,7 @@ pub fn unapply(ximod: &mut Ximod) -> Option<PresetPlan> {
         settings,
         feature_steps,
         presets,
+        mode_step_at: mi,
     })
 }
 
@@ -892,6 +982,7 @@ mod tests {
         PresetPlan {
             settings: PresetSettings::default(),
             feature_steps: vec![0, 1],
+            mode_step_at: 0,
             presets: vec![
                 PresetDef {
                     name: "Full".into(),
@@ -956,74 +1047,59 @@ mod tests {
             }
         );
 
-        // The mode step comes first with the two groups.
+        // The mode step comes first: the Preset group, then one two-option
+        // group per feature page.
         assert_eq!(x.steps.len(), 3);
         let mode = &x.steps[0];
         assert_eq!(mode.name, "Installation mode");
+        assert_eq!(mode.plugin_groups.len(), 3);
         assert_eq!(mode.plugin_groups[0].name, "Preset");
         assert_eq!(mode.plugin_groups[0].selection_type, SelectionType::SelectExactlyOne);
         assert_eq!(mode.plugin_groups[0].plugins.len(), 3, "two presets + No preset");
         let np = &mode.plugin_groups[0].plugins[2];
         assert_eq!(np.name, "No preset (build my own)");
-        assert_eq!(
-            np.condition_flags,
-            vec![
-                ConditionFlag::new("preset", "none"),
-                ConditionFlag::new("cust_Feature_A", "off"),
-                ConditionFlag::new("cust_Feature_B", "off"),
-            ]
-        );
-        assert_eq!(mode.plugin_groups[1].name, "Customise");
+        assert_eq!(np.condition_flags, vec![ConditionFlag::new("preset", "none")]);
         let full = &mode.plugin_groups[0].plugins[0];
         assert_eq!(full.name, "Full");
         assert!(full.files.is_empty());
-        let flags: Vec<(&str, &str)> = full
-            .condition_flags
-            .iter()
-            .map(|f| (f.name.as_str(), f.value.as_str()))
-            .collect();
-        assert_eq!(
-            flags,
-            vec![
-                ("preset", "Full"),
-                ("cust_Feature_A", "off"),
-                ("cust_Feature_B", "off"),
-                ("feat_Feature_A", "Version_2"),
-                ("opt_Feature_B_Extra_meshes", "on"),
-                ("opt_Feature_B_Extra_sounds", "on"),
-            ]
-        );
+        // A preset writes the preset flag and nothing else (one flag, one writer).
+        assert_eq!(full.condition_flags, vec![ConditionFlag::new("preset", "Full")]);
         assert_eq!(
             full.description,
             "Feature A: Version 2 · Feature B: Extra meshes, Extra sounds"
         );
-        let light = &mode.plugin_groups[0].plugins[1];
-        assert!(
-            light
-                .condition_flags
-                .iter()
-                .any(|f| f.name == "feat_Feature_A" && f.value == "Version_1")
+        assert_eq!(
+            mode.plugin_groups[0].plugins[1].condition_flags,
+            vec![ConditionFlag::new("preset", "Light")]
         );
-        assert!(light.condition_flags.iter().all(|f| !f.name.starts_with("opt_")));
 
-        // Customise options open their page and reset its flags.
-        let cust_a = &mode.plugin_groups[1].plugins[0];
-        assert_eq!(cust_a.name, "Customise Feature A");
-        assert!(
-            cust_a
-                .condition_flags
-                .contains(&ConditionFlag::new("cust_Feature_A", "on"))
+        // Page groups: "Use the preset's choices" (off, recommended unless
+        // No preset) / "Customise" (on, recommended under No preset).
+        let ga_mode = &mode.plugin_groups[1];
+        assert_eq!(ga_mode.name, "Feature A");
+        assert_eq!(ga_mode.selection_type, SelectionType::SelectExactlyOne);
+        assert_eq!(ga_mode.plugins.len(), 2);
+        let (use_preset, customise) = (&ga_mode.plugins[0], &ga_mode.plugins[1]);
+        assert_eq!(use_preset.name, "Use the preset's choices");
+        assert_eq!(
+            use_preset.condition_flags,
+            vec![ConditionFlag::new("cust_Feature_A", "off")]
         );
-        assert!(
-            cust_a
-                .condition_flags
-                .contains(&ConditionFlag::new("feat_Feature_A", "none"))
+        assert_eq!(use_preset.default_type, PluginType::Recommended);
+        assert_eq!(use_preset.dependency_patterns[0].pattern_type, "Optional");
+        let lv = leaves(&use_preset.dependency_patterns[0].condition);
+        assert_eq!((lv[0].name.as_str(), lv[0].value.as_str()), ("preset", "none"));
+        assert_eq!(customise.name, "Customise");
+        assert_eq!(
+            customise.condition_flags,
+            vec![ConditionFlag::new("cust_Feature_A", "on")]
         );
-        let cust_b = &mode.plugin_groups[1].plugins[1];
-        assert!(
-            cust_b
-                .condition_flags
-                .contains(&ConditionFlag::new("opt_Feature_B_Extra_meshes", "off"))
+        assert_eq!(customise.default_type, PluginType::Optional);
+        assert_eq!(customise.dependency_patterns[0].pattern_type, "Recommended");
+        assert_eq!(mode.plugin_groups[2].name, "Feature B");
+        assert_eq!(
+            mode.plugin_groups[2].plugins[1].condition_flags,
+            vec![ConditionFlag::new("cust_Feature_B", "on")]
         );
 
         // Feature A: visible on cust flag, None first (recommended, optional
@@ -1144,6 +1220,7 @@ mod tests {
         let plan = PresetPlan {
             settings: PresetSettings::default(),
             feature_steps: idx,
+            mode_step_at: 0,
             presets: vec![PresetDef {
                 name: "Default".into(),
                 choices: vec![vec![GroupChoice::One(0)], vec![GroupChoice::Many(vec![0])]],
@@ -1172,8 +1249,10 @@ mod tests {
             "files, flags, patterns and None options undone"
         );
         assert_eq!(back.feature_steps, vec![0, 1]);
+        assert_eq!(back.mode_step_at, 0);
         assert_eq!(back.settings.mode_step_name, "Installation mode");
-        assert_eq!(back.settings.customise_label, "Customise {name}");
+        assert_eq!(back.settings.customise_label, "Customise");
+        assert_eq!(back.settings.use_preset_name, "Use the preset's choices");
         assert!(back.settings.add_none);
         assert_eq!(back.presets.len(), 2);
         assert_eq!(back.presets[0].name, "Full");
@@ -1219,51 +1298,386 @@ mod tests {
 
     /// The files follow the user's current choice on the first page, even
     /// when a feature page visited earlier keeps stale flags in the manager.
-    #[test]
-    fn files_follow_the_current_first_page_choice() {
+    /// A model of how mod managers run an installer, to check that what the
+    /// user sees selected is what gets installed, whatever the clicks.
+    ///
+    /// * `Events` is the NMM / Vortex way: a flag table updated at every
+    ///   click — selecting an option writes its flags (last writer wins),
+    ///   deselecting it removes the flags it wrote; a step that becomes
+    ///   hidden keeps its selections and flags.
+    /// * `Order` is the Mod Organizer 2 way: the flags are recomputed from
+    ///   the selected options of the visible steps, in document order.
+    ///
+    /// Defaults are applied the first time a step is shown: Required and
+    /// Recommended options (dynamic types evaluated then) are selected, and
+    /// an exclusive group with nothing selected takes its first option.
+    mod mm {
+        use super::*;
         use crate::models::simulate::group_satisfied;
-        use std::collections::{BTreeMap, HashMap};
+        use std::collections::{BTreeMap, BTreeSet, HashMap};
+
+        #[derive(Clone, Copy, PartialEq, Eq, Debug)]
+        pub enum Semantics {
+            Events,
+            Order,
+        }
+
+        pub struct Manager<'a> {
+            x: &'a Ximod,
+            sem: Semantics,
+            pub sel: Vec<Vec<BTreeSet<usize>>>,
+            visited: Vec<bool>,
+            flags: HashMap<String, String>,
+            owner: HashMap<String, (usize, usize, usize)>,
+            pub cur: usize,
+        }
+
+        impl<'a> Manager<'a> {
+            pub fn new(x: &'a Ximod, sem: Semantics) -> Self {
+                let mut m = Self {
+                    x,
+                    sem,
+                    sel: x
+                        .steps
+                        .iter()
+                        .map(|s| vec![BTreeSet::new(); s.plugin_groups.len()])
+                        .collect(),
+                    visited: vec![false; x.steps.len()],
+                    flags: HashMap::new(),
+                    owner: HashMap::new(),
+                    cur: 0,
+                };
+                m.enter(0);
+                m
+            }
+            fn no_files() -> BTreeMap<String, crate::models::FileState> {
+                BTreeMap::new()
+            }
+            pub fn visible(&self, si: usize) -> bool {
+                group_satisfied(&self.x.steps[si].visibility, &self.flags, &Self::no_files())
+            }
+            fn ptype(&self, si: usize, gi: usize, pi: usize) -> String {
+                let p = &self.x.steps[si].plugin_groups[gi].plugins[pi];
+                p.dependency_patterns
+                    .iter()
+                    .find(|pat| group_satisfied(&pat.condition, &self.flags, &Self::no_files()))
+                    .map(|pat| pat.pattern_type.clone())
+                    .unwrap_or_else(|| p.default_type.as_str().to_string())
+            }
+            fn write(&mut self, si: usize, gi: usize, pi: usize) {
+                for c in &self.x.steps[si].plugin_groups[gi].plugins[pi].condition_flags {
+                    self.flags.insert(c.name.clone(), c.value.clone());
+                    self.owner.insert(c.name.clone(), (si, gi, pi));
+                }
+            }
+            fn erase(&mut self, key: (usize, usize, usize)) {
+                let gone: Vec<String> = self
+                    .owner
+                    .iter()
+                    .filter(|(_, o)| **o == key)
+                    .map(|(k, _)| k.clone())
+                    .collect();
+                for k in gone {
+                    self.flags.remove(&k);
+                    self.owner.remove(&k);
+                }
+            }
+            fn recompute(&mut self) {
+                if self.sem != Semantics::Order {
+                    return;
+                }
+                self.flags.clear();
+                self.owner.clear();
+                for si in 0..self.x.steps.len() {
+                    if !self.visible(si) {
+                        continue;
+                    }
+                    for gi in 0..self.x.steps[si].plugin_groups.len() {
+                        for pi in self.sel[si][gi].clone() {
+                            self.write(si, gi, pi);
+                        }
+                    }
+                }
+            }
+            pub fn select(&mut self, si: usize, gi: usize, pi: usize) {
+                let exclusive = is_exclusive(self.x.steps[si].plugin_groups[gi].selection_type);
+                if exclusive {
+                    for old in self.sel[si][gi].clone() {
+                        if old != pi {
+                            self.sel[si][gi].remove(&old);
+                            self.erase((si, gi, old));
+                        }
+                    }
+                }
+                self.sel[si][gi].insert(pi);
+                self.write(si, gi, pi);
+                self.recompute();
+            }
+            pub fn deselect(&mut self, si: usize, gi: usize, pi: usize) {
+                let g = &self.x.steps[si].plugin_groups[gi];
+                let keeps_one = matches!(
+                    g.selection_type,
+                    SelectionType::SelectExactlyOne | SelectionType::SelectAtLeastOne
+                );
+                if keeps_one && self.sel[si][gi].len() <= 1 {
+                    return;
+                }
+                if self.sel[si][gi].remove(&pi) {
+                    self.erase((si, gi, pi));
+                    self.recompute();
+                }
+            }
+            /// Show a step: defaults on the first visit.
+            pub fn enter(&mut self, si: usize) {
+                self.cur = si;
+                if self.visited[si] {
+                    return;
+                }
+                self.visited[si] = true;
+                for gi in 0..self.x.steps[si].plugin_groups.len() {
+                    let n = self.x.steps[si].plugin_groups[gi].plugins.len();
+                    for pi in 0..n {
+                        if matches!(self.ptype(si, gi, pi).as_str(), "Required" | "Recommended") {
+                            self.select(si, gi, pi);
+                        }
+                    }
+                    let g = &self.x.steps[si].plugin_groups[gi];
+                    let needs_one = matches!(
+                        g.selection_type,
+                        SelectionType::SelectExactlyOne | SelectionType::SelectAtLeastOne
+                    );
+                    if needs_one && self.sel[si][gi].is_empty() && n > 0 {
+                        self.select(si, gi, 0);
+                    }
+                }
+            }
+            pub fn next(&mut self) -> bool {
+                match (self.cur + 1..self.x.steps.len()).find(|&s| self.visible(s)) {
+                    Some(s) => {
+                        self.enter(s);
+                        true
+                    }
+                    None => false,
+                }
+            }
+            pub fn back(&mut self) -> bool {
+                match (0..self.cur).rev().find(|&s| self.visible(s)) {
+                    Some(s) => {
+                        self.enter(s);
+                        true
+                    }
+                    None => false,
+                }
+            }
+            pub fn finish(&mut self) {
+                while self.next() {}
+            }
+            /// The files the installer would install: those of the selected
+            /// options of visible steps, plus the conditional sets that hold.
+            pub fn installed(&self) -> BTreeSet<String> {
+                let mut out = BTreeSet::new();
+                for si in 0..self.x.steps.len() {
+                    if !self.visible(si) {
+                        continue;
+                    }
+                    for (gi, g) in self.x.steps[si].plugin_groups.iter().enumerate() {
+                        for &pi in &self.sel[si][gi] {
+                            out.extend(g.plugins[pi].files.iter().map(|f| f.source.clone()));
+                        }
+                    }
+                }
+                for set in &self.x.conditional_files {
+                    if group_satisfied(&set.condition, &self.flags, &Self::no_files()) {
+                        out.extend(set.files.iter().map(|f| f.source.clone()));
+                    }
+                }
+                out
+            }
+            /// What the user sees selected on the visible steps.
+            pub fn shown(&self) -> Vec<(usize, usize, usize)> {
+                let mut out = Vec::new();
+                for si in 0..self.x.steps.len() {
+                    if !self.visible(si) {
+                        continue;
+                    }
+                    for gi in 0..self.x.steps[si].plugin_groups.len() {
+                        out.extend(self.sel[si][gi].iter().map(|&pi| (si, gi, pi)));
+                    }
+                }
+                out
+            }
+        }
+
+        /// A tiny deterministic generator (no external crate in tests).
+        pub struct Lcg(pub u64);
+        impl Lcg {
+            pub fn next(&mut self, n: usize) -> usize {
+                self.0 = self
+                    .0
+                    .wrapping_mul(6364136223846793005)
+                    .wrapping_add(1442695040888963407);
+                ((self.0 >> 33) as usize) % n.max(1)
+            }
+        }
+    }
+
+    /// What the user expects from what the screen shows, for a project built
+    /// by `apply` on `sample()`: the files of the options ticked on customised
+    /// pages, and the preset's choices (from `plan()`) for the other pages.
+    fn expected_from_screen(x: &Ximod, m: &mm::Manager<'_>) -> std::collections::BTreeSet<String> {
+        use std::collections::BTreeSet;
+        let shown = m.shown();
+        let name = |si: usize, gi: usize, pi: usize| x.steps[si].plugin_groups[gi].plugins[pi].name.as_str();
+        let preset = shown
+            .iter()
+            .find(|&&(si, gi, _)| si == 0 && gi == 0)
+            .map(|&(si, gi, pi)| name(si, gi, pi))
+            .unwrap();
+        // The second option of a page's mode group is "Customise".
+        let customised = |page: usize| shown.contains(&(0, page, 1));
+        let mut out = BTreeSet::new();
+        // Page 1 (Feature A, exclusive) and page 2 (Feature B, multi).
+        let preset_files: &[&str] = match preset {
+            "Full" => &["FeatureA/Version 2", "FeatureB/meshes"],
+            "Light" => &["FeatureA/Version 1"],
+            _ => &[],
+        };
+        for f in preset_files {
+            let page = if f.starts_with("FeatureA") { 1 } else { 2 };
+            if !customised(page) {
+                out.insert(f.to_string());
+            }
+        }
+        for &(si, gi, pi) in &shown {
+            if si >= 1 && customised(si) {
+                let p = &x.steps[si].plugin_groups[gi].plugins[pi];
+                match p.name.as_str() {
+                    "None" | "Extra sounds" => {}
+                    "Version 1" => drop(out.insert("FeatureA/Version 1".into())),
+                    "Version 2" => drop(out.insert("FeatureA/Version 2".into())),
+                    "Extra meshes" => drop(out.insert("FeatureB/meshes".into())),
+                    other => panic!("unexpected option {other}"),
+                }
+            }
+        }
+        out
+    }
+
+    #[test]
+    fn what_is_shown_is_what_is_installed() {
+        use mm::{Manager, Semantics};
         let mut x = sample();
         apply(&mut x, &plan()).unwrap();
-        let set_of = |flag: &str, value: &str| {
-            x.conditional_files
-                .iter()
-                .find(|s| wizard_key(&s.condition) == Some((flag, value)))
-                .unwrap()
-                .condition
-                .clone()
-        };
-        let v1 = set_of("feat_Feature_A", "Version_1");
-        let v2 = set_of("feat_Feature_A", "Version_2");
-        let meshes = set_of("opt_Feature_B_Extra_meshes", "on");
-        let files = BTreeMap::new();
-        let flags = |pairs: &[(&str, &str)]| -> HashMap<String, String> {
-            pairs.iter().map(|(k, v)| (k.to_string(), v.to_string())).collect()
-        };
-        // "Full" alone: its choices.
-        let f = flags(&[("preset", "Full"), ("cust_Feature_A", "off"), ("cust_Feature_B", "off")]);
-        assert!(group_satisfied(&v2, &f, &files) && !group_satisfied(&v1, &f, &files));
-        assert!(group_satisfied(&meshes, &f, &files));
-        // "Full" + Customise A, Version 1 ticked on the page: the page wins.
-        let f = flags(&[
-            ("preset", "Full"),
-            ("cust_Feature_A", "on"),
-            ("cust_Feature_B", "off"),
-            ("feat_Feature_A", "Version_1"),
-        ]);
-        assert!(group_satisfied(&v1, &f, &files) && !group_satisfied(&v2, &f, &files));
-        // Noel's case: Full + Customise A + B visited, then back to page 1,
-        // "No preset" and only Customise A. Page B's flags linger in the
-        // manager, but nothing of page B is installed any more.
-        let f = flags(&[
-            ("preset", "none"),
-            ("cust_Feature_A", "on"),
-            ("cust_Feature_B", "off"),
-            ("feat_Feature_A", "Version_1"),
-            ("opt_Feature_B_Extra_meshes", "on"),
-        ]);
-        assert!(!group_satisfied(&meshes, &f, &files));
-        assert!(group_satisfied(&v1, &f, &files));
+        // Page 0 = mode step: group 0 Preset (Full, Light, No preset), group 1
+        // Feature A (Use preset, Customise), group 2 Feature B (same).
+        for sem in [Semantics::Events, Semantics::Order] {
+            // Noel's first report: Full + Customise A + Customise B, through
+            // the pages, back to the first page, drop the preset and keep
+            // only Customise A: page B must install nothing.
+            let mut m = Manager::new(&x, sem);
+            m.select(0, 1, 1);
+            m.select(0, 2, 1);
+            m.finish();
+            while m.back() {}
+            m.select(0, 0, 2); // No preset
+            m.select(0, 2, 0); // page B back to the preset (none)
+            m.finish();
+            assert_eq!(
+                m.installed(),
+                expected_from_screen(&x, &m),
+                "{sem:?}: Noel's first case"
+            );
+            assert_eq!(
+                m.installed(),
+                ["FeatureA/Version 2".to_string()].into(),
+                "{sem:?}: A keeps Full's Version 2"
+            );
+
+            // Noel's second report: tick Customise, then click the preset
+            // again — the checkbox must still mean what it shows.
+            let mut m = Manager::new(&x, sem);
+            m.select(0, 2, 1); // Customise B
+            m.select(0, 0, 0); // Full (again)
+            m.select(0, 0, 1); // Light
+            m.finish();
+            assert_eq!(
+                m.installed(),
+                expected_from_screen(&x, &m),
+                "{sem:?}: Noel's second case"
+            );
+            // Light's Version 1, nothing from B (page B shows nothing ticked).
+            assert_eq!(m.installed(), ["FeatureA/Version 1".to_string()].into());
+
+            // Customise A, pick Version 1 there, go back and re-click
+            // Customise A (which used to reset the page's flag).
+            let mut m = Manager::new(&x, sem);
+            m.select(0, 1, 1);
+            m.next();
+            m.select(1, 0, 1); // Version 1 (index 0 is None)
+            m.back();
+            m.select(0, 1, 0);
+            m.select(0, 1, 1);
+            m.finish();
+            assert_eq!(
+                m.installed(),
+                expected_from_screen(&x, &m),
+                "{sem:?}: re-ticking Customise"
+            );
+            assert!(m.installed().contains("FeatureA/Version 1"));
+        }
+    }
+
+    #[test]
+    fn random_click_sequences_never_install_more_or_less_than_shown() {
+        use mm::{Lcg, Manager, Semantics};
+        let mut x = sample();
+        apply(&mut x, &plan()).unwrap();
+        for sem in [Semantics::Events, Semantics::Order] {
+            for seed in 0..400u64 {
+                let mut rng = Lcg(seed * 7919 + 1);
+                let mut m = Manager::new(&x, sem);
+                for _ in 0..14 {
+                    match rng.next(5) {
+                        0 => {
+                            m.next();
+                        }
+                        1 => {
+                            m.back();
+                        }
+                        _ => {
+                            let si = m.cur;
+                            let gi = rng.next(x.steps[si].plugin_groups.len());
+                            let pi = rng.next(x.steps[si].plugin_groups[gi].plugins.len());
+                            if m.sel[si][gi].contains(&pi) {
+                                m.deselect(si, gi, pi);
+                            } else {
+                                m.select(si, gi, pi);
+                            }
+                        }
+                    }
+                    if !m.visible(m.cur) {
+                        m.back();
+                    }
+                }
+                m.finish();
+                assert_eq!(m.installed(), expected_from_screen(&x, &m), "{sem:?}, seed {seed}");
+            }
+        }
+    }
+
+    #[test]
+    fn a_rebuild_keeps_the_mode_step_where_the_author_moved_it() {
+        let mut x = sample();
+        apply(&mut x, &plan()).unwrap();
+        // The author moves a welcome page in front of the mode step.
+        x.steps.insert(0, Step::new("Welcome"));
+        let again = unapply(&mut x).unwrap();
+        assert_eq!(again.mode_step_at, 1);
+        assert_eq!(again.feature_steps, vec![1, 2]);
+        apply(&mut x, &again).unwrap();
+        assert_eq!(x.steps[0].name, "Welcome");
+        assert_eq!(x.steps[1].name, "Installation mode");
+        assert_eq!(x.steps[2].name, "Feature A");
     }
 
     #[test]

@@ -888,8 +888,8 @@ preset-no-steps = Projektissa ei ole vielä yhtään vaihetta: luo ominaisuussiv
 preset-names = Luodut nimet
 preset-mode-step = Asennustapa-vaihe:
 preset-group = Esiasetusryhmä:
-preset-customise-group = Mukauta-ryhmä:
-preset-customise-label = Mukauta-vaihtoehto ({ "{name}" } = sivun nimi):
+preset-use-preset-name = ”Noudata esiasetusta” -vaihtoehto:
+preset-customise-label = Mukauta-vaihtoehto ({ "{name}" } = sivun nimi, valinnainen):
 preset-flag = Esiasetuksen lippu:
 preset-none-name = ”Ei mitään” -vaihtoehto:
 preset-no-preset-name = ”Ei esiasetusta” -vaihtoehto:
@@ -922,9 +922,9 @@ preset-skel-none = Syötä vähintään yksi ominaisuus, jolla on nimi ja varian
 preset-default-mode-step = Asennustapa
 preset-default-group = Esiasetus
 preset-default-customise = Mukauta
-preset-default-customise-label = Mukauta: { "{name}" }
 preset-default-none = Ei mitään
 preset-default-no-preset = Ei esiasetusta (kokoa itse)
+preset-default-use-preset = Noudata esiasetuksen valintoja
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Asettaa yhden asennuskohteen jokaiselle pakolliselle tiedostolle.

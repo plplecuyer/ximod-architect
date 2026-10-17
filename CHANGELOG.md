@@ -4,6 +4,43 @@ All notable changes to XIMOD Architect are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [2.2.2] — 2026-10-17
+
+One fix, found by TheRealDoctorNormal while testing 2.2.1 on a real mod: the
+installers built by the preset wizard could still install something other
+than what the user saw selected after going back and choosing again.
+
+### Fixed
+
+- Preset wizard — the generated structure let several options that can be
+  selected together write the same flag (the presets wrote the Customise and
+  feature flags, the Customise checkboxes wrote them too, and so did the page
+  options). Mod managers keep the flags in a last-click-wins table, so going
+  back and clicking a preset or a Customise box again silently overrode what
+  the next page showed as selected. The wizard now follows one rule — one
+  flag, one writer: the presets write only the preset flag; each feature
+  page gets a two-option group on the first page, "Use the preset's choices"
+  / "Customise", which alone writes that page's Customise flag (it replaces
+  the Customise checkboxes); the page options alone write the feature flags,
+  and the Customise option no longer resets them. The conditional installs
+  are unchanged. The flags are now a pure function of what is on screen,
+  whatever the clicks. A model of the mod managers' behaviour (the flag
+  table of Vortex, the page-by-page evaluation of Mod Organizer 2) is part
+  of the test suite and replays random click-and-go-back sessions.
+- Preset wizard — a structure made by 2.1.0, 2.2.1 or 2.2.2 is recognised
+  when the wizard runs again, and rebuilt the current way with the same flag
+  names; the installation-mode step goes back where the author had moved it
+  (after a welcome page, say) instead of first.
+
+### Changed
+
+- Preset wizard: the "Customise group" field becomes the "Use the preset"
+  option field (default "Use the preset's choices"); the Customise option
+  label is "Customise" by default and `{name}` is optional. 33 interface
+  languages (868 messages per locale). Test suite at 346 tests.
+- User manual (32 languages): § 7.5 rewritten around the one-writer rule,
+  with a new XML example; § 8.29 updated.
+
 ## [2.2.1] — 2026-10-16
 
 Bug fixes and three additions for the preset wizard and for installers built

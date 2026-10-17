@@ -888,8 +888,8 @@ preset-no-steps = Het project heeft nog geen stap: gebruik het tabblad “Nieuw 
 preset-names = Gegenereerde namen
 preset-mode-step = Stap “installatiemodus”:
 preset-group = Presetgroep:
-preset-customise-group = Groep “Aanpassen”:
-preset-customise-label = Optie “Aanpassen” ({ "{name}" } = paginanaam):
+preset-use-preset-name = Optie “Preset volgen”:
+preset-customise-label = Optie “Aanpassen” ({ "{name}" } = paginanaam, optioneel):
 preset-flag = Presetvlag:
 preset-none-name = Optie “Geen”:
 preset-no-preset-name = Optie “Geen preset”:
@@ -922,9 +922,9 @@ preset-skel-none = Voer ten minste één functie in met een naam en een variant.
 preset-default-mode-step = Installatiemodus
 preset-default-group = Preset
 preset-default-customise = Aanpassen
-preset-default-customise-label = { "{name}" } aanpassen
 preset-default-none = Geen
 preset-default-no-preset = Geen preset (zelf samenstellen)
+preset-default-use-preset = De keuzes van de preset volgen
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Stelt één installatiebestemming in voor elk vereist bestand.

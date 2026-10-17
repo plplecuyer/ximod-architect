@@ -888,8 +888,8 @@ preset-no-steps = Το έργο δεν έχει ακόμη κανένα βήμα
 preset-names = Παραγόμενα ονόματα
 preset-mode-step = Βήμα τρόπου εγκατάστασης:
 preset-group = Ομάδα προεπιλογών:
-preset-customise-group = Ομάδα «Προσαρμογή»:
-preset-customise-label = Επιλογή «Προσαρμογή» ({ "{name}" } = όνομα σελίδας):
+preset-use-preset-name = Επιλογή «Χρήση της προεπιλογής»:
+preset-customise-label = Επιλογή «Προσαρμογή» ({ "{name}" } = όνομα σελίδας, προαιρετικό):
 preset-flag = Σημαία προεπιλογής:
 preset-none-name = Επιλογή «Καμία»:
 preset-no-preset-name = Επιλογή «Καμία προεπιλογή»:
@@ -922,9 +922,9 @@ preset-skel-none = Εισαγάγετε τουλάχιστον μία λειτο
 preset-default-mode-step = Τρόπος εγκατάστασης
 preset-default-group = Προεπιλογή
 preset-default-customise = Προσαρμογή
-preset-default-customise-label = Προσαρμογή { "{name}" }
 preset-default-none = Καμία
 preset-default-no-preset = Καμία προεπιλογή (δική μου σύνθεση)
+preset-default-use-preset = Χρήση των επιλογών της προεπιλογής
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Ορίζει έναν προορισμό εγκατάστασης για κάθε απαιτούμενο αρχείο.

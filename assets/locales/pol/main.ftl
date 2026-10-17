@@ -888,8 +888,8 @@ preset-no-steps = Projekt nie ma jeszcze żadnego kroku: użyj karty „Nowy szk
 preset-names = Generowane nazwy
 preset-mode-step = Krok trybu instalacji:
 preset-group = Grupa presetów:
-preset-customise-group = Grupa Dostosuj:
-preset-customise-label = Opcja Dostosuj ({ "{name}" } = nazwa strony):
+preset-use-preset-name = Opcja „Użyj presetu”:
+preset-customise-label = Opcja Dostosuj ({ "{name}" } = nazwa strony, opcjonalnie):
 preset-flag = Flaga presetu:
 preset-none-name = Opcja „Brak”:
 preset-no-preset-name = Opcja „Bez presetu”:
@@ -922,9 +922,9 @@ preset-skel-none = Wprowadź co najmniej jedną funkcję z nazwą i wariantem.
 preset-default-mode-step = Tryb instalacji
 preset-default-group = Preset
 preset-default-customise = Dostosuj
-preset-default-customise-label = Dostosuj { "{name}" }
 preset-default-none = Brak
 preset-default-no-preset = Bez presetu (własna konfiguracja)
+preset-default-use-preset = Użyj wyborów presetu
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Ustawia jedno miejsce docelowe instalacji dla każdego pliku wymaganego.

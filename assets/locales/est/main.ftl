@@ -888,8 +888,8 @@ preset-no-steps = Projektil pole veel ühtegi sammu: funktsioonilehtede loomisek
 preset-names = Genereeritud nimed
 preset-mode-step = Paigaldusrežiimi samm:
 preset-group = Eelseadistuste rühm:
-preset-customise-group = Rühm „Kohanda“:
-preset-customise-label = Valik „Kohanda“ ({ "{name}" } = lehe nimi):
+preset-use-preset-name = Valik „Järgi eelseadistust“:
+preset-customise-label = Valik „Kohanda“ ({ "{name}" } = lehe nimi, valikuline):
 preset-flag = Eelseadistuse lipp:
 preset-none-name = Valik „Mitte ükski“:
 preset-no-preset-name = Valik „Eelseadistuseta“:
@@ -922,9 +922,9 @@ preset-skel-none = Sisestage vähemalt üks funktsioon koos nime ja variandiga.
 preset-default-mode-step = Paigaldusrežiim
 preset-default-group = Eelseadistus
 preset-default-customise = Kohanda
-preset-default-customise-label = Kohanda: { "{name}" }
 preset-default-none = Mitte ükski
 preset-default-no-preset = Eelseadistuseta (koosta ise)
+preset-default-use-preset = Järgi eelseadistuse valikuid
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Määrab ühe paigalduse sihtkoha igale nõutavale failile.

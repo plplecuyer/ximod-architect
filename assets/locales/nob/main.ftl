@@ -888,8 +888,8 @@ preset-no-steps = Prosjektet har ingen trinn ennå: bruk fanen «Nytt skjelett»
 preset-names = Genererte navn
 preset-mode-step = Trinnet «Installasjonsmodus»:
 preset-group = Forhåndsinnstillingsgruppe:
-preset-customise-group = Gruppen «Tilpass»:
-preset-customise-label = Alternativet «Tilpass» ({ "{name}" } = sidenavn):
+preset-use-preset-name = Alternativet «Følg forhåndsinnstillingen»:
+preset-customise-label = Alternativet «Tilpass» ({ "{name}" } = sidenavn, valgfritt):
 preset-flag = Forhåndsinnstillingsflagg:
 preset-none-name = Alternativet «Ingen»:
 preset-no-preset-name = Alternativet «Ingen forhåndsinnstilling»:
@@ -922,9 +922,9 @@ preset-skel-none = Angi minst én funksjon med et navn og en variant.
 preset-default-mode-step = Installasjonsmodus
 preset-default-group = Forhåndsinnstilling
 preset-default-customise = Tilpass
-preset-default-customise-label = Tilpass { "{name}" }
 preset-default-none = Ingen
 preset-default-no-preset = Ingen forhåndsinnstilling (sett sammen selv)
+preset-default-use-preset = Følg forhåndsinnstillingens valg
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Angir ett installasjonsmål for hver påkrevde fil.

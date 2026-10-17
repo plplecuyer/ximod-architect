@@ -888,8 +888,8 @@ preset-no-steps = Projekt še nima nobenega koraka: z zavihkom „Novo ogrodje�
 preset-names = Ustvarjena imena
 preset-mode-step = Korak načina namestitve:
 preset-group = Skupina prednastavitev:
-preset-customise-group = Skupina Prilagodi:
-preset-customise-label = Možnost Prilagodi ({ "{name}" } = ime strani):
+preset-use-preset-name = Možnost „Uporabi prednastavitev“:
+preset-customise-label = Možnost Prilagodi ({ "{name}" } = ime strani, neobvezno):
 preset-flag = Zastavica prednastavitve:
 preset-none-name = Možnost „Brez“:
 preset-no-preset-name = Možnost „Brez prednastavitve“:
@@ -922,9 +922,9 @@ preset-skel-none = Vnesite vsaj eno funkcijo z imenom in različico.
 preset-default-mode-step = Način namestitve
 preset-default-group = Prednastavitev
 preset-default-customise = Prilagodi
-preset-default-customise-label = Prilagodi { "{name}" }
 preset-default-none = Brez
 preset-default-no-preset = Brez prednastavitve (lastna izbira)
+preset-default-use-preset = Uporabi izbire prednastavitve
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Nastavi en cilj namestitve za vsako obvezno datoteko.

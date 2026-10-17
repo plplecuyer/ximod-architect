@@ -888,8 +888,8 @@ preset-no-steps = لا يحتوي المشروع على أي خطوة بعد: ا
 preset-names = الأسماء المولَّدة
 preset-mode-step = خطوة «وضع التثبيت»:
 preset-group = مجموعة الإعدادات المسبقة:
-preset-customise-group = مجموعة «تخصيص»:
-preset-customise-label = خيار «تخصيص» (اسم الصفحة = { "{name}" }):
+preset-use-preset-name = خيار «اتّباع الإعداد المسبق»:
+preset-customise-label = خيار «تخصيص» (اسم الصفحة = { "{name}" }، اختياري):
 preset-flag = علامة الإعداد المسبق:
 preset-none-name = خيار «بلا»:
 preset-no-preset-name = خيار «بلا إعداد مسبق»:
@@ -922,9 +922,9 @@ preset-skel-none = أدخل ميزة واحدة على الأقل باسم وم�
 preset-default-mode-step = وضع التثبيت
 preset-default-group = إعداد مسبق
 preset-default-customise = تخصيص
-preset-default-customise-label = تخصيص { "{name}" }
 preset-default-none = بلا
 preset-default-no-preset = بلا إعداد مسبق (بناء يدوي)
+preset-default-use-preset = اتّباع اختيارات الإعداد المسبق
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = يحدد وجهة تثبيت واحدة لكل ملف مطلوب.

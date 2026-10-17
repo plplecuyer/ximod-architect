@@ -888,8 +888,8 @@ preset-no-steps = Проектът все още няма стъпки: изпо
 preset-names = Генерирани имена
 preset-mode-step = Стъпка «Режим на инсталиране»:
 preset-group = Група на пресетите:
-preset-customise-group = Група «Персонализиране»:
-preset-customise-label = Опция «Персонализиране» ({ "{name}" } = име на страницата):
+preset-use-preset-name = Опция «По пресета»:
+preset-customise-label = Опция «Персонализиране» ({ "{name}" } = име на страницата, незадължително):
 preset-flag = Флаг на пресета:
 preset-none-name = Опция «Няма»:
 preset-no-preset-name = Опция «Без пресет»:
@@ -922,9 +922,9 @@ preset-skel-none = Въведете поне една функция с име �
 preset-default-mode-step = Режим на инсталиране
 preset-default-group = Пресет
 preset-default-customise = Персонализиране
-preset-default-customise-label = Персонализиране на { "{name}" }
 preset-default-none = Няма
 preset-default-no-preset = Без пресет (ръчен избор)
+preset-default-use-preset = Следване на избора на пресета
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Задава едно местоназначение за инсталиране за всеки задължителен файл.

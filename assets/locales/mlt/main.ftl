@@ -888,8 +888,8 @@ preset-no-steps = Il-proġett għad m'għandu l-ebda pass: uża t-tab "Skeletru 
 preset-names = Ismijiet iġġenerati
 preset-mode-step = Pass tal-modalità ta' installazzjoni:
 preset-group = Grupp tal-presets:
-preset-customise-group = Grupp Ippersonalizza:
-preset-customise-label = Għażla Ippersonalizza ({ "{name}" } = isem il-paġna):
+preset-use-preset-name = Għażla "Segwi l-preset":
+preset-customise-label = Għażla Ippersonalizza ({ "{name}" } = isem il-paġna, fakultattiv):
 preset-flag = Flag tal-preset:
 preset-none-name = Għażla "Xejn":
 preset-no-preset-name = Għażla "L-ebda preset":
@@ -922,9 +922,9 @@ preset-skel-none = Daħħal mill-inqas funzjonalità waħda b'isem u varjant.
 preset-default-mode-step = Modalità ta' installazzjoni
 preset-default-group = Preset
 preset-default-customise = Ippersonalizza
-preset-default-customise-label = Ippersonalizza { "{name}" }
 preset-default-none = Xejn
 preset-default-no-preset = L-ebda preset (nagħżel kollox jien)
+preset-default-use-preset = Segwi l-għażliet tal-preset
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Jissettja destinazzjoni waħda tal-installazzjoni għal kull fajl meħtieġ.

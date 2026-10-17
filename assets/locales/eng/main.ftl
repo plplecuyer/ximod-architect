@@ -888,8 +888,8 @@ preset-no-steps = The project has no step yet: use the "New skeleton" tab to cre
 preset-names = Generated names
 preset-mode-step = Installation-mode step:
 preset-group = Preset group:
-preset-customise-group = Customise group:
-preset-customise-label = Customise option ({ "{name}" } = page name):
+preset-use-preset-name = "Use the preset" option:
+preset-customise-label = Customise option ({ "{name}" } = page name, optional):
 preset-flag = Preset flag:
 preset-none-name = "None" option:
 preset-no-preset-name = "No preset" option:
@@ -922,9 +922,9 @@ preset-skel-none = Enter at least one feature with a name and a variant.
 preset-default-mode-step = Installation mode
 preset-default-group = Preset
 preset-default-customise = Customise
-preset-default-customise-label = Customise { "{name}" }
 preset-default-none = None
 preset-default-no-preset = No preset (build my own)
+preset-default-use-preset = Use the preset's choices
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Set one install destination for every required file.

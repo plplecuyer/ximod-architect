@@ -888,8 +888,8 @@ preset-no-steps = Projekte dar nėra nė vieno žingsnio: naudokite kortelę „
 preset-names = Sugeneruoti pavadinimai
 preset-mode-step = Diegimo režimo žingsnis:
 preset-group = Išankstinių nustatymų grupė:
-preset-customise-group = Grupė „Tinkinti“:
-preset-customise-label = Parinktis „Tinkinti“ ({ "{name}" } = puslapio pavadinimas):
+preset-use-preset-name = Parinktis „Naudoti išankstinį nustatymą“:
+preset-customise-label = Parinktis „Tinkinti“ ({ "{name}" } = puslapio pavadinimas, neprivaloma):
 preset-flag = Išankstinio nustatymo vėliavėlė:
 preset-none-name = Parinktis „Nieko“:
 preset-no-preset-name = Parinktis „Be išankstinio nustatymo“:
@@ -922,9 +922,9 @@ preset-skel-none = Įveskite bent vieną funkciją su pavadinimu ir variantu.
 preset-default-mode-step = Diegimo režimas
 preset-default-group = Išankstinis nustatymas
 preset-default-customise = Tinkinti
-preset-default-customise-label = Tinkinti { "{name}" }
 preset-default-none = Nieko
 preset-default-no-preset = Be išankstinio nustatymo (savo pasirinkimas)
+preset-default-use-preset = Naudoti išankstinio nustatymo pasirinkimus
 
 # --- Bulk destination on the Required / Conditional Installs tabs
 req-dest-hint = Nustato vieną diegimo paskirties vietą kiekvienam privalomam failui.

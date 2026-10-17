@@ -1433,6 +1433,7 @@ mod tests {
         let plan = PresetPlan {
             settings: PresetSettings::default(),
             feature_steps: vec![0],
+            mode_step_at: 0,
             presets: vec![PresetDef {
                 name: "High".into(),
                 choices: vec![vec![GroupChoice::One(1)]],
