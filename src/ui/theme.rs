@@ -188,6 +188,26 @@ pub mod icon {
         STACK as STEP, TRANSLATE, TRASH as DELETE, TREE_STRUCTURE as CONDITIONAL, WARNING, X as CLOSE,
         X_CIRCLE as ERROR,
     };
+    // Symbols used inside texts (arrows, marks, status glyphs): the Phosphor
+    // icon font is part of every font set, whatever the interface language,
+    // while the text fonts (egui's Ubuntu-Light, Noto Sans) lack most of them.
+    pub use egui_phosphor::regular::{
+        ARROW_ELBOW_DOWN_LEFT as CARRIAGE_RETURN, ARROW_LINE_RIGHT as TAB, ARROW_UP_RIGHT as EXTERNAL,
+        ARROWS_LEFT_RIGHT as COMPARE, CARET_LEFT as BACK, CARET_RIGHT as FORWARD, CHECK, CIRCLE, CIRCLE_HALF,
+        DOT as MODIFIED, LOCK,
+    };
+}
+
+/// Replace the arrows that translators type in interface texts (→ ← ↗) by
+/// the matching Phosphor icons, which every font set contains. Only for text
+/// drawn by egui: not for strings written to files or shown by the system.
+pub fn ui_symbols(text: &str) -> String {
+    if !text.contains(['→', '←', '↗']) {
+        return text.to_string();
+    }
+    text.replace('→', icon::RIGHT)
+        .replace('←', icon::LEFT)
+        .replace('↗', icon::EXTERNAL)
 }
 
 /// `"<icon> <text>"`, the usual button/label composition.
@@ -198,6 +218,25 @@ pub fn with_icon(icon: &str, text: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn translated_arrows_become_phosphor_icons() {
+        assert_eq!(ui_symbols("Edit → Undo"), format!("Edit {} Undo", icon::RIGHT));
+        assert_eq!(ui_symbols("تحرير ← تراجع"), format!("تحرير {} تراجع", icon::LEFT));
+        assert_eq!(ui_symbols("Nexus ↗"), format!("Nexus {}", icon::EXTERNAL));
+        assert_eq!(ui_symbols("no arrow"), "no arrow");
+        for g in [
+            icon::RIGHT,
+            icon::LEFT,
+            icon::EXTERNAL,
+            icon::CHECK,
+            icon::CIRCLE,
+            icon::MODIFIED,
+        ] {
+            let c = g.chars().next().unwrap();
+            assert!(('\u{E000}'..='\u{F8FF}').contains(&c), "{c:?} is a Phosphor glyph");
+        }
+    }
 
     #[test]
     fn palettes_follow_visuals() {

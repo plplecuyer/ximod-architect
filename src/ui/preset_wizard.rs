@@ -526,7 +526,10 @@ impl XimodApp {
                                         ui.horizontal(|ui| {
                                             ui.add(egui::TextEdit::singleline(&mut p.name).desired_width(120.0));
                                             if ui
-                                                .add_enabled(n_presets > 1, egui::Button::new("✕").small())
+                                                .add_enabled(
+                                                    n_presets > 1,
+                                                    egui::Button::new(crate::ui::theme::icon::CLOSE).small(),
+                                                )
                                                 .on_hover_text(&t.remove)
                                                 .clicked()
                                             {

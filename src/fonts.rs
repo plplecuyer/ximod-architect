@@ -173,7 +173,6 @@ fn build_defs(rel_paths: &[String]) -> egui::FontDefinitions {
             fonts.families.entry(family).or_default().push(key.clone());
         }
     }
-
     fonts
 }
 

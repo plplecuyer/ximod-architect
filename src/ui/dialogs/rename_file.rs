@@ -53,7 +53,7 @@ impl XimodApp {
             RenameError::EmptyName => self.i18n.t("rename-err-empty"),
             RenameError::InvalidName => self.i18n.t("rename-err-invalid"),
             RenameError::OutsideRoot => self.i18n.t("rename-err-outside"),
-            RenameError::Missing => self.i18n.t("rename-err-missing"),
+            RenameError::Missing => crate::ui::theme::ui_symbols(&self.i18n.t("rename-err-missing")),
             RenameError::AlreadyExists => self.i18n.t("rename-err-exists"),
             RenameError::Io(msg) => self.i18n.t_arg("rename-err-io", "error", msg),
         }
@@ -105,7 +105,7 @@ impl XimodApp {
         let uses = self
             .i18n
             .t_num("rename-uses", self.rename_dialog.as_ref().map_or(0, |d| d.uses) as i64);
-        let warning = self.i18n.t("rename-warning");
+        let warning = crate::ui::theme::ui_symbols(&self.i18n.t("rename-warning"));
         let btn_rename = self.i18n.t("btn-rename");
         let btn_cancel = self.i18n.t("btn-cancel");
         let vb = self.free_viewport_builder(ctx, WINDOW_ID, title, WINDOW_SIZE, true);

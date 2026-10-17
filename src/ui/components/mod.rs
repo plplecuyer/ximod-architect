@@ -17,7 +17,8 @@ pub fn section_header(ui: &mut Ui, text: &str) {
 pub fn section_header_hint(ui: &mut Ui, text: &str, hint: &str) {
     ui.horizontal(|ui| {
         ui.label(RichText::new(text).strong().text_style(egui::TextStyle::Heading));
-        ui.label(RichText::new("ⓘ").weak()).on_hover_text(hint);
+        ui.label(RichText::new(crate::ui::theme::icon::INFO).weak())
+            .on_hover_text(hint);
     });
     ui.add_space(4.0);
 }
@@ -368,7 +369,7 @@ pub fn status_bar(ui: &mut Ui, status: &str, modified: bool, modified_text: &str
                 // Warning colour from the current visuals: readable on both
                 // the dark and the light theme (a hard-coded yellow was not).
                 let c = ui.visuals().warn_fg_color;
-                ui.label(RichText::new("●").color(c));
+                ui.label(RichText::new(crate::ui::theme::icon::MODIFIED).color(c));
                 ui.label(modified_text);
                 ui.separator();
             }

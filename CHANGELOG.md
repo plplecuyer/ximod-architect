@@ -31,15 +31,25 @@ than what the user saw selected after going back and choosing again.
   when the wizard runs again, and rebuilt the current way with the same flag
   names; the installation-mode step goes back where the author had moved it
   (after a welcome page, say) instead of first.
+- Empty squares instead of symbols: the "(i)" help marker next to section
+  titles (Condition flags, Option dependencies…), the close buttons, the
+  arrows of the installer preview, of the FOMOD translator and of some
+  messages, and the status marks of the translator used characters that
+  none of the text fonts has. They are now drawn with the Phosphor icon
+  font, which every font set contains whatever the interface language; the
+  arrows translators type in the texts (→ ← ↗) are turned into the matching
+  icons when they are displayed.
 
 ### Changed
 
 - Preset wizard: the "Customise group" field becomes the "Use the preset"
   option field (default "Use the preset's choices"); the Customise option
   label is "Customise" by default and `{name}` is optional. 33 interface
-  languages (868 messages per locale). Test suite at 346 tests.
+  languages (868 messages per locale). Test suite at 348 tests.
 - User manual (32 languages): § 7.5 rewritten around the one-writer rule,
   with a new XML example; § 8.29 updated.
+- Dependencies refreshed: libc 0.2.191, zbus_names 4.3.5, zvariant and
+  zvariant_derive 5.15.1.
 
 ## [2.2.1] — 2026-10-16
 

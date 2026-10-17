@@ -1050,7 +1050,7 @@ impl Labels {
     fn new(i18n: &I18n) -> Self {
         Self {
             setter: i18n.t("condeditor-setter-loc"),
-            pattern_of: i18n.t("condeditor-pattern-of"),
+            pattern_of: crate::ui::theme::ui_symbols(&i18n.t("condeditor-pattern-of")),
             visibility: i18n.t("condeditor-visibility-of"),
             cond_set: i18n.t("condeditor-cond-set"),
             needs: i18n.t("condeditor-needs"),

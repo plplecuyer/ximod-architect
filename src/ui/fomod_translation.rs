@@ -19,6 +19,7 @@ use crate::models::translate::{
     ExportMode, Glossary, GlossaryTerm, TField, TIssue, TStatus, TUnit, TranslationDoc, TranslationMemory,
     UpdateReport, glossary_issues, validate_doc,
 };
+use crate::ui::theme::icon;
 use crate::ui::toasts::ToastLevel;
 use eframe::egui::{self, RichText};
 use egui_extras::{Column, TableBuilder};
@@ -600,18 +601,18 @@ impl FomodTranslationState {
 /// Glyph and tooltip key for a unit's status column.
 fn status_glyph(u: &TUnit) -> (&'static str, &'static str) {
     if u.locked {
-        return ("🔒", "ftr-status-locked");
+        return (icon::LOCK, "ftr-status-locked");
     }
     match u.status {
-        TStatus::Translated => ("✔", "ftr-status-translated"),
-        TStatus::Auto => ("◐", "ftr-status-auto"),
+        TStatus::Translated => (icon::CHECK, "ftr-status-translated"),
+        TStatus::Auto => (icon::CIRCLE_HALF, "ftr-status-auto"),
         TStatus::Fuzzy => ("~", "ftr-status-fuzzy"),
-        TStatus::Obsolete => ("✖", "ftr-status-obsolete"),
+        TStatus::Obsolete => (icon::CLOSE, "ftr-status-obsolete"),
         TStatus::Untranslated => {
             if u.target.trim().is_empty() {
-                ("○", "ftr-status-untranslated")
+                (icon::CIRCLE, "ftr-status-untranslated")
             } else {
-                ("✔", "ftr-status-translated")
+                (icon::CHECK, "ftr-status-translated")
             }
         }
     }
@@ -653,17 +654,21 @@ fn issue_text(i18n: &crate::i18n::I18n, issue: &TIssue) -> String {
 }
 
 /// Make tabs and line breaks visible in the read-only source pane.
-/// Make every blank visible, the way editors do: `·` for a space, `⍽` for a
-/// non-breaking space, `→` for a tab, `␍` for a carriage return and `¶` at
-/// each line end (the line break itself is kept so the layout is unchanged).
+/// Make every blank visible, the way editors do: `·` for a space, `°` for a
+/// non-breaking space, a Phosphor arrow for a tab and for a carriage return,
+/// and `¶` at each line end (the line break itself is kept so the layout is
+/// unchanged).
 fn mark_whitespace(s: &str) -> String {
     let mut out = String::with_capacity(s.len() + s.len() / 4);
     for c in s.chars() {
         match c {
             ' ' => out.push('·'),
-            '\u{a0}' => out.push('⍽'),
-            '\t' => out.push_str("→   "),
-            '\r' => out.push('␍'),
+            '\u{a0}' => out.push('°'),
+            '\t' => {
+                out.push_str(icon::TAB);
+                out.push_str("   ");
+            }
+            '\r' => out.push_str(icon::CARRIAGE_RETURN),
             '\n' => out.push_str("¶\n"),
             other => out.push(other),
         }
@@ -928,7 +933,7 @@ fn render_header(
             ui.label(i18n.t("ftr-source-lang"));
             let loaded = st.doc.is_some();
             lang_combo(ui, "ftr_src", &mut st.source_lang, locales, i18n, !loaded);
-            ui.label("→");
+            ui.label(icon::RIGHT);
             ui.label(i18n.t("ftr-target-lang"));
             lang_combo(ui, "ftr_tgt", &mut st.target_lang, locales, i18n, !loaded);
             if loaded {
@@ -1026,7 +1031,7 @@ fn render_header(
                     args.set("total", s.total as i64);
                     let text = i18n.t_with_args("ftr-progress", Some(&args));
                     if st.dirty {
-                        ui.label(RichText::new("●").color(ui.visuals().warn_fg_color))
+                        ui.label(RichText::new(icon::MODIFIED).color(ui.visuals().warn_fg_color))
                             .on_hover_text(i18n.t("status-modified"));
                     }
                     // The bar only takes the room left by the buttons on its
@@ -1077,7 +1082,7 @@ fn render_header(
                     .hint_text(i18n.t("ftr-search-hint"))
                     .desired_width(220.0),
             );
-            if !st.search.is_empty() && ui.small_button("✕").clicked() {
+            if !st.search.is_empty() && ui.small_button(icon::CLOSE).clicked() {
                 st.search.clear();
             }
             ui.separator();
@@ -1391,7 +1396,7 @@ fn render_detail(ctx: &egui::Context, st: &mut FomodTranslationState, i18n: &cra
                         ui.visuals().warn_fg_color
                     };
                     ui.label(
-                        RichText::new(format!("⚠ {}", issue_text(i18n, issue)))
+                        RichText::new(format!("{} {}", icon::WARNING, issue_text(i18n, issue)))
                             .small()
                             .color(color),
                     );
@@ -1589,7 +1594,8 @@ fn render_table(ctx: &egui::Context, st: &mut FomodTranslationState, i18n: &crat
                                 ui.visuals().warn_fg_color
                             };
                             let tip: Vec<String> = list.iter().map(|i| issue_text(i18n, i)).collect();
-                            ui.label(RichText::new("⚠").color(color)).on_hover_text(tip.join("\n"));
+                            ui.label(RichText::new(icon::WARNING).color(color))
+                                .on_hover_text(tip.join("\n"));
                         }
                     });
                     if row.response().clicked() {
@@ -1745,10 +1751,16 @@ mod tests {
             context: String::new(),
             note: String::new(),
         };
-        assert_eq!(status_glyph(&u).0, "○");
+        assert_eq!(status_glyph(&u).0, icon::CIRCLE);
         u.target = "b".into();
-        assert_eq!(status_glyph(&u).0, "✔");
+        assert_eq!(status_glyph(&u).0, icon::CHECK);
         u.locked = true;
-        assert_eq!(status_glyph(&u).0, "🔒");
+        assert_eq!(status_glyph(&u).0, icon::LOCK);
+    }
+
+    #[test]
+    fn whitespace_marks_use_drawable_glyphs() {
+        let m = mark_whitespace("a b\u{a0}c\td\r\n");
+        assert_eq!(m, format!("a·b°c{}   d{}¶\n", icon::TAB, icon::CARRIAGE_RETURN));
     }
 }

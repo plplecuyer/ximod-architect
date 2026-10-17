@@ -821,7 +821,7 @@ impl XimodApp {
                 ui.horizontal(|ui| {
                     for (i, (label, tooltip, modified)) in entries.iter().enumerate() {
                         let text = if *modified {
-                            format!("● {label}")
+                            format!("{} {label}", crate::ui::theme::icon::MODIFIED)
                         } else {
                             label.clone()
                         };

@@ -46,8 +46,8 @@ impl XimodApp {
             .default_size([600.0, 460.0])
             .show(ctx, |ui| {
                 match &diff {
-                    Some(d) => ui.small(format!("↔ {other} · Δ {}", d.total())),
-                    None => ui.small(format!("↔ {other}")),
+                    Some(d) => ui.small(format!("{} {other} · Δ {}", crate::ui::theme::icon::COMPARE, d.total())),
+                    None => ui.small(format!("{} {other}", crate::ui::theme::icon::COMPARE)),
                 };
                 ui.separator();
                 match &diff {

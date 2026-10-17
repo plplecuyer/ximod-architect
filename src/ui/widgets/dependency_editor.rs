@@ -261,7 +261,7 @@ fn render_nested_group_inner(
                 group.operator = op;
                 out.modified = true;
             }
-            ui.label(egui::RichText::new("ⓘ").weak())
+            ui.label(egui::RichText::new(crate::ui::theme::icon::INFO).weak())
                 .on_hover_text(&labels.hint_group);
             if ui.small_button(&labels.btn_add_condition).clicked() {
                 group.push_leaf(Dependency::new_flag("", ""));

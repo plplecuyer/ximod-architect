@@ -555,8 +555,8 @@ impl XimodApp {
                         preview.history.last().copied()
                     };
                     let back_label = match back_target {
-                        Some(INFO_PAGE) => format!("◀  {}", l_info_title),
-                        Some(s) => format!("◀  {}", name_of(s)),
+                        Some(INFO_PAGE) => format!("{}  {}", crate::ui::theme::icon::BACK, l_info_title),
+                        Some(s) => format!("{}  {}", crate::ui::theme::icon::BACK, name_of(s)),
                         None => l_back.clone(),
                     };
                     if ui
@@ -588,7 +588,7 @@ impl XimodApp {
                                 visible.iter().copied().find(|&s| s > preview.cursor)
                             };
                             let next_label = match next_target {
-                                Some(s) => format!("{}  ▶", name_of(s)),
+                                Some(s) => format!("{}  {}", name_of(s), crate::ui::theme::icon::FORWARD),
                                 None => l_install.clone(),
                             };
                             if ui.add_enabled(step_ok, egui::Button::new(next_label)).clicked() {
@@ -812,7 +812,8 @@ impl XimodApp {
                             }
                         });
                         if root.is_none() {
-                            ui.label(RichText::new("ⓘ").weak()).on_hover_text(&l_no_root);
+                            ui.label(RichText::new(crate::ui::theme::icon::INFO).weak())
+                                .on_hover_text(&l_no_root);
                         }
                     });
                     ui.add_space(4.0);

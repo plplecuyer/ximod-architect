@@ -67,7 +67,7 @@ impl XimodApp {
         let game_categories: Vec<String> = self.games.categories_for(&selected_game_id).to_vec();
         // Nexus Mods slug of the selected game (empty when unknown) → direct link.
         let nexus_slug = self.games.nexus_slug_for(&selected_game_id).unwrap_or("").to_string();
-        let btn_nexus = self.i18n.t("btn-nexus");
+        let btn_nexus = crate::ui::theme::ui_symbols(&self.i18n.t("btn-nexus"));
         let nexus_hint = self.i18n.t("nexus-open-hint");
 
         egui::ScrollArea::vertical().show(ui, |ui| {

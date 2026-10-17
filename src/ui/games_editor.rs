@@ -343,7 +343,8 @@ impl XimodApp {
                                 }
                             };
                             let text = if bad.contains(&i) {
-                                RichText::new(format!("⚠ {label}")).color(ui.visuals().warn_fg_color)
+                                RichText::new(format!("{} {label}", crate::ui::theme::icon::WARNING))
+                                    .color(ui.visuals().warn_fg_color)
                             } else {
                                 RichText::new(label)
                             };

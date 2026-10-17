@@ -81,7 +81,7 @@ impl XimodApp {
             }
         }
         self.mark_modified();
-        let msg = self.i18n.t_arg("msg-node-cut", "name", item.name());
+        let msg = crate::ui::theme::ui_symbols(&self.i18n.t_arg("msg-node-cut", "name", item.name()));
         self.node_clipboard = Some(item);
         self.notify_info(msg);
     }
